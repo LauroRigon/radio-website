@@ -22,13 +22,24 @@ Auth::routes();
  * */
 Route::group(['prefix' => 'admin'], function () {
     //Rotas para gerenciamento de usuário
-    Route::get('/users', 'UserController@index');  //criar usuário
-    Route::post('/users', 'UserController@store');  //criar usuário
-    Route::put('/users/{id}', 'UserController@update'); //atualiza usuário
-    Route::delete('/users/{id}', 'UserController@destroy'); //deleta usuário
+    Route::group(['prefix' => 'users'], function() {
+        Route::get('/', 'UserController@index');  //pagina de usuários
+        Route::post('/', 'UserController@store');  //criar usuário
+        Route::put('/{id}', 'UserController@update'); //atualiza usuário
+        Route::delete('/{id}', 'UserController@destroy'); //deleta usuário
 
-    Route::put('/users/changePassword/{id}', 'UserController@changePassword'); //troca senha
-    Route::post('/users/uploadAvatar/{id}', 'UserController@uploadAvatar'); //upload do avatar
+        Route::put('/changePassword/{id}', 'UserController@changePassword'); //troca senha
+        Route::post('/uploadAvatar/{id}', 'UserController@uploadAvatar'); //upload do avatar
+    });
+
+    //Rotas para gerenciamento de categoritas
+    Route::group(['prefix' => 'categories'], function() {
+        Route::get('/', 'UserController@index');  //pagina de categorias
+        Route::post('/', 'UserController@store');  //criar categoria
+        Route::put('/{id}', 'UserController@update'); //atualiza categoria
+        Route::delete('/{id}', 'UserController@destroy'); //deleta categoria
+    });
+
 });
 
 Route::get('/home', 'HomeController@index');
