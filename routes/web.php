@@ -34,10 +34,10 @@ Route::group(['prefix' => 'admin'], function () {
 
     //Rotas para gerenciamento de categoritas
     Route::group(['prefix' => 'categories'], function() {
-        Route::get('/', 'UserController@index');  //pagina de categorias
-        Route::post('/', 'UserController@store');  //criar categoria
-        Route::put('/{id}', 'UserController@update'); //atualiza categoria
-        Route::delete('/{id}', 'UserController@destroy'); //deleta categoria
+        Route::get('/', 'CategoryController@index');  //pagina de categorias
+        Route::post('/', 'CategoryController@store');  //criar categoria
+        Route::put('/{id}', 'CategoryController@update'); //atualiza categoria
+        Route::delete('/{id}', 'CategoryController@destroy'); //deleta categoria
     });
 
 });

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Category;
+use Illuminate\Support\Facades\Validator;
 
 class CategoryController extends Controller
 {
@@ -13,41 +15,71 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        //
+        $categories = Category::all();
+        return view('dashboard.category.index')->with('categories', $categories);
     }
 
     /**
-     * Store a newly created resource in storage.
+     * Armazena no banco uma categoria
      *
-     * @param  \Illuminate\Http\Request  $request
+     * @param  \Illuminate\Http\Request  $request(name, description)
      * @return \Illuminate\Http\Response
      */
     public function store(Request $request)
     {
-        //
+        $data = $request->input();
+
+        $validator = Validator::make($data, [
+            'name' => 'required',
+            'description' => 'required'
+        ]);
+
+        if ($validator->fails()){
+            return response()->json([
+                $validator->errors()
+            ]);
+        }
+
+        $createdCategory = Category::create([
+            'name' => ucfirst($data['name']),
+            'description' => ucfirst($data['description'])
+        ]);
+
+        return $createdCategory;
+
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
 
     /**
-     * Update the specified resource in storage.
+     * Atualiza no banco de dados uma categoria
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
+     * @param  \Illuminate\Http\Request  $request (name, description)
+     * @param  int  $id (CategoryId)
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, Category $id)
     {
-        //
+        $data = $request->input();
+
+        $validator = Validator::make($data, [
+            'name' => 'required',
+            'description' => 'required'
+        ]);
+
+        if ($validator->fails()){
+            return response()->json([
+                $validator->errors()
+            ]);
+        }
+
+        $updatedCategory = $id->update([
+            'name' => ucfirst($data['name']),
+            'description' => ucfirst($data['description'])
+        ]);
+
+        return response()->json([
+            'status' => 'Atualizado com sucesso!'
+        ], 200);
     }
 
     /**
@@ -56,8 +88,12 @@ class CategoryController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Category $id)
     {
-        //
+        $id->delete();
+
+        return response()->json([
+            'status' => 'Deletado com sucesso!'
+        ], 200);
     }
 }

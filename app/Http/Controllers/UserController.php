@@ -30,14 +30,21 @@ class UserController extends Controller
     public function store(Request $request)
     {
 
-        $this->validate($request, [
+        $validator = Validator::make($request->all(), [
             'name' => 'required',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6',
         ]);
 
+        /*Retorna os erros se ouver*/
+        if ($validator->fails()){
+            return response()->json([
+                $validator->errors()
+            ]);
+        }
+
         $createdUser = User::create([
-            'name' => $request->input()['name'],
+            'name' => ucfirst($request->input()['name']),
             'email' => $request->input()['email'],
             'password' => bcrypt($request->input()['password'])
         ]);
@@ -80,7 +87,7 @@ class UserController extends Controller
         }
 
         $updatedUser = $id->update([
-            'name' => $request->input()['name'],
+            'name' => ucfirst($request->input()['name']),
             'email' => $request->input()['email'],
         ]);
 
