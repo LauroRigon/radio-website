@@ -6,7 +6,7 @@ use Illuminate\Http\Request;
 use App\User;
 use App\Http\UploadManager;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Facades\Storage;
 
 
 class UserController extends Controller
@@ -134,6 +134,22 @@ class UserController extends Controller
     {
         //dd($request->all());
         //dd($request->user()->id);     usar isso se possivel quando tiver login
+        $validator = Validator::make($request->all(), [
+            'avatar' => 'mimes:jpeg,bmp,png,jpg'
+        ]);
+
+        /*Retorna os erros se ouver*/
+        if ($validator->fails()){
+            return response()->json([
+                $validator->errors()
+            ]);
+        }
+
+        $oldFile = $id->avatar;
+        if($oldFile != null){
+            Storage::delete($oldFile);
+        }
+
         $fileName = $id->id . "." . $request->file('avatar')->getClientOriginalExtension();
         $path = $request->file('avatar')->storeAs('avatars', $fileName); //aqui
 

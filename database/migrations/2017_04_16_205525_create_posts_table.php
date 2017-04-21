@@ -21,7 +21,7 @@ class CreatePostsTable extends Migration
             $table->string('content');
             $table->integer('category_id')->unsigned();
             $table->integer('user_id')->unsigned();
-            $table->string('avatar')->nullable();
+            $table->string('thumbnail')->nullable();
             $table->boolean('allowed')->default(0);
             $table->integer('view_count')->default(0);
             $table->timestamp('published_at')->nullable();
