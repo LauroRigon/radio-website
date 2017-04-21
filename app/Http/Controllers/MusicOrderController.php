@@ -3,12 +3,8 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\User;
-use App\Http\UploadManager;
-use Illuminate\Support\Facades\Validator;
 
-
-class UserController extends Controller
+class MusicOrderController extends Controller
 {
     /**
      * Display a listing of the resource.

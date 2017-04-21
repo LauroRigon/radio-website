@@ -10,8 +10,34 @@ class UploadManager
 {
     protected $user;
 
-    public static function storeAvatar($userId, $avatar){
-        return Storage::url('jPVtVIfMc5pXA2dzdeKbbqLO3jXPj9rKSwytxrf8.jpeg');
-        return Storage::put('avatars/' + $userId, $avatar);
+    /*
+     * Armazena um avatar
+     * */
+    public static function storeAvatar($user, $avatar) {
+        $oldAvatar = $user->avatar;
+        if($oldAvatar != null){
+            Storage::delete($oldAvatar);
+        }
+
+        $fileName = $user->id . "." . $avatar->getClientOriginalExtension();
+        $path = $avatar->storeAs('/public/avatars', $fileName);
+
+        return $path;
+    }
+
+    public static function storeThumbnail($post, $thumbnail) {
+        $oldThumb = $post->thumbnail;
+        if($oldThumb != null){
+            Storage::delete($oldThumb);
+        }
+
+        $fileName = $post->id . "." . $thumbnail->getClientOriginalExtension();
+        $path = $thumbnail->storeAs('/public/thumbnails', $fileName);
+
+        return $path;
+    }
+
+    public static function deleteFile($filePath) {
+        Storage::delete($filePath);
     }
 }

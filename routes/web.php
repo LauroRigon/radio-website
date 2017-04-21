@@ -40,6 +40,16 @@ Route::group(['prefix' => 'admin'], function () {
         Route::delete('/{id}', 'CategoryController@destroy'); //deleta categoria
     });
 
+    //Rotas de gerenciamento de posts
+    Route::group(['prefix' => 'posts'], function() {
+        Route::get('/', 'PostController@index');  //pagina de posts
+        Route::post('/', 'PostController@store');  //criar post
+        Route::put('/{id}', 'PostController@update'); //atualiza post
+        Route::delete('/{id}', 'PostController@destroy'); //deleta post
+
+        Route::post('/allowPost/{id}', 'PostController@allowPost');
+    });
+
 });
 
 Route::get('/home', 'HomeController@index');
