@@ -18,6 +18,7 @@ class CreateMusicOrdersTable extends Migration
             $table->increments('id');
             $table->string('name');
             $table->string('content');
+            $table->string('user_order_ip');
             $table->timestamps();
         });
     }
