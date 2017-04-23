@@ -41,7 +41,7 @@ class PostController extends Controller
             'title' => 'required',
             'subtitle' => 'required',
             'content' => 'required',
-            'category_id' => 'required|unique:posts',
+            'category_id' => 'required',
             'user_id' => 'required',
             'thumbnail' => 'mimes:jpeg,bmp,png,jpg'
         ]);
@@ -57,7 +57,7 @@ class PostController extends Controller
             'subtitle' => $data['subtitle'],
             'content' => $data['content'],
             'category_id' => $data['category_id'],
-            'user_id' => $data['user_id'],
+            'user_id' => $data['user_id']
         ]);
 
         $path = UploadManager::storeThumbnail($postCreated, $data['thumbnail']);
@@ -105,7 +105,7 @@ class PostController extends Controller
             'title' => 'required',
             'subtitle' => 'required',
             'content' => 'required',
-            'category_id' => 'required|unique:posts'
+            'category_id' => 'required'
         ]);
 
         if($validator->fails()){
@@ -167,6 +167,24 @@ class PostController extends Controller
 
         return response()->json([
             'status' => 'Noticia postada com sucesso!'
+        ], 200);
+    }
+
+    /**
+     * Modifica o conteudo da sessão about
+     *
+     * @param  int  $id (post)
+     * @param  Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function setAsAbout(Request $request, Post $id) {
+        $oldAbout = Post::where('is_about', '=', 1)->delete();
+
+        $id->is_about = 1;
+        $id->save();
+
+        return response()->json([
+            'status' => 'Sessão Sobre atualizada com sucesso!'
         ], 200);
     }
 }

@@ -39,7 +39,10 @@ Vue.component('login-box', {
       password: '',
       buttonText: 'Send',
       isLoading: false,
-      avatar: ''
+      avatar: '',
+      options: [
+          'musica1', 'musica2', 'musica3'
+      ]
     }
   },
 
@@ -49,11 +52,14 @@ Vue.component('login-box', {
       if(this.email != '' && this.password != ''){
           this.isLoading = true;
           this.buttonText = ' Loading...';
-          axios.post('admin/users', {
-            name: this.name,
+          axios.post('admin/polls', {
+            /*name: this.name,
             email: this.email,
             password: this.password,
-            avatar: this.avatar
+            avatar: this.avatar*/
+
+            title: this.name,
+            options: this.options
 
           }).then(function (response) {
             console.log(response);

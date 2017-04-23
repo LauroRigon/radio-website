@@ -48,8 +48,13 @@ Route::group(['prefix' => 'admin'], function () {
         Route::delete('/{id}', 'PostController@destroy'); //deleta post
 
         Route::post('/allowPost/{id}', 'PostController@allowPost');
+        Route::post('/setAbout/{id}', 'PostController@setAsAbout');
     });
 
+    Route::group(['prefix' => 'polls'], function() {
+        Route::post('/', 'PollController@store');
+        Route::delete('/{id}', 'PollController@destroy');
+    });
 });
 
 Route::get('/home', 'HomeController@index');
