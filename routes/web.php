@@ -54,6 +54,8 @@ Route::group(['prefix' => 'admin'], function () {
     Route::group(['prefix' => 'polls'], function() {
         Route::post('/', 'PollController@store');
         Route::delete('/{id}', 'PollController@destroy');
+
+        Route::post('/addVote/{pollId}', 'PollController@addVote');
     });
 });
 

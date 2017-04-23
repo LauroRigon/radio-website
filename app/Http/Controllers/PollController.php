@@ -104,4 +104,24 @@ class PollController extends Controller
             'status' => 'Deletada com sucesso!'
         ], 200);
     }
+
+    /**
+     * Soma o contador de votos de uma enquete. Pelo ip é verificado se já existe um voto nessa enquete com o mesmo ip.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function addVote(Request $request, $pollId) {
+        if(!Poll::canVote($request, $pollId)){
+            return response()->json([
+                'status' => 'Já votado!'
+            ], 422);
+        }
+
+        Poll::storeVote($request->input('option'));
+
+        return response()->json([
+            'status' => 'Voto efetuado com sucesso!'
+        ], 200);
+    }
 }
