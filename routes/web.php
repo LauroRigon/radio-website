@@ -21,9 +21,11 @@ Auth::routes();
  * Rotas da área de admin do site
  * */
 Route::group(['prefix' => 'admin'], function () {
+    Route::get('/dashboard', 'DashboardController@index');
+
     //Rotas para gerenciamento de usuário
     Route::group(['prefix' => 'users'], function() {
-        Route::get('/', 'UserController@index');  //pagina de usuários
+        Route::get('/', 'UserController@index')->name('user_index');  //pagina de usuários
         Route::post('/', 'UserController@store');  //criar usuário
         Route::put('/{id}', 'UserController@update'); //atualiza usuário
         Route::delete('/{id}', 'UserController@destroy'); //deleta usuário

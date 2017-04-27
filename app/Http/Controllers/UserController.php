@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\User;
 use App\Http\UploadManager;
+use Illuminate\Support\Facades\App;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -17,7 +18,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        return view('dashboard.user.index');
+        $users = User::all();
+        return view('dashboard.user.index')->with("users", $users);
     }
 
     /**

@@ -20,8 +20,9 @@ class UploadManager
         }
 
         $fileName = $user->id . "." . $avatar->getClientOriginalExtension();
-        $path = $avatar->storeAs('/public/avatars', $fileName);
+        $avatar->storeAs('/avatars', $fileName);
 
+        $path = '/storage/avatars/' . $fileName;
         return $path;
     }
 
@@ -32,7 +33,7 @@ class UploadManager
         }
 
         $fileName = $post->id . "." . $thumbnail->getClientOriginalExtension();
-        $path = $thumbnail->storeAs('/public/thumbnails', $fileName);
+        $path = $thumbnail->storeAs('/thumbnails', $fileName);
 
         return $path;
     }

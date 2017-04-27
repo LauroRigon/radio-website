@@ -1,1 +1,1 @@
-pode cre meu chapa
+@extends('dashboard.layouts.app')
