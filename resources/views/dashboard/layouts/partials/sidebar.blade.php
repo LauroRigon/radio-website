@@ -17,9 +17,9 @@
         <ul class="sidebar-menu">
             <li class="header">Menu</li>
 			@if(Auth::user()->is_master == 1)
-				<li><a href="{{route('user_index')}}"><i class='fa fa-user-circle-o'></i> <span>Usuários</span></a></li>
+				<li class="{{ Route::currentRouteName() == 'user_index'? 'active' : ''}}"><a href="{{route('user_index')}}"><i class="fa fa-user-circle-o"></i> <span>Usuários</span></a></li>
 			@endif
-            <li class="active"><a href=""><i class='fa fa-link'></i> <span>Content</span></a></li>
+            <li><a href=""><i class='fa fa-link'></i> <span>Content</span></a></li>
             <li><a href="#"><i class='fa fa-link'></i> <span>Content</span></a></li>
             <li class="treeview">
                 <a href="#"><i class='fa fa-link'></i> <span>Content</span> <i class="fa fa-angle-left pull-right"></i></a>

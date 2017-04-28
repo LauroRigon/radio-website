@@ -23,7 +23,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         @include('dashboard.layouts.partials.contentheader')
 
         <!-- Main content -->
-        <section class="content">
+        <section class="content" id="content">
             <!-- Your Page Content Here -->
             @yield('main-content')
         </section><!-- /.content -->
@@ -38,4 +38,5 @@ scratch. This page gets rid of all links and provides the needed markup only.
 @show
 
 </body>
+@yield('page-scripts')
 </html>

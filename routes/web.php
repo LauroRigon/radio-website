@@ -32,6 +32,8 @@ Route::group(['prefix' => 'admin'], function () {
 
         Route::put('/changePassword/{id}', 'UserController@changePassword'); //troca senha
         Route::post('/uploadAvatar/{id}', 'UserController@uploadAvatar'); //upload do avatar
+
+        Route::get('/getUsers', 'UserController@getUsers'); //get all users
     });
 
     //Rotas para gerenciamento de categoritas

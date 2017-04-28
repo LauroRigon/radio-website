@@ -1,4 +1,4 @@
-//import Sidebar from './components/Sidebar.vue';
+//import UserTable from './components/user/UsersTable.vue';
 /**
  * First we will load all of this project's JavaScript dependencies which
  * includes Vue and other libraries. It is a great starting point when
@@ -11,12 +11,18 @@ require('./bootstrap.js');
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
-
+window.Event = new Vue();
 //Vue.component('example', require('./components/Example.vue'));
-//Vue.component('sidebar', require('./components/Sidebar.vue'));
+//Vue.component('user-table', require('./components/partials/GenericTable.vue'));
+import UserTable from './components/user/UserTable.vue';
 
 
 
 const app = new Vue({
-    el: '#app'
+    el: '#app',
+    components: {
+    	UserTable
+    }
 });
+
+

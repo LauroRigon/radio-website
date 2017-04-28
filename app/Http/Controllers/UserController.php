@@ -170,4 +170,19 @@ class UserController extends Controller
             'status' => 'Deletado com sucesso!'
         ], 200);
     }
+
+    /**
+     * Remove the specified resource from storage.
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function getUsers()
+    {
+        $users = User::all();
+
+        return response()->json([
+            $users
+        ], 200);
+    }
 }
