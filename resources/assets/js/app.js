@@ -14,15 +14,13 @@ require('./bootstrap.js');
 window.Event = new Vue();
 //Vue.component('example', require('./components/Example.vue'));
 //Vue.component('user-table', require('./components/partials/GenericTable.vue'));
-import UserTable from './components/user/UserTable.vue';
-
+//import UserTable from './components/user/UserTable.vue';
+//Vue.component('my-vuetable', require('./components/partials/MyVuetable.vue'));
+Vue.component('user-table', require('./components/user/UserTable.vue'));
 
 
 const app = new Vue({
-    el: '#app',
-    components: {
-    	UserTable
-    }
+    el: '#app'
 });
 
 

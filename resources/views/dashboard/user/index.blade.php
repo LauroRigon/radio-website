@@ -5,7 +5,8 @@ Usuários
 @endsection
 
 @section('main-content')
-    <user-table title = "Tabela de usuários"></user-table>
+    <user-table title="Tabela de usuários"></user-table>
+	
 @endsection
 @section('page-scripts')
 <script>

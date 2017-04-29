@@ -6,37 +6,26 @@
     <!-- /.box-header -->
     <div class="box-body">
       <table class="table table-bordered">
-        <tr>
-          <th style="width: 10px" v-for="thead in theads">{{thead}}</th>
-          
-        </tr>
-        <table-item v-for="user in users" datas="user">
-          
+        <tbody>
+          <tr>
+            <th style="width: 10px" v-for="thead in theads">{{thead}}</th>
+          </tr>
+
+          <table-item v-for="(item, index) in tdatas" :key="index" :datas = "item">
+            <td v-for="singleData in item">{{singleData}}</td>
               
-        </table-item>
-        
-      </table>
-    </div>
-    <!-- /.box-body -->
-    <div class="box-footer clearfix">
-      <ul class="pagination pagination-sm no-margin pull-right">
-        <li><a href="#">&laquo;</a></li>
-        <li><a href="#">1</a></li>
-        <li><a href="#">2</a></li>
-        <li><a href="#">3</a></li>
-        <li><a href="#">&raquo;</a></li>
-      </ul>
+          </table-item>
+        </tbody>
+        </table>
     </div>
   </div>
 </template>
 
     <script>
-      import TableItem from './TableItem.vue';
-        export default {
-            component: {
-              TableItem
-            },
+      import TableItem from './TableItem.vue'
 
+        export default {
+            components: { TableItem },
             props: {
                 showPaginate: {
                     type: Boolean,
@@ -53,7 +42,7 @@
             },
             data() {
                 return {
-                    users: {},
+                    tdatas: {},
                     theads: ['Id', 'Nome', 'Email', 'Master', 'Ação']
                 }
             },
@@ -61,7 +50,7 @@
             mounted() {
                 axios.get('users/getUsers')
                 .then(function(serverResponse) {
-                  this.users = serverResponse.data[0];
+                  this.tdatas = serverResponse.data[0];
 
                   this.filterUsersData();
                 }.bind(this))
@@ -69,13 +58,13 @@
 
             methods: {
               filterUsersData: function() {
-                for(var i = 0; i < this.users.length; i++){
-                  console.log(this.users[i]);
-                  delete this.users[i].avatar;
-                  delete this.users[i].updated_at;
-                  delete this.users[i].created_at;
+                for(var i = 0; i < this.tdatas.length; i++){
+                  delete this.tdatas[i].avatar;
+                  delete this.tdatas[i].updated_at;
+                  delete this.tdatas[i].created_at;
+                  this.tdatas[i].is_master = (this.tdatas[i].is_master == 1)? "Sim" : "Não";
                 }
-              }    
+              }
             }
         }
     </script>

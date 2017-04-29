@@ -181,8 +181,9 @@ class UserController extends Controller
     {
         $users = User::all();
 
+
         return response()->json([
-            $users
+        $users
         ], 200);
     }
 }
