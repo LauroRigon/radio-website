@@ -18,7 +18,8 @@ mix.js('resources/assets/js/app.js', 'public/js')
    .combine([
        'resources/assets/css/skins/skin-blue.css',
        'resources/assets/css/AdminLTE.css',
-       'public/css/font-awesome.css'
+       'public/css/font-awesome.css',
+       'node_modules/animate.css/animate.min.css'
    ], 'public/css/dashboard/all.css')
    .combine([
        'resources/assets/js/adminLTEapp.js',

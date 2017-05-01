@@ -5,7 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\User;
 use App\Http\UploadManager;
-use Illuminate\Support\Facades\App;
+use App\Post;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -172,18 +172,41 @@ class UserController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Retorna informações da conta de todos os uruários
+     *
+     *  @return \Illuminate\Http\Response
+     */
+    public function getUsers() {
+        $users = User::all();
+
+        //filtra o array trocando os valores 1 por 0 na posição is_master
+        $users->filter(function($val){
+            if ($val->is_master == 1){
+                $val->is_master = "Sim";
+            }else{
+                $val->is_master = "Não";
+            }
+            return $val;
+        });
+
+        return response()->json([
+        $users
+        ], 200);
+    }
+
+    /**
+     * Retorna informações completas sobre um único usuário como numero de posts e infos básicas...
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function getUsers()
-    {
-        $users = User::all();
+    public function getUserComplete(User $user) {
+        $user->post_count = Post::where('user_id', $user->id)->where('allowed', 1)->count();
+        $user->created_date = $user->created_at->format('d-m-Y');
 
-
+        //$user->is_master = ($user->is_master)? "Sim" : "Não";
         return response()->json([
-        $users
+            $user
         ], 200);
     }
 }

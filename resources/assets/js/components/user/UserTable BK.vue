@@ -11,7 +11,7 @@
             <th style="width: 10px" v-for="thead in theads">{{thead}}</th>
           </tr>
 
-          <table-item v-for="(item, index) in tdatas" :key="index" :datas = "item">
+          <table-item v-for="(item, index) in tdatas" :key="index" :datas = "item" hasActions="true">
             <td v-for="singleData in item">{{singleData}}</td>
               
           </table-item>
@@ -22,7 +22,7 @@
 </template>
 
     <script>
-      import TableItem from './TableItem.vue'
+      import TableItem from '../partials/TableItem.vue'
 
         export default {
             components: { TableItem },

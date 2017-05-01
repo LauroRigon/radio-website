@@ -11,12 +11,14 @@ require('./bootstrap.js');
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
-window.Event = new Vue();
+window.Event = new Vue();	//Instância que é usada pra comunicação entre os componentes
+
 //Vue.component('example', require('./components/Example.vue'));
 //Vue.component('user-table', require('./components/partials/GenericTable.vue'));
 //import UserTable from './components/user/UserTable.vue';
 //Vue.component('my-vuetable', require('./components/partials/MyVuetable.vue'));
-Vue.component('user-table', require('./components/user/UserTable.vue'));
+Vue.component('vue-table', require('./components/partials/VueTable.vue'));
+Vue.component('view-modal', require('./components/user/ViewModal.vue'));
 
 
 const app = new Vue({

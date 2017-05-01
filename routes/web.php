@@ -34,6 +34,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::post('/uploadAvatar/{id}', 'UserController@uploadAvatar'); //upload do avatar
 
         Route::get('/getUsers', 'UserController@getUsers'); //get all users
+        Route::get('/getUserComplete/{user}', 'UserController@getUserComplete'); //retorna informações mais completas sobre usuário
     });
 
     //Rotas para gerenciamento de categoritas
