@@ -4,18 +4,21 @@
     <div class="box-header with-border">
       <h3 class="box-title">{{title}}</h3>
     </div>
+    <div class="button-create" v-if="hasAction('create')">
+      <button class="btn btn-primary" @click="createAction">Criar</button>
+    </div>
     <!-- /.box-header -->
       <div class="box-body">
         <table class="table table-bordered">
           <tbody>
             <tr>
-              <th style="width: 10px" v-for="field in fields">{{field}}</th>
+              <th style="width: 10px" v-for="field in fields" v-text="field"></th>
             </tr>
             <div class="overlay" v-show="isLoading">
               <i class="fa fa-refresh fa-spin"></i>
             </div>
-            <table-item v-for="(item, index) in tdatas" :key="index" :datas = "item" :has-actions="hasActions">
-              <td v-for="singleData in item">{{singleData}}</td>
+            <table-item v-for="(item, index) in tdatas" :key="index" :datas = "item" :actions="actions" :delete-api="deleteApi">
+              <td v-for="singleData in item" v-text="singleData"></td>
                 
             </table-item>
           </tbody>
@@ -57,6 +60,12 @@
                 },
                 sourceData: {
                   type: String
+                },
+                deleteApi: {
+                  type: String
+                },
+                actions: {
+                  type: Array
                 }
 
             },
@@ -75,6 +84,9 @@
 
                   this.filterUsersData(response);                  
                 }.bind(this))
+                .catch(function() {
+                  toastr.error("Ocorreu um erro ao tentar encontrar usuários!");
+                });
             },
 
             methods: {
@@ -90,6 +102,16 @@
                   }
                   return val;
                 }.bind(this));
+            },
+
+            hasAction: function(action) {
+              return this.actions.find(function(act) {
+                return (act == action)? true: false;
+              });
+            },
+
+            createAction: function() {
+              Event.$emit('open-create-modal');
             }
         }
       }
@@ -98,6 +120,9 @@
     <style>
       .btn {
         margin-top: 5px; 
+      }
+      .button-create{
+        margin-left: 10px;
       }
     </style>
 

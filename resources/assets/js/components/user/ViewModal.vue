@@ -36,8 +36,8 @@
                 <!-- /.col -->
                 <div class="col-sm-4 border-right">
                   <div class="description-block">
-                    <h5 class="description-header">13,000</h5>
-                    <span class="description-text">FOLLOWERS</span>
+                    <h5 class="description-header" v-text="data.email"></h5>
+                    <span class="description-text">Email</span>
                   </div>
                   <!-- /.description-block -->
                 </div>
@@ -57,8 +57,7 @@
       </div>
 
       <div class="modal-footer">
-        <button type="button" class="btn btn-default" data-dismiss="modal" @click="closeModal">Close</button>
-        <button type="button" class="btn btn-primary">Save changes</button>
+        <button type="button" class="btn btn-primary" data-dismiss="modal" @click="closeModal">Fechar</button>
       </div>
     </div>
   </div>
@@ -79,6 +78,13 @@ export default {
     }
   },
   created() {
+    Event.$on("open-view-modal", function(data){
+      this.isVisible = true;
+      this.isLoading = true;
+      this.getData(data.id);
+    }.bind(this));
+  },
+  mounted() {
     //event listener para sair com o esc do modal
     window.addEventListener('keyup', function(event) {
         // If esc was pressed...
@@ -86,15 +92,6 @@ export default {
           this.closeModal();
         }
     }.bind(this))
-
-
-  },
-  mounted() {
-    Event.$on("open-view-modal", function(data){
-      this.isVisible = true;
-      this.isLoading = true;
-      this.getData(data.id);
-    }.bind(this));
   },
 
   methods: {
@@ -108,7 +105,10 @@ export default {
         this.data = serverResponse.data[0];
 
         this.isLoading = false;
-      }.bind(this));
+      }.bind(this))
+      .catch(function() {
+        toastr.error("Ocorreu um erro ao tentar encontrar usuário!");
+      });
     }
   }
 }

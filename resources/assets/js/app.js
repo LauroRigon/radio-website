@@ -13,12 +13,25 @@ require('./bootstrap.js');
  */
 window.Event = new Vue();	//Instância que é usada pra comunicação entre os componentes
 
-//Vue.component('example', require('./components/Example.vue'));
-//Vue.component('user-table', require('./components/partials/GenericTable.vue'));
-//import UserTable from './components/user/UserTable.vue';
-//Vue.component('my-vuetable', require('./components/partials/MyVuetable.vue'));
+window.toastr = require('toastr/build/toastr.min.js');
+
+window.toastr.options = {
+    positionClass: "toast-top-right",
+    showDuration: "300",
+    hideDuration: "1000",
+    timeOut: "5000",
+    extendedTimeOut: "1000",
+    showEasing: "swing",
+    hideEasing: "linear",
+    showMethod: "fadeIn",
+    hideMethod: "fadeOut",
+    closeButton: true,
+    progressBar: true
+};
+
 Vue.component('vue-table', require('./components/partials/VueTable.vue'));
-Vue.component('view-modal', require('./components/user/ViewModal.vue'));
+Vue.component('user-view-modal', require('./components/user/ViewModal.vue'));
+Vue.component('user-create-modal', require('./components/user/CreateModal.vue'));
 
 
 const app = new Vue({

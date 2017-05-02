@@ -8,11 +8,11 @@
 	      <td v-for="data in datas">{{data}}</td>
 	      
 			
-	      <td v-if="hasActions">
+	      <td v-if="hasAction()">
 	        <div class="btn-group">
-				<button class="btn btn-info" @click="viewAction(datas)"><i class="glyphicon glyphicon-search"></i></button>
-	          	<button class="btn btn-warning" @click="editAction(datas)"><i class="glyphicon glyphicon-pencil"></i></button>
-	          	<button class="btn btn-danger" @click="deleteAction(datas)"><i class="glyphicon glyphicon-trash"></i></button>
+				<button class="btn btn-info" v-if="hasAction('view')" @click="viewAction(datas)"><i class="glyphicon glyphicon-search"></i></button>
+	          	<button class="btn btn-warning" v-if="hasAction('edit')" @click="editAction(datas)"><i class="glyphicon glyphicon-pencil"></i></button>
+	          	<button class="btn btn-danger" v-if="hasAction('remove')" @click="deleteAction(datas)"><i class="glyphicon glyphicon-trash"></i></button>
 	        </div>
 	      </td>
 	    </tr>
@@ -26,10 +26,12 @@
 			datas: {
 				required: true
 			},
+			deleteApi: {
+				type: String
+			},
 
-			hasActions: {
-				type: Boolean,
-				default: false
+			actions: {
+				type: Array
 			}
 		},
 		data() {
@@ -39,17 +41,45 @@
 		},
 
 		methods: {
-          editAction: function(data) {
-            console.log(data)
-          },
+			//se usada sem parametro, verifica se existe alguma action. Se usada com parametro deverá ser passado o nome da action a ser analisada então retorna true caso encontre a action no array de actions
+			hasAction: function(action) {
+				if(action == null){
+					if(this.actions != null){
+						return true;
+					}else{
+						return false;
+					}
+				}
 
-          deleteAction: function(data) {
-			this.isVisible = false
-		  },
+				return this.actions.find(function(act) {
+					return (act == action)? true: false;
+				});
+			},
 
-		  viewAction: function(data) {
-			Event.$emit("open-view-modal", data);
-		  }
+			editAction: function(data) {
+				console.log(data);
+			},
+
+			deleteAction: function(data) {
+				if(confirm("Tem certeza que deseja deletar esse usuário?") != 1) {
+					return false;
+				}
+
+				axios.delete(this.deleteApi + data.id)
+				.then(function(response){
+					toastr.success("Usuário deletado com sucesso!");
+					this.isVisible = false;
+				})
+				.catch(function(error) {
+					
+			      toastr.warning("Existem postagens desse usuário!");
+			    });
+				
+			},
+
+			viewAction: function(data) {
+				Event.$emit("open-view-modal", data);
+			}
 		}
 
 

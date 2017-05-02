@@ -35,19 +35,21 @@ class UserController extends Controller
             'name' => 'required',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6',
+            'is_master' => 'required'
         ]);
 
         /*Retorna os erros se ouver*/
         if ($validator->fails()){
-            return response()->json([
+            return response()->json(
                 $validator->errors()
-            ]);
+            , 422);
         }
 
         $createdUser = User::create([
             'name' => ucfirst($request->input()['name']),
             'email' => $request->input()['email'],
-            'password' => bcrypt($request->input()['password'])
+            'password' => bcrypt($request->input()['password']),
+            'is_master' => $request->input()['is_master']
         ]);
 
         return $createdUser;

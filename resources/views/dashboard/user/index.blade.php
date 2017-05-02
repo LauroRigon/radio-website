@@ -9,13 +9,14 @@ Usuários
 				:has-actions="true"
 				:fields="['Id', 'Nome', 'Email', 'Master', 'Ação']"
 				:fillable="['id', 'name', 'email', 'is_master']"
-				source-data="users/getUsers"></vue-table>
+				source-data="users/getUsers"
+				delete-api="users/delete/"
+				:actions="['view', 'remove', 'create']"></vue-table>
 
-	<view-modal title="Detalhes do usuário"></view-modal>
+	<user-view-modal title="Detalhes do usuário"></user-view-modal>
+	<user-create-modal title="Cadastrar novo usuário"></user-create-modal>
 	
 @endsection
 @section('page-scripts')
-<script>
 
-</script>
 @endsection
