@@ -66,14 +66,18 @@
 				}
 
 				axios.delete(this.deleteApi + data.id)
-				.then(function(response){
-					toastr.success("Usuário deletado com sucesso!");
-					this.isVisible = false;
-				})
-				.catch(function(error) {
-					
-			      toastr.warning("Existem postagens desse usuário!");
-			    });
+				.then(function() {
+					this.isVisible = false
+					toastr.success("Usuário deletado com sucesso!")
+				}.bind(this))
+
+				.catch(function(error){
+					if(error.response.status == 500){
+						toastr.warning("Usuário tem postagens cadastradas!")
+					}else{
+						toastr.error(error.response.data['status'], "Ocorreu um erro ao deletar!")
+					}
+				});
 				
 			},
 

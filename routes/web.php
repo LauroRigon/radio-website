@@ -25,16 +25,18 @@ Route::group(['prefix' => 'admin'], function () {
 
     //Rotas para gerenciamento de usuário
     Route::group(['prefix' => 'users'], function() {
-        Route::get('/', 'UserController@index')->name('user_index');  //pagina de usuários
-        Route::post('/create', 'UserController@store');  //criar usuário
+        Route::get('/', 'UserController@index')->name('user_index')->middleware('master');  //pagina de usuários
+        Route::post('/create', 'UserController@store')->middleware('master');  //criar usuário
         Route::put('/{id}', 'UserController@update'); //atualiza usuário
-        Route::delete('/delete/{id}', 'UserController@destroy'); //deleta usuário
+        Route::delete('/delete/{id}', 'UserController@destroy')->middleware('master'); //deleta usuário
 
+        Route::get('/profile', 'UserController@show')->name('user_profile');
         Route::put('/changePassword/{id}', 'UserController@changePassword'); //troca senha
-        Route::post('/uploadAvatar/{id}', 'UserController@uploadAvatar'); //upload do avatar
+        Route::post('/uploadAvatar', 'UserController@uploadAvatar'); //upload do avatar
 
-        Route::get('/getUsers', 'UserController@getUsers'); //get all users
+        Route::get('/getUsers', 'UserController@getUsers')->middleware('master'); //get all users
         Route::get('/getUserComplete/{user}', 'UserController@getUserComplete'); //retorna informações mais completas sobre usuário
+        Route::get('/getCurrentUser', 'UserController@getCurrentUserData')->name('getCurrentUser'); //retorna informações sobre o user logado
     });
 
     //Rotas para gerenciamento de categoritas

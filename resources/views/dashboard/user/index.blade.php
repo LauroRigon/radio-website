@@ -4,6 +4,11 @@
 Usuários
 @endsection
 
+@section('content_header')
+	<li><a href="/admin/dashboard"><i class="fa fa-dashboard"></i> Dashboard</a></li>
+	<li class="active">Usuários</li>
+@endsection
+
 @section('main-content')
     <vue-table title="Tabela de usuários"
 				:has-actions="true"

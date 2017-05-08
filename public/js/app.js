@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 54);
+/******/ 	return __webpack_require__(__webpack_require__.s = 68);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -73,7 +73,7 @@
 "use strict";
 
 
-var bind = __webpack_require__(7);
+var bind = __webpack_require__(9);
 
 /*global toString:true*/
 
@@ -374,13 +374,70 @@ module.exports = {
 
 /***/ }),
 /* 1 */
+/***/ (function(module, exports) {
+
+// this module is a runtime utility for cleaner component module output and will
+// be included in the final webpack user bundle
+
+module.exports = function normalizeComponent (
+  rawScriptExports,
+  compiledTemplate,
+  scopeId,
+  cssModules
+) {
+  var esModule
+  var scriptExports = rawScriptExports = rawScriptExports || {}
+
+  // ES6 modules interop
+  var type = typeof rawScriptExports.default
+  if (type === 'object' || type === 'function') {
+    esModule = rawScriptExports
+    scriptExports = rawScriptExports.default
+  }
+
+  // Vue.extend constructor export interop
+  var options = typeof scriptExports === 'function'
+    ? scriptExports.options
+    : scriptExports
+
+  // render functions
+  if (compiledTemplate) {
+    options.render = compiledTemplate.render
+    options.staticRenderFns = compiledTemplate.staticRenderFns
+  }
+
+  // scopedId
+  if (scopeId) {
+    options._scopeId = scopeId
+  }
+
+  // inject cssModules
+  if (cssModules) {
+    var computed = Object.create(options.computed || null)
+    Object.keys(cssModules).forEach(function (key) {
+      var module = cssModules[key]
+      computed[key] = function () { return module }
+    })
+    options.computed = computed
+  }
+
+  return {
+    esModule: esModule,
+    exports: scriptExports,
+    options: options
+  }
+}
+
+
+/***/ }),
+/* 2 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(process) {
 
 var utils = __webpack_require__(0);
-var normalizeHeaderName = __webpack_require__(29);
+var normalizeHeaderName = __webpack_require__(31);
 
 var PROTECTION_PREFIX = /^\)\]\}',?\n/;
 var DEFAULT_CONTENT_TYPE = {
@@ -397,10 +454,10 @@ function getDefaultAdapter() {
   var adapter;
   if (typeof XMLHttpRequest !== 'undefined') {
     // For browsers use XHR adapter
-    adapter = __webpack_require__(3);
+    adapter = __webpack_require__(5);
   } else if (typeof process !== 'undefined') {
     // For node use HTTP adapter
-    adapter = __webpack_require__(3);
+    adapter = __webpack_require__(5);
   }
   return adapter;
 }
@@ -471,79 +528,299 @@ utils.forEach(['post', 'put', 'patch'], function forEachMethodWithData(method) {
 
 module.exports = defaults;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(40)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(47)))
 
 /***/ }),
-/* 2 */
+/* 3 */
 /***/ (function(module, exports) {
 
-// this module is a runtime utility for cleaner component module output and will
-// be included in the final webpack user bundle
+/*
+	MIT License http://www.opensource.org/licenses/mit-license.php
+	Author Tobias Koppers @sokra
+*/
+// css base code, injected by the css-loader
+module.exports = function() {
+	var list = [];
 
-module.exports = function normalizeComponent (
-  rawScriptExports,
-  compiledTemplate,
-  scopeId,
-  cssModules
-) {
-  var esModule
-  var scriptExports = rawScriptExports = rawScriptExports || {}
+	// return the list of modules as css string
+	list.toString = function toString() {
+		var result = [];
+		for(var i = 0; i < this.length; i++) {
+			var item = this[i];
+			if(item[2]) {
+				result.push("@media " + item[2] + "{" + item[1] + "}");
+			} else {
+				result.push(item[1]);
+			}
+		}
+		return result.join("");
+	};
 
-  // ES6 modules interop
-  var type = typeof rawScriptExports.default
-  if (type === 'object' || type === 'function') {
-    esModule = rawScriptExports
-    scriptExports = rawScriptExports.default
+	// import a list of modules into the list
+	list.i = function(modules, mediaQuery) {
+		if(typeof modules === "string")
+			modules = [[null, modules, ""]];
+		var alreadyImportedModules = {};
+		for(var i = 0; i < this.length; i++) {
+			var id = this[i][0];
+			if(typeof id === "number")
+				alreadyImportedModules[id] = true;
+		}
+		for(i = 0; i < modules.length; i++) {
+			var item = modules[i];
+			// skip already imported module
+			// this implementation is not 100% perfect for weird media query combinations
+			//  when a module is imported multiple times with different media queries.
+			//  I hope this will never occur (Hey this way we have smaller bundles)
+			if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
+				if(mediaQuery && !item[2]) {
+					item[2] = mediaQuery;
+				} else if(mediaQuery) {
+					item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
+				}
+				list.push(item);
+			}
+		}
+	};
+	return list;
+};
+
+
+/***/ }),
+/* 4 */
+/***/ (function(module, exports, __webpack_require__) {
+
+/*
+  MIT License http://www.opensource.org/licenses/mit-license.php
+  Author Tobias Koppers @sokra
+  Modified by Evan You @yyx990803
+*/
+
+var hasDocument = typeof document !== 'undefined'
+
+if (typeof DEBUG !== 'undefined' && DEBUG) {
+  if (!hasDocument) {
+    throw new Error(
+    'vue-style-loader cannot be used in a non-browser environment. ' +
+    "Use { target: 'node' } in your Webpack config to indicate a server-rendering environment."
+  ) }
+}
+
+var listToStyles = __webpack_require__(64)
+
+/*
+type StyleObject = {
+  id: number;
+  parts: Array<StyleObjectPart>
+}
+
+type StyleObjectPart = {
+  css: string;
+  media: string;
+  sourceMap: ?string
+}
+*/
+
+var stylesInDom = {/*
+  [id: number]: {
+    id: number,
+    refs: number,
+    parts: Array<(obj?: StyleObjectPart) => void>
+  }
+*/}
+
+var head = hasDocument && (document.head || document.getElementsByTagName('head')[0])
+var singletonElement = null
+var singletonCounter = 0
+var isProduction = false
+var noop = function () {}
+
+// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
+// tags it will allow on a page
+var isOldIE = typeof navigator !== 'undefined' && /msie [6-9]\b/.test(navigator.userAgent.toLowerCase())
+
+module.exports = function (parentId, list, _isProduction) {
+  isProduction = _isProduction
+
+  var styles = listToStyles(parentId, list)
+  addStylesToDom(styles)
+
+  return function update (newList) {
+    var mayRemove = []
+    for (var i = 0; i < styles.length; i++) {
+      var item = styles[i]
+      var domStyle = stylesInDom[item.id]
+      domStyle.refs--
+      mayRemove.push(domStyle)
+    }
+    if (newList) {
+      styles = listToStyles(parentId, newList)
+      addStylesToDom(styles)
+    } else {
+      styles = []
+    }
+    for (var i = 0; i < mayRemove.length; i++) {
+      var domStyle = mayRemove[i]
+      if (domStyle.refs === 0) {
+        for (var j = 0; j < domStyle.parts.length; j++) {
+          domStyle.parts[j]()
+        }
+        delete stylesInDom[domStyle.id]
+      }
+    }
+  }
+}
+
+function addStylesToDom (styles /* Array<StyleObject> */) {
+  for (var i = 0; i < styles.length; i++) {
+    var item = styles[i]
+    var domStyle = stylesInDom[item.id]
+    if (domStyle) {
+      domStyle.refs++
+      for (var j = 0; j < domStyle.parts.length; j++) {
+        domStyle.parts[j](item.parts[j])
+      }
+      for (; j < item.parts.length; j++) {
+        domStyle.parts.push(addStyle(item.parts[j]))
+      }
+      if (domStyle.parts.length > item.parts.length) {
+        domStyle.parts.length = item.parts.length
+      }
+    } else {
+      var parts = []
+      for (var j = 0; j < item.parts.length; j++) {
+        parts.push(addStyle(item.parts[j]))
+      }
+      stylesInDom[item.id] = { id: item.id, refs: 1, parts: parts }
+    }
+  }
+}
+
+function createStyleElement () {
+  var styleElement = document.createElement('style')
+  styleElement.type = 'text/css'
+  head.appendChild(styleElement)
+  return styleElement
+}
+
+function addStyle (obj /* StyleObjectPart */) {
+  var update, remove
+  var styleElement = document.querySelector('style[data-vue-ssr-id~="' + obj.id + '"]')
+
+  if (styleElement) {
+    if (isProduction) {
+      // has SSR styles and in production mode.
+      // simply do nothing.
+      return noop
+    } else {
+      // has SSR styles but in dev mode.
+      // for some reason Chrome can't handle source map in server-rendered
+      // style tags - source maps in <style> only works if the style tag is
+      // created and inserted dynamically. So we remove the server rendered
+      // styles and inject new ones.
+      styleElement.parentNode.removeChild(styleElement)
+    }
   }
 
-  // Vue.extend constructor export interop
-  var options = typeof scriptExports === 'function'
-    ? scriptExports.options
-    : scriptExports
-
-  // render functions
-  if (compiledTemplate) {
-    options.render = compiledTemplate.render
-    options.staticRenderFns = compiledTemplate.staticRenderFns
+  if (isOldIE) {
+    // use singleton mode for IE9.
+    var styleIndex = singletonCounter++
+    styleElement = singletonElement || (singletonElement = createStyleElement())
+    update = applyToSingletonTag.bind(null, styleElement, styleIndex, false)
+    remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true)
+  } else {
+    // use multi-style-tag mode in all other cases
+    styleElement = createStyleElement()
+    update = applyToTag.bind(null, styleElement)
+    remove = function () {
+      styleElement.parentNode.removeChild(styleElement)
+    }
   }
 
-  // scopedId
-  if (scopeId) {
-    options._scopeId = scopeId
+  update(obj)
+
+  return function updateStyle (newObj /* StyleObjectPart */) {
+    if (newObj) {
+      if (newObj.css === obj.css &&
+          newObj.media === obj.media &&
+          newObj.sourceMap === obj.sourceMap) {
+        return
+      }
+      update(obj = newObj)
+    } else {
+      remove()
+    }
+  }
+}
+
+var replaceText = (function () {
+  var textStore = []
+
+  return function (index, replacement) {
+    textStore[index] = replacement
+    return textStore.filter(Boolean).join('\n')
+  }
+})()
+
+function applyToSingletonTag (styleElement, index, remove, obj) {
+  var css = remove ? '' : obj.css
+
+  if (styleElement.styleSheet) {
+    styleElement.styleSheet.cssText = replaceText(index, css)
+  } else {
+    var cssNode = document.createTextNode(css)
+    var childNodes = styleElement.childNodes
+    if (childNodes[index]) styleElement.removeChild(childNodes[index])
+    if (childNodes.length) {
+      styleElement.insertBefore(cssNode, childNodes[index])
+    } else {
+      styleElement.appendChild(cssNode)
+    }
+  }
+}
+
+function applyToTag (styleElement, obj) {
+  var css = obj.css
+  var media = obj.media
+  var sourceMap = obj.sourceMap
+
+  if (media) {
+    styleElement.setAttribute('media', media)
   }
 
-  // inject cssModules
-  if (cssModules) {
-    var computed = Object.create(options.computed || null)
-    Object.keys(cssModules).forEach(function (key) {
-      var module = cssModules[key]
-      computed[key] = function () { return module }
-    })
-    options.computed = computed
+  if (sourceMap) {
+    // https://developer.chrome.com/devtools/docs/javascript-debugging
+    // this makes source maps inside style tags work properly in Chrome
+    css += '\n/*# sourceURL=' + sourceMap.sources[0] + ' */'
+    // http://stackoverflow.com/a/26603875
+    css += '\n/*# sourceMappingURL=data:application/json;base64,' + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + ' */'
   }
 
-  return {
-    esModule: esModule,
-    exports: scriptExports,
-    options: options
+  if (styleElement.styleSheet) {
+    styleElement.styleSheet.cssText = css
+  } else {
+    while (styleElement.firstChild) {
+      styleElement.removeChild(styleElement.firstChild)
+    }
+    styleElement.appendChild(document.createTextNode(css))
   }
 }
 
 
 /***/ }),
-/* 3 */
+/* 5 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var utils = __webpack_require__(0);
-var settle = __webpack_require__(21);
-var buildURL = __webpack_require__(24);
-var parseHeaders = __webpack_require__(30);
-var isURLSameOrigin = __webpack_require__(28);
-var createError = __webpack_require__(6);
-var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(23);
+var settle = __webpack_require__(23);
+var buildURL = __webpack_require__(26);
+var parseHeaders = __webpack_require__(32);
+var isURLSameOrigin = __webpack_require__(30);
+var createError = __webpack_require__(8);
+var btoa = (typeof window !== 'undefined' && window.btoa && window.btoa.bind(window)) || __webpack_require__(25);
 
 module.exports = function xhrAdapter(config) {
   return new Promise(function dispatchXhrRequest(resolve, reject) {
@@ -639,7 +916,7 @@ module.exports = function xhrAdapter(config) {
     // This is only done if running in a standard browser environment.
     // Specifically not if we're in a web worker, or react-native.
     if (utils.isStandardBrowserEnv()) {
-      var cookies = __webpack_require__(26);
+      var cookies = __webpack_require__(28);
 
       // Add xsrf header
       var xsrfValue = (config.withCredentials || isURLSameOrigin(config.url)) && config.xsrfCookieName ?
@@ -715,7 +992,7 @@ module.exports = function xhrAdapter(config) {
 
 
 /***/ }),
-/* 4 */
+/* 6 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -741,7 +1018,7 @@ module.exports = Cancel;
 
 
 /***/ }),
-/* 5 */
+/* 7 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -753,13 +1030,13 @@ module.exports = function isCancel(value) {
 
 
 /***/ }),
-/* 6 */
+/* 8 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var enhanceError = __webpack_require__(20);
+var enhanceError = __webpack_require__(22);
 
 /**
  * Create an Error with the specified message, config, error code, and response.
@@ -777,7 +1054,7 @@ module.exports = function createError(message, config, code, response) {
 
 
 /***/ }),
-/* 7 */
+/* 9 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -795,7 +1072,7 @@ module.exports = function bind(fn, thisArg) {
 
 
 /***/ }),
-/* 8 */
+/* 10 */
 /***/ (function(module, exports, __webpack_require__) {
 
 var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;/*!
@@ -11055,7 +11332,7 @@ return jQuery;
 
 
 /***/ }),
-/* 9 */
+/* 11 */
 /***/ (function(module, exports) {
 
 var g;
@@ -11082,8 +11359,9 @@ module.exports = g;
 
 
 /***/ }),
-/* 10 */
+/* 12 */
 /***/ (function(module, exports, __webpack_require__) {
+
 
 //import UserTable from './components/user/UsersTable.vue';
 /**
@@ -11092,7 +11370,7 @@ module.exports = g;
  * building robust, powerful web applications using Vue and Laravel.
  */
 
-__webpack_require__(35);
+__webpack_require__(40);
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
@@ -11100,7 +11378,7 @@ __webpack_require__(35);
  */
 window.Event = new Vue(); //Instância que é usada pra comunicação entre os componentes
 
-window.toastr = __webpack_require__(41);
+window.toastr = __webpack_require__(48);
 
 window.toastr.options = {
     positionClass: "toast-top-right",
@@ -11116,25 +11394,15 @@ window.toastr.options = {
     progressBar: true
 };
 
-Vue.component('vue-table', __webpack_require__(43));
-Vue.component('user-view-modal', __webpack_require__(44));
-Vue.component('user-create-modal', __webpack_require__(70));
+Vue.component('vue-table', __webpack_require__(50));
+Vue.component('user-view-modal', __webpack_require__(54));
+Vue.component('user-create-modal', __webpack_require__(52));
+Vue.component('user-profile', __webpack_require__(53));
+Vue.component('avatar', __webpack_require__(51));
 
 var app = new Vue({
     el: '#app'
 });
-
-/***/ }),
-/* 11 */
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
-
-/***/ }),
-/* 12 */
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
 
 /***/ }),
 /* 13 */
@@ -11144,21 +11412,33 @@ var app = new Vue({
 
 /***/ }),
 /* 14 */
-/***/ (function(module, exports, __webpack_require__) {
+/***/ (function(module, exports) {
 
-module.exports = __webpack_require__(15);
+// removed by extract-text-webpack-plugin
 
 /***/ }),
 /* 15 */
+/***/ (function(module, exports) {
+
+// removed by extract-text-webpack-plugin
+
+/***/ }),
+/* 16 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports = __webpack_require__(17);
+
+/***/ }),
+/* 17 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var utils = __webpack_require__(0);
-var bind = __webpack_require__(7);
-var Axios = __webpack_require__(17);
-var defaults = __webpack_require__(1);
+var bind = __webpack_require__(9);
+var Axios = __webpack_require__(19);
+var defaults = __webpack_require__(2);
 
 /**
  * Create an instance of Axios
@@ -11191,15 +11471,15 @@ axios.create = function create(instanceConfig) {
 };
 
 // Expose Cancel & CancelToken
-axios.Cancel = __webpack_require__(4);
-axios.CancelToken = __webpack_require__(16);
-axios.isCancel = __webpack_require__(5);
+axios.Cancel = __webpack_require__(6);
+axios.CancelToken = __webpack_require__(18);
+axios.isCancel = __webpack_require__(7);
 
 // Expose all/spread
 axios.all = function all(promises) {
   return Promise.all(promises);
 };
-axios.spread = __webpack_require__(31);
+axios.spread = __webpack_require__(33);
 
 module.exports = axios;
 
@@ -11208,13 +11488,13 @@ module.exports.default = axios;
 
 
 /***/ }),
-/* 16 */
+/* 18 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var Cancel = __webpack_require__(4);
+var Cancel = __webpack_require__(6);
 
 /**
  * A `CancelToken` is an object that can be used to request cancellation of an operation.
@@ -11272,18 +11552,18 @@ module.exports = CancelToken;
 
 
 /***/ }),
-/* 17 */
+/* 19 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var defaults = __webpack_require__(1);
+var defaults = __webpack_require__(2);
 var utils = __webpack_require__(0);
-var InterceptorManager = __webpack_require__(18);
-var dispatchRequest = __webpack_require__(19);
-var isAbsoluteURL = __webpack_require__(27);
-var combineURLs = __webpack_require__(25);
+var InterceptorManager = __webpack_require__(20);
+var dispatchRequest = __webpack_require__(21);
+var isAbsoluteURL = __webpack_require__(29);
+var combineURLs = __webpack_require__(27);
 
 /**
  * Create a new instance of Axios
@@ -11364,7 +11644,7 @@ module.exports = Axios;
 
 
 /***/ }),
-/* 18 */
+/* 20 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11423,16 +11703,16 @@ module.exports = InterceptorManager;
 
 
 /***/ }),
-/* 19 */
+/* 21 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
 var utils = __webpack_require__(0);
-var transformData = __webpack_require__(22);
-var isCancel = __webpack_require__(5);
-var defaults = __webpack_require__(1);
+var transformData = __webpack_require__(24);
+var isCancel = __webpack_require__(7);
+var defaults = __webpack_require__(2);
 
 /**
  * Throws a `Cancel` if cancellation has been requested.
@@ -11509,7 +11789,7 @@ module.exports = function dispatchRequest(config) {
 
 
 /***/ }),
-/* 20 */
+/* 22 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11535,13 +11815,13 @@ module.exports = function enhanceError(error, config, code, response) {
 
 
 /***/ }),
-/* 21 */
+/* 23 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-var createError = __webpack_require__(6);
+var createError = __webpack_require__(8);
 
 /**
  * Resolve or reject a Promise based on response status.
@@ -11567,7 +11847,7 @@ module.exports = function settle(resolve, reject, response) {
 
 
 /***/ }),
-/* 22 */
+/* 24 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11594,7 +11874,7 @@ module.exports = function transformData(data, headers, fns) {
 
 
 /***/ }),
-/* 23 */
+/* 25 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11637,7 +11917,7 @@ module.exports = btoa;
 
 
 /***/ }),
-/* 24 */
+/* 26 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11712,7 +11992,7 @@ module.exports = function buildURL(url, params, paramsSerializer) {
 
 
 /***/ }),
-/* 25 */
+/* 27 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11731,7 +12011,7 @@ module.exports = function combineURLs(baseURL, relativeURL) {
 
 
 /***/ }),
-/* 26 */
+/* 28 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11791,7 +12071,7 @@ module.exports = (
 
 
 /***/ }),
-/* 27 */
+/* 29 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11812,7 +12092,7 @@ module.exports = function isAbsoluteURL(url) {
 
 
 /***/ }),
-/* 28 */
+/* 30 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11887,7 +12167,7 @@ module.exports = (
 
 
 /***/ }),
-/* 29 */
+/* 31 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11906,7 +12186,7 @@ module.exports = function normalizeHeaderName(headers, normalizedName) {
 
 
 /***/ }),
-/* 30 */
+/* 32 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11950,7 +12230,7 @@ module.exports = function parseHeaders(headers) {
 
 
 /***/ }),
-/* 31 */
+/* 33 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11984,7 +12264,7 @@ module.exports = function spread(callback) {
 
 
 /***/ }),
-/* 32 */
+/* 34 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -12057,12 +12337,15 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				return false;
 			}
 
-			axios.delete(this.deleteApi + data.id).then(function (response) {
-				toastr.success("Usuário deletado com sucesso!");
+			axios.delete(this.deleteApi + data.id).then(function () {
 				this.isVisible = false;
-			}).catch(function (error) {
-
-				toastr.warning("Existem postagens desse usuário!");
+				toastr.success("Usuário deletado com sucesso!");
+			}.bind(this)).catch(function (error) {
+				if (error.response.status == 500) {
+					toastr.warning("Usuário tem postagens cadastradas!");
+				} else {
+					toastr.error(error.response.data['status'], "Ocorreu um erro ao deletar!");
+				}
 			});
 		},
 
@@ -12074,12 +12357,12 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 33 */
+/* 35 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
 Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__TableItem_vue__ = __webpack_require__(42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__TableItem_vue__ = __webpack_require__(49);
 /* harmony import */ var __WEBPACK_IMPORTED_MODULE_0__TableItem_vue___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0__TableItem_vue__);
 //
 //
@@ -12163,10 +12446,14 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       var response = serverResponse.data[0];
       this.isLoading = false;
 
-      this.filterUsersData(response);
+      this.filterData(response);
     }.bind(this)).catch(function () {
       toastr.error("Ocorreu um erro ao tentar encontrar usuários!");
     });
+
+    Event.$on('set-new-tdata', function (tdata) {
+      this.tdatas.push(tdata);
+    }.bind(this));
   },
 
 
@@ -12174,7 +12461,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     /*
     * filtra os campos que serão preenchidos baseado na opção fillable. Deletando qualquer dado exedente
     */
-    filterUsersData: function filterUsersData(data) {
+    filterData: function filterData(data) {
       this.tdatas = data.filter(function (val) {
         for (var attName in val) {
           if (this.fillable.indexOf(attName) === -1) {
@@ -12198,7 +12485,277 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 34 */
+/* 36 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cropperjs__ = __webpack_require__(42);
+/* harmony import */ var __WEBPACK_IMPORTED_MODULE_0_cropperjs___default = __webpack_require__.n(__WEBPACK_IMPORTED_MODULE_0_cropperjs__);
+//
+//
+//
+//
+
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  props: ['src']
+
+});
+
+/***/ }),
+/* 37 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  props: ['title'],
+  data: function data() {
+    return {
+      isVisible: false,
+      isLoading: false,
+      user: {
+        name: '',
+        email: '',
+        password: '',
+        is_master: false
+      },
+      errors: []
+    };
+  },
+  created: function created() {
+    Event.$on("open-create-modal", function (data) {
+      this.isVisible = true;
+    }.bind(this));
+  },
+  mounted: function mounted() {
+
+    //event listener para sair com o esc do modal
+    window.addEventListener('keyup', function (event) {
+      // If esc was pressed...
+      if (event.keyCode == 27) {
+        this.closeModal();
+      }
+    }.bind(this));
+  },
+
+
+  methods: {
+    closeModal: function closeModal() {
+      this.isVisible = false;
+    },
+
+    sendForm: function sendForm() {
+      this.isLoading = true;
+
+      axios.post('users/create', this.user).then(function (serverResponse) {
+        this.appendToTable(serverResponse.data);
+
+        this.isLoading = false;
+        this.clearFields();
+
+        toastr.success("Usuário criado com sucesso!");
+      }.bind(this)).catch(function (error) {
+        console.log(error.response);
+        this.errors = error.response.data;
+        this.isLoading = false;
+      }.bind(this));
+    },
+
+    getError: function getError(error) {
+      if (this.errors[error]) {
+        return this.errors[error][0];
+      } else {
+        return false;
+      }
+    },
+
+    clearError: function clearError(error) {
+      delete this.errors[error];
+    },
+
+    clearFields: function clearFields() {
+      this.user.email = '';
+      this.user.name = '';
+      this.user.is_master = false;
+      this.user.password = '';
+    },
+
+    appendToTable: function appendToTable(userd) {
+      Event.$emit('set-new-tdata', {
+        id: userd.id,
+        name: userd.name,
+        email: userd.email,
+        is_master: userd.is_master ? "Sim" : "Não"
+      });
+    }
+  }
+
+});
+
+/***/ }),
+/* 38 */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+//
+
+/* harmony default export */ __webpack_exports__["default"] = ({
+  props: ['user-api', 'post-avatar'],
+  data: function data() {
+    return {
+      user: {
+        name: '',
+        email: '',
+        avatar: '',
+        created_date: '',
+        is_master: ''
+
+      },
+      isLoading: true,
+      image: '',
+      tab: 'profile'
+    };
+  },
+  mounted: function mounted() {
+    axios.get(this.userApi).then(function (serverResponse) {
+      this.user = serverResponse.data[0];
+
+      this.isLoading = false;
+    }.bind(this)).catch(function (error) {
+      console.log(error.response);
+      toastr.error("Ocorreu um erro ao tentar encontrar usuário!");
+    });
+  },
+
+
+  methods: {}
+});
+
+/***/ }),
+/* 39 */
 /***/ (function(module, __webpack_exports__, __webpack_require__) {
 
 "use strict";
@@ -12316,11 +12873,11 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 });
 
 /***/ }),
-/* 35 */
+/* 40 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
-window._ = __webpack_require__(39);
+window._ = __webpack_require__(46);
 
 /**
  * We'll load jQuery and the Bootstrap jQuery plugin which provides support
@@ -12328,9 +12885,9 @@ window._ = __webpack_require__(39);
  * code may be modified to fit the specific needs of your application.
  */
 
-window.$ = window.jQuery = __webpack_require__(8);
+window.$ = window.jQuery = __webpack_require__(10);
 
-__webpack_require__(36);
+__webpack_require__(41);
 
 /**
  * Vue is a modern JavaScript library for building interactive web interfaces
@@ -12338,7 +12895,7 @@ __webpack_require__(36);
  * and simple, leaving you to focus on building your next great project.
  */
 
-window.Vue = __webpack_require__(51);
+window.Vue = __webpack_require__(65);
 
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests
@@ -12346,7 +12903,7 @@ window.Vue = __webpack_require__(51);
  * CSRF token as a header based on the value of the "XSRF" token cookie.
  */
 
-window.axios = __webpack_require__(14);
+window.axios = __webpack_require__(16);
 
 window.axios.defaults.headers.common['X-CSRF-TOKEN'] = window.Laravel.csrfToken;
 window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
@@ -12367,7 +12924,7 @@ window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
 // });
 
 /***/ }),
-/* 36 */
+/* 41 */
 /***/ (function(module, exports) {
 
 /*!
@@ -14750,70 +15307,3600 @@ if (typeof jQuery === 'undefined') {
 
 
 /***/ }),
-/* 37 */
+/* 42 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(38)();
-exports.push([module.i, "\n.btn {\n  margin-top: 5px;\n}\n.button-create{\n  margin-left: 10px;\n}\n", ""]);
+/*!
+ * Cropper.js v1.0.0-rc.1
+ * https://github.com/fengyuanchen/cropperjs
+ *
+ * Copyright (c) 2017 Fengyuan Chen
+ * Released under the MIT license
+ *
+ * Date: 2017-04-30T03:26:33.550Z
+ */
 
-/***/ }),
-/* 38 */
-/***/ (function(module, exports) {
+(function (global, factory) {
+   true ? module.exports = factory() :
+  typeof define === 'function' && define.amd ? define(factory) :
+  (global.Cropper = factory());
+}(this, (function () { 'use strict';
 
-/*
-	MIT License http://www.opensource.org/licenses/mit-license.php
-	Author Tobias Koppers @sokra
-*/
-// css base code, injected by the css-loader
-module.exports = function() {
-	var list = [];
+var DEFAULTS = {
+  // Define the view mode of the cropper
+  viewMode: 0, // 0, 1, 2, 3
 
-	// return the list of modules as css string
-	list.toString = function toString() {
-		var result = [];
-		for(var i = 0; i < this.length; i++) {
-			var item = this[i];
-			if(item[2]) {
-				result.push("@media " + item[2] + "{" + item[1] + "}");
-			} else {
-				result.push(item[1]);
-			}
-		}
-		return result.join("");
-	};
+  // Define the dragging mode of the cropper
+  dragMode: 'crop', // 'crop', 'move' or 'none'
 
-	// import a list of modules into the list
-	list.i = function(modules, mediaQuery) {
-		if(typeof modules === "string")
-			modules = [[null, modules, ""]];
-		var alreadyImportedModules = {};
-		for(var i = 0; i < this.length; i++) {
-			var id = this[i][0];
-			if(typeof id === "number")
-				alreadyImportedModules[id] = true;
-		}
-		for(i = 0; i < modules.length; i++) {
-			var item = modules[i];
-			// skip already imported module
-			// this implementation is not 100% perfect for weird media query combinations
-			//  when a module is imported multiple times with different media queries.
-			//  I hope this will never occur (Hey this way we have smaller bundles)
-			if(typeof item[0] !== "number" || !alreadyImportedModules[item[0]]) {
-				if(mediaQuery && !item[2]) {
-					item[2] = mediaQuery;
-				} else if(mediaQuery) {
-					item[2] = "(" + item[2] + ") and (" + mediaQuery + ")";
-				}
-				list.push(item);
-			}
-		}
-	};
-	return list;
+  // Define the aspect ratio of the crop box
+  aspectRatio: NaN,
+
+  // An object with the previous cropping result data
+  data: null,
+
+  // A selector for adding extra containers to preview
+  preview: '',
+
+  // Re-render the cropper when resize the window
+  responsive: true,
+
+  // Restore the cropped area after resize the window
+  restore: true,
+
+  // Check if the current image is a cross-origin image
+  checkCrossOrigin: true,
+
+  // Check the current image's Exif Orientation information
+  checkOrientation: true,
+
+  // Show the black modal
+  modal: true,
+
+  // Show the dashed lines for guiding
+  guides: true,
+
+  // Show the center indicator for guiding
+  center: true,
+
+  // Show the white modal to highlight the crop box
+  highlight: true,
+
+  // Show the grid background
+  background: true,
+
+  // Enable to crop the image automatically when initialize
+  autoCrop: true,
+
+  // Define the percentage of automatic cropping area when initializes
+  autoCropArea: 0.8,
+
+  // Enable to move the image
+  movable: true,
+
+  // Enable to rotate the image
+  rotatable: true,
+
+  // Enable to scale the image
+  scalable: true,
+
+  // Enable to zoom the image
+  zoomable: true,
+
+  // Enable to zoom the image by dragging touch
+  zoomOnTouch: true,
+
+  // Enable to zoom the image by wheeling mouse
+  zoomOnWheel: true,
+
+  // Define zoom ratio when zoom the image by wheeling mouse
+  wheelZoomRatio: 0.1,
+
+  // Enable to move the crop box
+  cropBoxMovable: true,
+
+  // Enable to resize the crop box
+  cropBoxResizable: true,
+
+  // Toggle drag mode between "crop" and "move" when click twice on the cropper
+  toggleDragModeOnDblclick: true,
+
+  // Size limitation
+  minCanvasWidth: 0,
+  minCanvasHeight: 0,
+  minCropBoxWidth: 0,
+  minCropBoxHeight: 0,
+  minContainerWidth: 200,
+  minContainerHeight: 100,
+
+  // Shortcuts of events
+  ready: null,
+  cropstart: null,
+  cropmove: null,
+  cropend: null,
+  crop: null,
+  zoom: null
+};
+
+var TEMPLATE = '<div class="cropper-container">' + '<div class="cropper-wrap-box">' + '<div class="cropper-canvas"></div>' + '</div>' + '<div class="cropper-drag-box"></div>' + '<div class="cropper-crop-box">' + '<span class="cropper-view-box"></span>' + '<span class="cropper-dashed dashed-h"></span>' + '<span class="cropper-dashed dashed-v"></span>' + '<span class="cropper-center"></span>' + '<span class="cropper-face"></span>' + '<span class="cropper-line line-e" data-action="e"></span>' + '<span class="cropper-line line-n" data-action="n"></span>' + '<span class="cropper-line line-w" data-action="w"></span>' + '<span class="cropper-line line-s" data-action="s"></span>' + '<span class="cropper-point point-e" data-action="e"></span>' + '<span class="cropper-point point-n" data-action="n"></span>' + '<span class="cropper-point point-w" data-action="w"></span>' + '<span class="cropper-point point-s" data-action="s"></span>' + '<span class="cropper-point point-ne" data-action="ne"></span>' + '<span class="cropper-point point-nw" data-action="nw"></span>' + '<span class="cropper-point point-sw" data-action="sw"></span>' + '<span class="cropper-point point-se" data-action="se"></span>' + '</div>' + '</div>';
+
+var _typeof = typeof Symbol === "function" && typeof Symbol.iterator === "symbol" ? function (obj) {
+  return typeof obj;
+} : function (obj) {
+  return obj && typeof Symbol === "function" && obj.constructor === Symbol && obj !== Symbol.prototype ? "symbol" : typeof obj;
 };
 
 
+
+
+
+
+
+
+
+
+
+var classCallCheck = function (instance, Constructor) {
+  if (!(instance instanceof Constructor)) {
+    throw new TypeError("Cannot call a class as a function");
+  }
+};
+
+var createClass = function () {
+  function defineProperties(target, props) {
+    for (var i = 0; i < props.length; i++) {
+      var descriptor = props[i];
+      descriptor.enumerable = descriptor.enumerable || false;
+      descriptor.configurable = true;
+      if ("value" in descriptor) descriptor.writable = true;
+      Object.defineProperty(target, descriptor.key, descriptor);
+    }
+  }
+
+  return function (Constructor, protoProps, staticProps) {
+    if (protoProps) defineProperties(Constructor.prototype, protoProps);
+    if (staticProps) defineProperties(Constructor, staticProps);
+    return Constructor;
+  };
+}();
+
+
+
+
+
+
+
+var get = function get(object, property, receiver) {
+  if (object === null) object = Function.prototype;
+  var desc = Object.getOwnPropertyDescriptor(object, property);
+
+  if (desc === undefined) {
+    var parent = Object.getPrototypeOf(object);
+
+    if (parent === null) {
+      return undefined;
+    } else {
+      return get(parent, property, receiver);
+    }
+  } else if ("value" in desc) {
+    return desc.value;
+  } else {
+    var getter = desc.get;
+
+    if (getter === undefined) {
+      return undefined;
+    }
+
+    return getter.call(receiver);
+  }
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var set = function set(object, property, value, receiver) {
+  var desc = Object.getOwnPropertyDescriptor(object, property);
+
+  if (desc === undefined) {
+    var parent = Object.getPrototypeOf(object);
+
+    if (parent !== null) {
+      set(parent, property, value, receiver);
+    }
+  } else if ("value" in desc && desc.writable) {
+    desc.value = value;
+  } else {
+    var setter = desc.set;
+
+    if (setter !== undefined) {
+      setter.call(receiver, value);
+    }
+  }
+
+  return value;
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+var toConsumableArray = function (arr) {
+  if (Array.isArray(arr)) {
+    for (var i = 0, arr2 = Array(arr.length); i < arr.length; i++) arr2[i] = arr[i];
+
+    return arr2;
+  } else {
+    return Array.from(arr);
+  }
+};
+
+// RegExps
+var REGEXP_DATA_URL_HEAD = /^data:.*,/;
+var REGEXP_HYPHENATE = /([a-z\d])([A-Z])/g;
+var REGEXP_ORIGINS = /^(https?:)\/\/([^:/?#]+):?(\d*)/i;
+var REGEXP_SPACES = /\s+/;
+var REGEXP_SUFFIX = /^(width|height|left|top|marginLeft|marginTop)$/;
+var REGEXP_TRIM = /^\s+(.*)\s+$/;
+var REGEXP_USERAGENT = /(Macintosh|iPhone|iPod|iPad).*AppleWebKit/i;
+
+// Utilities
+var navigator = typeof window !== 'undefined' ? window.navigator : null;
+var IS_SAFARI_OR_UIWEBVIEW = navigator && REGEXP_USERAGENT.test(navigator.userAgent);
+var objectProto = Object.prototype;
+var toString = objectProto.toString;
+var hasOwnProperty = objectProto.hasOwnProperty;
+var slice = Array.prototype.slice;
+var fromCharCode = String.fromCharCode;
+
+function typeOf(obj) {
+  return toString.call(obj).slice(8, -1).toLowerCase();
+}
+
+function isNumber(num) {
+  return typeof num === 'number' && !isNaN(num);
+}
+
+function isUndefined(obj) {
+  return typeof obj === 'undefined';
+}
+
+function isObject(obj) {
+  return (typeof obj === 'undefined' ? 'undefined' : _typeof(obj)) === 'object' && obj !== null;
+}
+
+function isPlainObject(obj) {
+  if (!isObject(obj)) {
+    return false;
+  }
+
+  try {
+    var _constructor = obj.constructor;
+    var prototype = _constructor.prototype;
+
+    return _constructor && prototype && hasOwnProperty.call(prototype, 'isPrototypeOf');
+  } catch (e) {
+    return false;
+  }
+}
+
+function isFunction(fn) {
+  return typeOf(fn) === 'function';
+}
+
+function isArray(arr) {
+  return Array.isArray ? Array.isArray(arr) : typeOf(arr) === 'array';
+}
+
+
+
+function trim(str) {
+  if (typeof str === 'string') {
+    str = str.trim ? str.trim() : str.replace(REGEXP_TRIM, '$1');
+  }
+
+  return str;
+}
+
+function each(obj, callback) {
+  if (obj && isFunction(callback)) {
+    var i = void 0;
+
+    if (isArray(obj) || isNumber(obj.length) /* array-like */) {
+        var length = obj.length;
+
+        for (i = 0; i < length; i++) {
+          if (callback.call(obj, obj[i], i, obj) === false) {
+            break;
+          }
+        }
+      } else if (isObject(obj)) {
+      Object.keys(obj).forEach(function (key) {
+        callback.call(obj, obj[key], key, obj);
+      });
+    }
+  }
+
+  return obj;
+}
+
+function extend(obj) {
+  for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+    args[_key - 1] = arguments[_key];
+  }
+
+  if (isObject(obj) && args.length > 0) {
+    if (Object.assign) {
+      return Object.assign.apply(Object, [obj].concat(args));
+    }
+
+    args.forEach(function (arg) {
+      if (isObject(arg)) {
+        Object.keys(arg).forEach(function (key) {
+          obj[key] = arg[key];
+        });
+      }
+    });
+  }
+
+  return obj;
+}
+
+function proxy(fn, context) {
+  for (var _len2 = arguments.length, args = Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
+    args[_key2 - 2] = arguments[_key2];
+  }
+
+  return function () {
+    for (var _len3 = arguments.length, args2 = Array(_len3), _key3 = 0; _key3 < _len3; _key3++) {
+      args2[_key3] = arguments[_key3];
+    }
+
+    return fn.apply(context, args.concat(args2));
+  };
+}
+
+function setStyle(element, styles) {
+  var style = element.style;
+
+  each(styles, function (value, property) {
+    if (REGEXP_SUFFIX.test(property) && isNumber(value)) {
+      value += 'px';
+    }
+
+    style[property] = value;
+  });
+}
+
+function hasClass(element, value) {
+  return element.classList ? element.classList.contains(value) : element.className.indexOf(value) > -1;
+}
+
+function addClass(element, value) {
+  if (!value) {
+    return;
+  }
+
+  if (isNumber(element.length)) {
+    each(element, function (elem) {
+      addClass(elem, value);
+    });
+    return;
+  }
+
+  if (element.classList) {
+    element.classList.add(value);
+    return;
+  }
+
+  var className = trim(element.className);
+
+  if (!className) {
+    element.className = value;
+  } else if (className.indexOf(value) < 0) {
+    element.className = className + ' ' + value;
+  }
+}
+
+function removeClass(element, value) {
+  if (!value) {
+    return;
+  }
+
+  if (isNumber(element.length)) {
+    each(element, function (elem) {
+      removeClass(elem, value);
+    });
+    return;
+  }
+
+  if (element.classList) {
+    element.classList.remove(value);
+    return;
+  }
+
+  if (element.className.indexOf(value) >= 0) {
+    element.className = element.className.replace(value, '');
+  }
+}
+
+function toggleClass(element, value, added) {
+  if (!value) {
+    return;
+  }
+
+  if (isNumber(element.length)) {
+    each(element, function (elem) {
+      toggleClass(elem, value, added);
+    });
+    return;
+  }
+
+  // IE10-11 doesn't support the second parameter of `classList.toggle`
+  if (added) {
+    addClass(element, value);
+  } else {
+    removeClass(element, value);
+  }
+}
+
+function hyphenate(str) {
+  return str.replace(REGEXP_HYPHENATE, '$1-$2').toLowerCase();
+}
+
+function getData$1(element, name) {
+  if (isObject(element[name])) {
+    return element[name];
+  } else if (element.dataset) {
+    return element.dataset[name];
+  }
+
+  return element.getAttribute('data-' + hyphenate(name));
+}
+
+function setData$1(element, name, data) {
+  if (isObject(data)) {
+    element[name] = data;
+  } else if (element.dataset) {
+    element.dataset[name] = data;
+  } else {
+    element.setAttribute('data-' + hyphenate(name), data);
+  }
+}
+
+function removeData(element, name) {
+  if (isObject(element[name])) {
+    delete element[name];
+  } else if (element.dataset) {
+    // #128 Safari not allows to delete dataset property
+    try {
+      delete element.dataset[name];
+    } catch (e) {
+      element.dataset[name] = null;
+    }
+  } else {
+    element.removeAttribute('data-' + hyphenate(name));
+  }
+}
+
+function removeListener(element, type, handler) {
+  var types = trim(type).split(REGEXP_SPACES);
+
+  if (types.length > 1) {
+    each(types, function (t) {
+      removeListener(element, t, handler);
+    });
+    return;
+  }
+
+  if (element.removeEventListener) {
+    element.removeEventListener(type, handler, false);
+  } else if (element.detachEvent) {
+    element.detachEvent('on' + type, handler);
+  }
+}
+
+function addListener(element, type, _handler, once) {
+  var types = trim(type).split(REGEXP_SPACES);
+  var originalHandler = _handler;
+
+  if (types.length > 1) {
+    each(types, function (t) {
+      addListener(element, t, _handler);
+    });
+    return;
+  }
+
+  if (once) {
+    _handler = function handler() {
+      for (var _len4 = arguments.length, args = Array(_len4), _key4 = 0; _key4 < _len4; _key4++) {
+        args[_key4] = arguments[_key4];
+      }
+
+      removeListener(element, type, _handler);
+
+      return originalHandler.apply(element, args);
+    };
+  }
+
+  if (element.addEventListener) {
+    element.addEventListener(type, _handler, false);
+  } else if (element.attachEvent) {
+    element.attachEvent('on' + type, _handler);
+  }
+}
+
+function dispatchEvent(element, type, data) {
+  if (element.dispatchEvent) {
+    var event = void 0;
+
+    // Event and CustomEvent on IE9-11 are global objects, not constructors
+    if (isFunction(Event) && isFunction(CustomEvent)) {
+      if (isUndefined(data)) {
+        event = new Event(type, {
+          bubbles: true,
+          cancelable: true
+        });
+      } else {
+        event = new CustomEvent(type, {
+          detail: data,
+          bubbles: true,
+          cancelable: true
+        });
+      }
+    } else if (isUndefined(data)) {
+      event = document.createEvent('Event');
+      event.initEvent(type, true, true);
+    } else {
+      event = document.createEvent('CustomEvent');
+      event.initCustomEvent(type, true, true, data);
+    }
+
+    // IE9+
+    return element.dispatchEvent(event);
+  } else if (element.fireEvent) {
+    // IE6-10 (native events only)
+    return element.fireEvent('on' + type);
+  }
+
+  return true;
+}
+
+function getEvent(event) {
+  var e = event || window.event;
+
+  // Fix target property (IE8)
+  if (!e.target) {
+    e.target = e.srcElement || document;
+  }
+
+  if (!isNumber(e.pageX) && isNumber(e.clientX)) {
+    var eventDoc = event.target.ownerDocument || document;
+    var doc = eventDoc.documentElement;
+    var body = eventDoc.body;
+
+    e.pageX = e.clientX + ((doc && doc.scrollLeft || body && body.scrollLeft || 0) - (doc && doc.clientLeft || body && body.clientLeft || 0));
+    e.pageY = e.clientY + ((doc && doc.scrollTop || body && body.scrollTop || 0) - (doc && doc.clientTop || body && body.clientTop || 0));
+  }
+
+  return e;
+}
+
+function getOffset(element) {
+  var doc = document.documentElement;
+  var box = element.getBoundingClientRect();
+
+  return {
+    left: box.left + ((window.scrollX || doc && doc.scrollLeft || 0) - (doc && doc.clientLeft || 0)),
+    top: box.top + ((window.scrollY || doc && doc.scrollTop || 0) - (doc && doc.clientTop || 0))
+  };
+}
+
+function getByTag(element, tagName) {
+  return element.getElementsByTagName(tagName);
+}
+
+function getByClass(element, className) {
+  return element.getElementsByClassName ? element.getElementsByClassName(className) : element.querySelectorAll('.' + className);
+}
+
+function createElement(tagName) {
+  return document.createElement(tagName);
+}
+
+function appendChild(element, elem) {
+  element.appendChild(elem);
+}
+
+function removeChild(element) {
+  if (element.parentNode) {
+    element.parentNode.removeChild(element);
+  }
+}
+
+function empty(element) {
+  while (element.firstChild) {
+    element.removeChild(element.firstChild);
+  }
+}
+
+function isCrossOriginURL(url) {
+  var parts = url.match(REGEXP_ORIGINS);
+
+  return parts && (parts[1] !== location.protocol || parts[2] !== location.hostname || parts[3] !== location.port);
+}
+
+function addTimestamp(url) {
+  var timestamp = 'timestamp=' + new Date().getTime();
+
+  return url + (url.indexOf('?') === -1 ? '?' : '&') + timestamp;
+}
+
+function getImageSize(image, callback) {
+  // Modern browsers (ignore Safari)
+  if (image.naturalWidth && !IS_SAFARI_OR_UIWEBVIEW) {
+    callback(image.naturalWidth, image.naturalHeight);
+    return;
+  }
+
+  // IE8: Don't use `new Image()` here
+  var newImage = createElement('img');
+
+  newImage.onload = function load() {
+    callback(this.width, this.height);
+  };
+
+  newImage.src = image.src;
+}
+
+function getTransforms(data) {
+  var transforms = [];
+  var translateX = data.translateX;
+  var translateY = data.translateY;
+  var rotate = data.rotate;
+  var scaleX = data.scaleX;
+  var scaleY = data.scaleY;
+
+  if (isNumber(translateX) && translateX !== 0) {
+    transforms.push('translateX(' + translateX + 'px)');
+  }
+
+  if (isNumber(translateY) && translateY !== 0) {
+    transforms.push('translateY(' + translateY + 'px)');
+  }
+
+  // Rotate should come first before scale to match orientation transform
+  if (isNumber(rotate) && rotate !== 0) {
+    transforms.push('rotate(' + rotate + 'deg)');
+  }
+
+  if (isNumber(scaleX) && scaleX !== 1) {
+    transforms.push('scaleX(' + scaleX + ')');
+  }
+
+  if (isNumber(scaleY) && scaleY !== 1) {
+    transforms.push('scaleY(' + scaleY + ')');
+  }
+
+  var transform = transforms.length ? transforms.join(' ') : 'none';
+
+  return {
+    WebkitTransform: transform,
+    msTransform: transform,
+    transform: transform
+  };
+}
+
+function getRotatedSizes(data, reversed) {
+  var deg = Math.abs(data.degree) % 180;
+  var arc = (deg > 90 ? 180 - deg : deg) * Math.PI / 180;
+  var sinArc = Math.sin(arc);
+  var cosArc = Math.cos(arc);
+  var width = data.width;
+  var height = data.height;
+  var aspectRatio = data.aspectRatio;
+  var newWidth = void 0;
+  var newHeight = void 0;
+
+  if (!reversed) {
+    newWidth = width * cosArc + height * sinArc;
+    newHeight = width * sinArc + height * cosArc;
+  } else {
+    newWidth = width / (cosArc + sinArc / aspectRatio);
+    newHeight = newWidth / aspectRatio;
+  }
+
+  return {
+    width: newWidth,
+    height: newHeight
+  };
+}
+
+function getSourceCanvas(image, data) {
+  var canvas = createElement('canvas');
+  var context = canvas.getContext('2d');
+  var dstX = 0;
+  var dstY = 0;
+  var dstWidth = data.naturalWidth;
+  var dstHeight = data.naturalHeight;
+  var rotate = data.rotate;
+  var scaleX = data.scaleX;
+  var scaleY = data.scaleY;
+  var scalable = isNumber(scaleX) && isNumber(scaleY) && (scaleX !== 1 || scaleY !== 1);
+  var rotatable = isNumber(rotate) && rotate !== 0;
+  var advanced = rotatable || scalable;
+  var canvasWidth = dstWidth * Math.abs(scaleX || 1);
+  var canvasHeight = dstHeight * Math.abs(scaleY || 1);
+  var translateX = void 0;
+  var translateY = void 0;
+  var rotated = void 0;
+
+  if (scalable) {
+    translateX = canvasWidth / 2;
+    translateY = canvasHeight / 2;
+  }
+
+  if (rotatable) {
+    rotated = getRotatedSizes({
+      width: canvasWidth,
+      height: canvasHeight,
+      degree: rotate
+    });
+
+    canvasWidth = rotated.width;
+    canvasHeight = rotated.height;
+    translateX = canvasWidth / 2;
+    translateY = canvasHeight / 2;
+  }
+
+  canvas.width = canvasWidth;
+  canvas.height = canvasHeight;
+
+  if (advanced) {
+    dstX = -dstWidth / 2;
+    dstY = -dstHeight / 2;
+
+    context.save();
+    context.translate(translateX, translateY);
+  }
+
+  // Rotate should come first before scale as in the "getTransform" function
+  if (rotatable) {
+    context.rotate(rotate * Math.PI / 180);
+  }
+
+  if (scalable) {
+    context.scale(scaleX, scaleY);
+  }
+
+  context.drawImage(image, Math.floor(dstX), Math.floor(dstY), Math.floor(dstWidth), Math.floor(dstHeight));
+
+  if (advanced) {
+    context.restore();
+  }
+
+  return canvas;
+}
+
+function getStringFromCharCode(dataView, start, length) {
+  var str = '';
+  var i = start;
+
+  for (length += start; i < length; i++) {
+    str += fromCharCode(dataView.getUint8(i));
+  }
+
+  return str;
+}
+
+function getOrientation(arrayBuffer) {
+  var dataView = new DataView(arrayBuffer);
+  var length = dataView.byteLength;
+  var orientation = void 0;
+  var exifIDCode = void 0;
+  var tiffOffset = void 0;
+  var firstIFDOffset = void 0;
+  var littleEndian = void 0;
+  var endianness = void 0;
+  var app1Start = void 0;
+  var ifdStart = void 0;
+  var offset = void 0;
+  var i = void 0;
+
+  // Only handle JPEG image (start by 0xFFD8)
+  if (dataView.getUint8(0) === 0xFF && dataView.getUint8(1) === 0xD8) {
+    offset = 2;
+
+    while (offset < length) {
+      if (dataView.getUint8(offset) === 0xFF && dataView.getUint8(offset + 1) === 0xE1) {
+        app1Start = offset;
+        break;
+      }
+
+      offset++;
+    }
+  }
+
+  if (app1Start) {
+    exifIDCode = app1Start + 4;
+    tiffOffset = app1Start + 10;
+
+    if (getStringFromCharCode(dataView, exifIDCode, 4) === 'Exif') {
+      endianness = dataView.getUint16(tiffOffset);
+      littleEndian = endianness === 0x4949;
+
+      if (littleEndian || endianness === 0x4D4D /* bigEndian */) {
+          if (dataView.getUint16(tiffOffset + 2, littleEndian) === 0x002A) {
+            firstIFDOffset = dataView.getUint32(tiffOffset + 4, littleEndian);
+
+            if (firstIFDOffset >= 0x00000008) {
+              ifdStart = tiffOffset + firstIFDOffset;
+            }
+          }
+        }
+    }
+  }
+
+  if (ifdStart) {
+    length = dataView.getUint16(ifdStart, littleEndian);
+
+    for (i = 0; i < length; i++) {
+      offset = ifdStart + i * 12 + 2;
+
+      if (dataView.getUint16(offset, littleEndian) === 0x0112 /* Orientation */) {
+          // 8 is the offset of the current tag's value
+          offset += 8;
+
+          // Get the original orientation value
+          orientation = dataView.getUint16(offset, littleEndian);
+
+          // Override the orientation with its default value for Safari
+          if (IS_SAFARI_OR_UIWEBVIEW) {
+            dataView.setUint16(offset, 1, littleEndian);
+          }
+
+          break;
+        }
+    }
+  }
+
+  return orientation;
+}
+
+function dataURLToArrayBuffer(dataURL) {
+  var base64 = dataURL.replace(REGEXP_DATA_URL_HEAD, '');
+  var binary = atob(base64);
+  var length = binary.length;
+  var arrayBuffer = new ArrayBuffer(length);
+  var dataView = new Uint8Array(arrayBuffer);
+  var i = void 0;
+
+  for (i = 0; i < length; i++) {
+    dataView[i] = binary.charCodeAt(i);
+  }
+
+  return arrayBuffer;
+}
+
+// Only available for JPEG image
+function arrayBufferToDataURL(arrayBuffer) {
+  var dataView = new Uint8Array(arrayBuffer);
+  var length = dataView.length;
+  var base64 = '';
+  var i = void 0;
+
+  for (i = 0; i < length; i++) {
+    base64 += fromCharCode(dataView[i]);
+  }
+
+  return 'data:image/jpeg;base64,' + btoa(base64);
+}
+
+var render$1 = {
+  render: function render() {
+    var self = this;
+
+    self.initContainer();
+    self.initCanvas();
+    self.initCropBox();
+
+    self.renderCanvas();
+
+    if (self.cropped) {
+      self.renderCropBox();
+    }
+  },
+  initContainer: function initContainer() {
+    var self = this;
+    var options = self.options;
+    var element = self.element;
+    var container = self.container;
+    var cropper = self.cropper;
+    var hidden = 'cropper-hidden';
+    var containerData = void 0;
+
+    addClass(cropper, hidden);
+    removeClass(element, hidden);
+
+    self.containerData = containerData = {
+      width: Math.max(container.offsetWidth, Number(options.minContainerWidth) || 200),
+      height: Math.max(container.offsetHeight, Number(options.minContainerHeight) || 100)
+    };
+
+    setStyle(cropper, {
+      width: containerData.width,
+      height: containerData.height
+    });
+
+    addClass(element, hidden);
+    removeClass(cropper, hidden);
+  },
+
+
+  // Canvas (image wrapper)
+  initCanvas: function initCanvas() {
+    var self = this;
+    var viewMode = self.options.viewMode;
+    var containerData = self.containerData;
+    var imageData = self.imageData;
+    var rotated = Math.abs(imageData.rotate) === 90;
+    var naturalWidth = rotated ? imageData.naturalHeight : imageData.naturalWidth;
+    var naturalHeight = rotated ? imageData.naturalWidth : imageData.naturalHeight;
+    var aspectRatio = naturalWidth / naturalHeight;
+    var canvasWidth = containerData.width;
+    var canvasHeight = containerData.height;
+
+    if (containerData.height * aspectRatio > containerData.width) {
+      if (viewMode === 3) {
+        canvasWidth = containerData.height * aspectRatio;
+      } else {
+        canvasHeight = containerData.width / aspectRatio;
+      }
+    } else if (viewMode === 3) {
+      canvasHeight = containerData.width / aspectRatio;
+    } else {
+      canvasWidth = containerData.height * aspectRatio;
+    }
+
+    var canvasData = {
+      naturalWidth: naturalWidth,
+      naturalHeight: naturalHeight,
+      aspectRatio: aspectRatio,
+      width: canvasWidth,
+      height: canvasHeight
+    };
+
+    canvasData.oldLeft = canvasData.left = (containerData.width - canvasWidth) / 2;
+    canvasData.oldTop = canvasData.top = (containerData.height - canvasHeight) / 2;
+
+    self.canvasData = canvasData;
+    self.limited = viewMode === 1 || viewMode === 2;
+    self.limitCanvas(true, true);
+    self.initialImageData = extend({}, imageData);
+    self.initialCanvasData = extend({}, canvasData);
+  },
+  limitCanvas: function limitCanvas(sizeLimited, positionLimited) {
+    var self = this;
+    var options = self.options;
+    var viewMode = options.viewMode;
+    var containerData = self.containerData;
+    var canvasData = self.canvasData;
+    var aspectRatio = canvasData.aspectRatio;
+    var cropBoxData = self.cropBoxData;
+    var cropped = self.cropped && cropBoxData;
+
+    if (sizeLimited) {
+      var minCanvasWidth = Number(options.minCanvasWidth) || 0;
+      var minCanvasHeight = Number(options.minCanvasHeight) || 0;
+
+      if (viewMode > 1) {
+        minCanvasWidth = Math.max(minCanvasWidth, containerData.width);
+        minCanvasHeight = Math.max(minCanvasHeight, containerData.height);
+
+        if (viewMode === 3) {
+          if (minCanvasHeight * aspectRatio > minCanvasWidth) {
+            minCanvasWidth = minCanvasHeight * aspectRatio;
+          } else {
+            minCanvasHeight = minCanvasWidth / aspectRatio;
+          }
+        }
+      } else if (viewMode > 0) {
+        if (minCanvasWidth) {
+          minCanvasWidth = Math.max(minCanvasWidth, cropped ? cropBoxData.width : 0);
+        } else if (minCanvasHeight) {
+          minCanvasHeight = Math.max(minCanvasHeight, cropped ? cropBoxData.height : 0);
+        } else if (cropped) {
+          minCanvasWidth = cropBoxData.width;
+          minCanvasHeight = cropBoxData.height;
+
+          if (minCanvasHeight * aspectRatio > minCanvasWidth) {
+            minCanvasWidth = minCanvasHeight * aspectRatio;
+          } else {
+            minCanvasHeight = minCanvasWidth / aspectRatio;
+          }
+        }
+      }
+
+      if (minCanvasWidth && minCanvasHeight) {
+        if (minCanvasHeight * aspectRatio > minCanvasWidth) {
+          minCanvasHeight = minCanvasWidth / aspectRatio;
+        } else {
+          minCanvasWidth = minCanvasHeight * aspectRatio;
+        }
+      } else if (minCanvasWidth) {
+        minCanvasHeight = minCanvasWidth / aspectRatio;
+      } else if (minCanvasHeight) {
+        minCanvasWidth = minCanvasHeight * aspectRatio;
+      }
+
+      canvasData.minWidth = minCanvasWidth;
+      canvasData.minHeight = minCanvasHeight;
+      canvasData.maxWidth = Infinity;
+      canvasData.maxHeight = Infinity;
+    }
+
+    if (positionLimited) {
+      if (viewMode) {
+        var newCanvasLeft = containerData.width - canvasData.width;
+        var newCanvasTop = containerData.height - canvasData.height;
+
+        canvasData.minLeft = Math.min(0, newCanvasLeft);
+        canvasData.minTop = Math.min(0, newCanvasTop);
+        canvasData.maxLeft = Math.max(0, newCanvasLeft);
+        canvasData.maxTop = Math.max(0, newCanvasTop);
+
+        if (cropped && self.limited) {
+          canvasData.minLeft = Math.min(cropBoxData.left, cropBoxData.left + (cropBoxData.width - canvasData.width));
+          canvasData.minTop = Math.min(cropBoxData.top, cropBoxData.top + (cropBoxData.height - canvasData.height));
+          canvasData.maxLeft = cropBoxData.left;
+          canvasData.maxTop = cropBoxData.top;
+
+          if (viewMode === 2) {
+            if (canvasData.width >= containerData.width) {
+              canvasData.minLeft = Math.min(0, newCanvasLeft);
+              canvasData.maxLeft = Math.max(0, newCanvasLeft);
+            }
+
+            if (canvasData.height >= containerData.height) {
+              canvasData.minTop = Math.min(0, newCanvasTop);
+              canvasData.maxTop = Math.max(0, newCanvasTop);
+            }
+          }
+        }
+      } else {
+        canvasData.minLeft = -canvasData.width;
+        canvasData.minTop = -canvasData.height;
+        canvasData.maxLeft = containerData.width;
+        canvasData.maxTop = containerData.height;
+      }
+    }
+  },
+  renderCanvas: function renderCanvas(changed) {
+    var self = this;
+    var canvasData = self.canvasData;
+    var imageData = self.imageData;
+    var rotate = imageData.rotate;
+
+    if (self.rotated) {
+      self.rotated = false;
+
+      // Computes rotated sizes with image sizes
+      var rotatedData = getRotatedSizes({
+        width: imageData.width,
+        height: imageData.height,
+        degree: rotate
+      });
+      var aspectRatio = rotatedData.width / rotatedData.height;
+      var isSquareImage = imageData.aspectRatio === 1;
+
+      if (isSquareImage || aspectRatio !== canvasData.aspectRatio) {
+        canvasData.left -= (rotatedData.width - canvasData.width) / 2;
+        canvasData.top -= (rotatedData.height - canvasData.height) / 2;
+        canvasData.width = rotatedData.width;
+        canvasData.height = rotatedData.height;
+        canvasData.aspectRatio = aspectRatio;
+        canvasData.naturalWidth = imageData.naturalWidth;
+        canvasData.naturalHeight = imageData.naturalHeight;
+
+        // Computes rotated sizes with natural image sizes
+        if (isSquareImage && rotate % 90 || rotate % 180) {
+          var rotatedData2 = getRotatedSizes({
+            width: imageData.naturalWidth,
+            height: imageData.naturalHeight,
+            degree: rotate
+          });
+
+          canvasData.naturalWidth = rotatedData2.width;
+          canvasData.naturalHeight = rotatedData2.height;
+        }
+
+        self.limitCanvas(true, false);
+      }
+    }
+
+    if (canvasData.width > canvasData.maxWidth || canvasData.width < canvasData.minWidth) {
+      canvasData.left = canvasData.oldLeft;
+    }
+
+    if (canvasData.height > canvasData.maxHeight || canvasData.height < canvasData.minHeight) {
+      canvasData.top = canvasData.oldTop;
+    }
+
+    canvasData.width = Math.min(Math.max(canvasData.width, canvasData.minWidth), canvasData.maxWidth);
+    canvasData.height = Math.min(Math.max(canvasData.height, canvasData.minHeight), canvasData.maxHeight);
+
+    self.limitCanvas(false, true);
+
+    canvasData.oldLeft = canvasData.left = Math.min(Math.max(canvasData.left, canvasData.minLeft), canvasData.maxLeft);
+    canvasData.oldTop = canvasData.top = Math.min(Math.max(canvasData.top, canvasData.minTop), canvasData.maxTop);
+
+    setStyle(self.canvas, extend({
+      width: canvasData.width,
+      height: canvasData.height
+    }, getTransforms({
+      translateX: canvasData.left,
+      translateY: canvasData.top
+    })));
+
+    self.renderImage();
+
+    if (self.cropped && self.limited) {
+      self.limitCropBox(true, true);
+    }
+
+    if (changed) {
+      self.output();
+    }
+  },
+  renderImage: function renderImage(changed) {
+    var self = this;
+    var canvasData = self.canvasData;
+    var imageData = self.imageData;
+    var newImageData = void 0;
+    var reversedData = void 0;
+    var reversedWidth = void 0;
+    var reversedHeight = void 0;
+
+    if (imageData.rotate) {
+      reversedData = getRotatedSizes({
+        width: canvasData.width,
+        height: canvasData.height,
+        degree: imageData.rotate,
+        aspectRatio: imageData.aspectRatio
+      }, true);
+
+      reversedWidth = reversedData.width;
+      reversedHeight = reversedData.height;
+
+      newImageData = {
+        width: reversedWidth,
+        height: reversedHeight,
+        left: (canvasData.width - reversedWidth) / 2,
+        top: (canvasData.height - reversedHeight) / 2
+      };
+    }
+
+    extend(imageData, newImageData || {
+      width: canvasData.width,
+      height: canvasData.height,
+      left: 0,
+      top: 0
+    });
+
+    setStyle(self.image, extend({
+      width: imageData.width,
+      height: imageData.height
+    }, getTransforms(extend({
+      translateX: imageData.left,
+      translateY: imageData.top
+    }, imageData))));
+
+    if (changed) {
+      self.output();
+    }
+  },
+  initCropBox: function initCropBox() {
+    var self = this;
+    var options = self.options;
+    var aspectRatio = options.aspectRatio;
+    var autoCropArea = Number(options.autoCropArea) || 0.8;
+    var canvasData = self.canvasData;
+    var cropBoxData = {
+      width: canvasData.width,
+      height: canvasData.height
+    };
+
+    if (aspectRatio) {
+      if (canvasData.height * aspectRatio > canvasData.width) {
+        cropBoxData.height = cropBoxData.width / aspectRatio;
+      } else {
+        cropBoxData.width = cropBoxData.height * aspectRatio;
+      }
+    }
+
+    self.cropBoxData = cropBoxData;
+    self.limitCropBox(true, true);
+
+    // Initialize auto crop area
+    cropBoxData.width = Math.min(Math.max(cropBoxData.width, cropBoxData.minWidth), cropBoxData.maxWidth);
+    cropBoxData.height = Math.min(Math.max(cropBoxData.height, cropBoxData.minHeight), cropBoxData.maxHeight);
+
+    // The width/height of auto crop area must large than "minWidth/Height"
+    cropBoxData.width = Math.max(cropBoxData.minWidth, cropBoxData.width * autoCropArea);
+    cropBoxData.height = Math.max(cropBoxData.minHeight, cropBoxData.height * autoCropArea);
+    cropBoxData.oldLeft = cropBoxData.left = canvasData.left + (canvasData.width - cropBoxData.width) / 2;
+    cropBoxData.oldTop = cropBoxData.top = canvasData.top + (canvasData.height - cropBoxData.height) / 2;
+
+    self.initialCropBoxData = extend({}, cropBoxData);
+  },
+  limitCropBox: function limitCropBox(sizeLimited, positionLimited) {
+    var self = this;
+    var options = self.options;
+    var aspectRatio = options.aspectRatio;
+    var containerData = self.containerData;
+    var canvasData = self.canvasData;
+    var cropBoxData = self.cropBoxData;
+    var limited = self.limited;
+
+    if (sizeLimited) {
+      var minCropBoxWidth = Number(options.minCropBoxWidth) || 0;
+      var minCropBoxHeight = Number(options.minCropBoxHeight) || 0;
+      var maxCropBoxWidth = Math.min(containerData.width, limited ? canvasData.width : containerData.width);
+      var maxCropBoxHeight = Math.min(containerData.height, limited ? canvasData.height : containerData.height);
+
+      // The min/maxCropBoxWidth/Height must be less than containerWidth/Height
+      minCropBoxWidth = Math.min(minCropBoxWidth, containerData.width);
+      minCropBoxHeight = Math.min(minCropBoxHeight, containerData.height);
+
+      if (aspectRatio) {
+        if (minCropBoxWidth && minCropBoxHeight) {
+          if (minCropBoxHeight * aspectRatio > minCropBoxWidth) {
+            minCropBoxHeight = minCropBoxWidth / aspectRatio;
+          } else {
+            minCropBoxWidth = minCropBoxHeight * aspectRatio;
+          }
+        } else if (minCropBoxWidth) {
+          minCropBoxHeight = minCropBoxWidth / aspectRatio;
+        } else if (minCropBoxHeight) {
+          minCropBoxWidth = minCropBoxHeight * aspectRatio;
+        }
+
+        if (maxCropBoxHeight * aspectRatio > maxCropBoxWidth) {
+          maxCropBoxHeight = maxCropBoxWidth / aspectRatio;
+        } else {
+          maxCropBoxWidth = maxCropBoxHeight * aspectRatio;
+        }
+      }
+
+      // The minWidth/Height must be less than maxWidth/Height
+      cropBoxData.minWidth = Math.min(minCropBoxWidth, maxCropBoxWidth);
+      cropBoxData.minHeight = Math.min(minCropBoxHeight, maxCropBoxHeight);
+      cropBoxData.maxWidth = maxCropBoxWidth;
+      cropBoxData.maxHeight = maxCropBoxHeight;
+    }
+
+    if (positionLimited) {
+      if (limited) {
+        cropBoxData.minLeft = Math.max(0, canvasData.left);
+        cropBoxData.minTop = Math.max(0, canvasData.top);
+        cropBoxData.maxLeft = Math.min(containerData.width, canvasData.left + canvasData.width) - cropBoxData.width;
+        cropBoxData.maxTop = Math.min(containerData.height, canvasData.top + canvasData.height) - cropBoxData.height;
+      } else {
+        cropBoxData.minLeft = 0;
+        cropBoxData.minTop = 0;
+        cropBoxData.maxLeft = containerData.width - cropBoxData.width;
+        cropBoxData.maxTop = containerData.height - cropBoxData.height;
+      }
+    }
+  },
+  renderCropBox: function renderCropBox() {
+    var self = this;
+    var options = self.options;
+    var containerData = self.containerData;
+    var cropBoxData = self.cropBoxData;
+
+    if (cropBoxData.width > cropBoxData.maxWidth || cropBoxData.width < cropBoxData.minWidth) {
+      cropBoxData.left = cropBoxData.oldLeft;
+    }
+
+    if (cropBoxData.height > cropBoxData.maxHeight || cropBoxData.height < cropBoxData.minHeight) {
+      cropBoxData.top = cropBoxData.oldTop;
+    }
+
+    cropBoxData.width = Math.min(Math.max(cropBoxData.width, cropBoxData.minWidth), cropBoxData.maxWidth);
+    cropBoxData.height = Math.min(Math.max(cropBoxData.height, cropBoxData.minHeight), cropBoxData.maxHeight);
+
+    self.limitCropBox(false, true);
+
+    cropBoxData.oldLeft = cropBoxData.left = Math.min(Math.max(cropBoxData.left, cropBoxData.minLeft), cropBoxData.maxLeft);
+    cropBoxData.oldTop = cropBoxData.top = Math.min(Math.max(cropBoxData.top, cropBoxData.minTop), cropBoxData.maxTop);
+
+    if (options.movable && options.cropBoxMovable) {
+      // Turn to move the canvas when the crop box is equal to the container
+      setData$1(self.face, 'action', cropBoxData.width === containerData.width && cropBoxData.height === containerData.height ? 'move' : 'all');
+    }
+
+    setStyle(self.cropBox, extend({
+      width: cropBoxData.width,
+      height: cropBoxData.height
+    }, getTransforms({
+      translateX: cropBoxData.left,
+      translateY: cropBoxData.top
+    })));
+
+    if (self.cropped && self.limited) {
+      self.limitCanvas(true, true);
+    }
+
+    if (!self.disabled) {
+      self.output();
+    }
+  },
+  output: function output() {
+    var self = this;
+
+    self.preview();
+
+    if (self.complete) {
+      dispatchEvent(self.element, 'crop', self.getData());
+    }
+  }
+};
+
+var DATA_PREVIEW = 'preview';
+
+var preview$1 = {
+  initPreview: function initPreview() {
+    var self = this;
+    var preview = self.options.preview;
+    var image = createElement('img');
+    var crossOrigin = self.crossOrigin;
+    var url = crossOrigin ? self.crossOriginUrl : self.url;
+
+    if (crossOrigin) {
+      image.crossOrigin = crossOrigin;
+    }
+
+    image.src = url;
+    appendChild(self.viewBox, image);
+    self.image2 = image;
+
+    if (!preview) {
+      return;
+    }
+
+    var previews = preview.querySelector ? [preview] : document.querySelectorAll(preview);
+
+    self.previews = previews;
+
+    each(previews, function (element) {
+      var img = createElement('img');
+
+      // Save the original size for recover
+      setData$1(element, DATA_PREVIEW, {
+        width: element.offsetWidth,
+        height: element.offsetHeight,
+        html: element.innerHTML
+      });
+
+      if (crossOrigin) {
+        img.crossOrigin = crossOrigin;
+      }
+
+      img.src = url;
+
+      /**
+       * Override img element styles
+       * Add `display:block` to avoid margin top issue
+       * Add `height:auto` to override `height` attribute on IE8
+       * (Occur only when margin-top <= -height)
+       */
+
+      img.style.cssText = 'display:block;' + 'width:100%;' + 'height:auto;' + 'min-width:0!important;' + 'min-height:0!important;' + 'max-width:none!important;' + 'max-height:none!important;' + 'image-orientation:0deg!important;"';
+
+      empty(element);
+      appendChild(element, img);
+    });
+  },
+  resetPreview: function resetPreview() {
+    each(this.previews, function (element) {
+      var data = getData$1(element, DATA_PREVIEW);
+
+      setStyle(element, {
+        width: data.width,
+        height: data.height
+      });
+
+      element.innerHTML = data.html;
+      removeData(element, DATA_PREVIEW);
+    });
+  },
+  preview: function preview() {
+    var self = this;
+    var imageData = self.imageData;
+    var canvasData = self.canvasData;
+    var cropBoxData = self.cropBoxData;
+    var cropBoxWidth = cropBoxData.width;
+    var cropBoxHeight = cropBoxData.height;
+    var width = imageData.width;
+    var height = imageData.height;
+    var left = cropBoxData.left - canvasData.left - imageData.left;
+    var top = cropBoxData.top - canvasData.top - imageData.top;
+
+    if (!self.cropped || self.disabled) {
+      return;
+    }
+
+    setStyle(self.image2, extend({
+      width: width,
+      height: height
+    }, getTransforms(extend({
+      translateX: -left,
+      translateY: -top
+    }, imageData))));
+
+    each(self.previews, function (element) {
+      var data = getData$1(element, DATA_PREVIEW);
+      var originalWidth = data.width;
+      var originalHeight = data.height;
+      var newWidth = originalWidth;
+      var newHeight = originalHeight;
+      var ratio = 1;
+
+      if (cropBoxWidth) {
+        ratio = originalWidth / cropBoxWidth;
+        newHeight = cropBoxHeight * ratio;
+      }
+
+      if (cropBoxHeight && newHeight > originalHeight) {
+        ratio = originalHeight / cropBoxHeight;
+        newWidth = cropBoxWidth * ratio;
+        newHeight = originalHeight;
+      }
+
+      setStyle(element, {
+        width: newWidth,
+        height: newHeight
+      });
+
+      setStyle(getByTag(element, 'img')[0], extend({
+        width: width * ratio,
+        height: height * ratio
+      }, getTransforms(extend({
+        translateX: -left * ratio,
+        translateY: -top * ratio
+      }, imageData))));
+    });
+  }
+};
+
+// Globals
+var PointerEvent = typeof window !== 'undefined' ? window.PointerEvent : null;
+
+// Events
+var EVENT_POINTER_DOWN = PointerEvent ? 'pointerdown' : 'touchstart mousedown';
+var EVENT_POINTER_MOVE = PointerEvent ? 'pointermove' : 'touchmove mousemove';
+var EVENT_POINTER_UP = PointerEvent ? ' pointerup pointercancel' : 'touchend touchcancel mouseup';
+var EVENT_WHEEL = 'wheel mousewheel DOMMouseScroll';
+var EVENT_DBLCLICK = 'dblclick';
+var EVENT_RESIZE = 'resize';
+var EVENT_CROP_START = 'cropstart';
+var EVENT_CROP_MOVE = 'cropmove';
+var EVENT_CROP_END = 'cropend';
+var EVENT_CROP$1 = 'crop';
+var EVENT_ZOOM = 'zoom';
+
+var events = {
+  bind: function bind() {
+    var self = this;
+    var options = self.options;
+    var element = self.element;
+    var cropper = self.cropper;
+
+    if (isFunction(options.cropstart)) {
+      addListener(element, EVENT_CROP_START, options.cropstart);
+    }
+
+    if (isFunction(options.cropmove)) {
+      addListener(element, EVENT_CROP_MOVE, options.cropmove);
+    }
+
+    if (isFunction(options.cropend)) {
+      addListener(element, EVENT_CROP_END, options.cropend);
+    }
+
+    if (isFunction(options.crop)) {
+      addListener(element, EVENT_CROP$1, options.crop);
+    }
+
+    if (isFunction(options.zoom)) {
+      addListener(element, EVENT_ZOOM, options.zoom);
+    }
+
+    addListener(cropper, EVENT_POINTER_DOWN, self.onCropStart = proxy(self.cropStart, self));
+
+    if (options.zoomable && options.zoomOnWheel) {
+      addListener(cropper, EVENT_WHEEL, self.onWheel = proxy(self.wheel, self));
+    }
+
+    if (options.toggleDragModeOnDblclick) {
+      addListener(cropper, EVENT_DBLCLICK, self.onDblclick = proxy(self.dblclick, self));
+    }
+
+    addListener(document, EVENT_POINTER_MOVE, self.onCropMove = proxy(self.cropMove, self));
+    addListener(document, EVENT_POINTER_UP, self.onCropEnd = proxy(self.cropEnd, self));
+
+    if (options.responsive) {
+      addListener(window, EVENT_RESIZE, self.onResize = proxy(self.resize, self));
+    }
+  },
+  unbind: function unbind() {
+    var self = this;
+    var options = self.options;
+    var element = self.element;
+    var cropper = self.cropper;
+
+    if (isFunction(options.cropstart)) {
+      removeListener(element, EVENT_CROP_START, options.cropstart);
+    }
+
+    if (isFunction(options.cropmove)) {
+      removeListener(element, EVENT_CROP_MOVE, options.cropmove);
+    }
+
+    if (isFunction(options.cropend)) {
+      removeListener(element, EVENT_CROP_END, options.cropend);
+    }
+
+    if (isFunction(options.crop)) {
+      removeListener(element, EVENT_CROP$1, options.crop);
+    }
+
+    if (isFunction(options.zoom)) {
+      removeListener(element, EVENT_ZOOM, options.zoom);
+    }
+
+    removeListener(cropper, EVENT_POINTER_DOWN, self.onCropStart);
+
+    if (options.zoomable && options.zoomOnWheel) {
+      removeListener(cropper, EVENT_WHEEL, self.onWheel);
+    }
+
+    if (options.toggleDragModeOnDblclick) {
+      removeListener(cropper, EVENT_DBLCLICK, self.onDblclick);
+    }
+
+    removeListener(document, EVENT_POINTER_MOVE, self.onCropMove);
+    removeListener(document, EVENT_POINTER_UP, self.onCropEnd);
+
+    if (options.responsive) {
+      removeListener(window, EVENT_RESIZE, self.onResize);
+    }
+  }
+};
+
+var REGEXP_ACTIONS = /^(e|w|s|n|se|sw|ne|nw|all|crop|move|zoom)$/;
+
+function getPointer(_ref, endOnly) {
+  var pageX = _ref.pageX,
+      pageY = _ref.pageY;
+
+  var end = {
+    endX: pageX,
+    endY: pageY
+  };
+
+  if (endOnly) {
+    return end;
+  }
+
+  return extend({
+    startX: pageX,
+    startY: pageY
+  }, end);
+}
+
+var handlers = {
+  resize: function resize() {
+    var self = this;
+    var options = self.options;
+    var container = self.container;
+    var containerData = self.containerData;
+    var minContainerWidth = Number(options.minContainerWidth) || 200;
+    var minContainerHeight = Number(options.minContainerHeight) || 100;
+
+    if (self.disabled || containerData.width === minContainerWidth || containerData.height === minContainerHeight) {
+      return;
+    }
+
+    var ratio = container.offsetWidth / containerData.width;
+
+    // Resize when width changed or height changed
+    if (ratio !== 1 || container.offsetHeight !== containerData.height) {
+      (function () {
+        var canvasData = void 0;
+        var cropBoxData = void 0;
+
+        if (options.restore) {
+          canvasData = self.getCanvasData();
+          cropBoxData = self.getCropBoxData();
+        }
+
+        self.render();
+
+        if (options.restore) {
+          self.setCanvasData(each(canvasData, function (n, i) {
+            canvasData[i] = n * ratio;
+          }));
+          self.setCropBoxData(each(cropBoxData, function (n, i) {
+            cropBoxData[i] = n * ratio;
+          }));
+        }
+      })();
+    }
+  },
+  dblclick: function dblclick() {
+    var self = this;
+
+    if (self.disabled || self.options.dragMode === 'none') {
+      return;
+    }
+
+    self.setDragMode(hasClass(self.dragBox, 'cropper-crop') ? 'move' : 'crop');
+  },
+  wheel: function wheel(event) {
+    var self = this;
+    var e = getEvent(event);
+    var ratio = Number(self.options.wheelZoomRatio) || 0.1;
+    var delta = 1;
+
+    if (self.disabled) {
+      return;
+    }
+
+    e.preventDefault();
+
+    // Limit wheel speed to prevent zoom too fast (#21)
+    if (self.wheeling) {
+      return;
+    }
+
+    self.wheeling = true;
+
+    setTimeout(function () {
+      self.wheeling = false;
+    }, 50);
+
+    if (e.deltaY) {
+      delta = e.deltaY > 0 ? 1 : -1;
+    } else if (e.wheelDelta) {
+      delta = -e.wheelDelta / 120;
+    } else if (e.detail) {
+      delta = e.detail > 0 ? 1 : -1;
+    }
+
+    self.zoom(-delta * ratio, e);
+  },
+  cropStart: function cropStart(event) {
+    var self = this;
+
+    if (self.disabled) {
+      return;
+    }
+
+    var options = self.options;
+    var pointers = self.pointers;
+    var e = getEvent(event);
+    var action = void 0;
+
+    if (e.changedTouches) {
+      // Handle touch event
+      each(e.changedTouches, function (touch) {
+        pointers[touch.identifier] = getPointer(touch);
+      });
+    } else {
+      // Handle mouse event and pointer event
+      pointers[e.pointerId || 0] = getPointer(e);
+    }
+
+    if (Object.keys(pointers).length > 1 && options.zoomable && options.zoomOnTouch) {
+      action = 'zoom';
+    } else {
+      action = getData$1(e.target, 'action');
+    }
+
+    if (!REGEXP_ACTIONS.test(action)) {
+      return;
+    }
+
+    if (dispatchEvent(self.element, 'cropstart', {
+      originalEvent: e,
+      action: action
+    }) === false) {
+      return;
+    }
+
+    e.preventDefault();
+
+    self.action = action;
+    self.cropping = false;
+
+    if (action === 'crop') {
+      self.cropping = true;
+      addClass(self.dragBox, 'cropper-modal');
+    }
+  },
+  cropMove: function cropMove(event) {
+    var self = this;
+    var action = self.action;
+
+    if (self.disabled || !action) {
+      return;
+    }
+
+    var pointers = self.pointers;
+    var e = getEvent(event);
+
+    e.preventDefault();
+
+    if (dispatchEvent(self.element, 'cropmove', {
+      originalEvent: e,
+      action: action
+    }) === false) {
+      return;
+    }
+
+    if (e.changedTouches) {
+      each(e.changedTouches, function (touch) {
+        extend(pointers[touch.identifier], getPointer(touch, true));
+      });
+    } else {
+      extend(pointers[e.pointerId || 0], getPointer(e, true));
+    }
+
+    self.change(e);
+  },
+  cropEnd: function cropEnd(event) {
+    var self = this;
+
+    if (self.disabled) {
+      return;
+    }
+
+    var action = self.action;
+    var pointers = self.pointers;
+    var e = getEvent(event);
+
+    if (e.changedTouches) {
+      each(e.changedTouches, function (touch) {
+        delete pointers[touch.identifier];
+      });
+    } else {
+      delete pointers[e.pointerId || 0];
+    }
+
+    if (!action) {
+      return;
+    }
+
+    e.preventDefault();
+
+    if (!Object.keys(pointers).length) {
+      self.action = '';
+    }
+
+    if (self.cropping) {
+      self.cropping = false;
+      toggleClass(self.dragBox, 'cropper-modal', self.cropped && this.options.modal);
+    }
+
+    dispatchEvent(self.element, 'cropend', {
+      originalEvent: e,
+      action: action
+    });
+  }
+};
+
+// Actions
+var ACTION_EAST = 'e';
+var ACTION_WEST = 'w';
+var ACTION_SOUTH = 's';
+var ACTION_NORTH = 'n';
+var ACTION_SOUTH_EAST = 'se';
+var ACTION_SOUTH_WEST = 'sw';
+var ACTION_NORTH_EAST = 'ne';
+var ACTION_NORTH_WEST = 'nw';
+
+function getMaxZoomRatio(pointers) {
+  var pointers2 = extend({}, pointers);
+  var ratios = [];
+
+  each(pointers, function (pointer, pointerId) {
+    delete pointers2[pointerId];
+
+    each(pointers2, function (pointer2) {
+      var x1 = Math.abs(pointer.startX - pointer2.startX);
+      var y1 = Math.abs(pointer.startY - pointer2.startY);
+      var x2 = Math.abs(pointer.endX - pointer2.endX);
+      var y2 = Math.abs(pointer.endY - pointer2.endY);
+      var z1 = Math.sqrt(x1 * x1 + y1 * y1);
+      var z2 = Math.sqrt(x2 * x2 + y2 * y2);
+      var ratio = (z2 - z1) / z1;
+
+      ratios.push(ratio);
+    });
+  });
+
+  ratios.sort(function (a, b) {
+    return Math.abs(a) < Math.abs(b);
+  });
+
+  return ratios[0];
+}
+
+var change$1 = {
+  change: function change(e) {
+    var self = this;
+    var options = self.options;
+    var containerData = self.containerData;
+    var canvasData = self.canvasData;
+    var cropBoxData = self.cropBoxData;
+    var aspectRatio = options.aspectRatio;
+    var action = self.action;
+    var width = cropBoxData.width;
+    var height = cropBoxData.height;
+    var left = cropBoxData.left;
+    var top = cropBoxData.top;
+    var right = left + width;
+    var bottom = top + height;
+    var minLeft = 0;
+    var minTop = 0;
+    var maxWidth = containerData.width;
+    var maxHeight = containerData.height;
+    var renderable = true;
+    var offset = void 0;
+
+    // Locking aspect ratio in "free mode" by holding shift key
+    if (!aspectRatio && e.shiftKey) {
+      aspectRatio = width && height ? width / height : 1;
+    }
+
+    if (self.limited) {
+      minLeft = cropBoxData.minLeft;
+      minTop = cropBoxData.minTop;
+      maxWidth = minLeft + Math.min(containerData.width, canvasData.width, canvasData.left + canvasData.width);
+      maxHeight = minTop + Math.min(containerData.height, canvasData.height, canvasData.top + canvasData.height);
+    }
+
+    var pointers = self.pointers;
+    var pointer = pointers[Object.keys(pointers)[0]];
+    var range = {
+      x: pointer.endX - pointer.startX,
+      y: pointer.endY - pointer.startY
+    };
+
+    if (aspectRatio) {
+      range.X = range.y * aspectRatio;
+      range.Y = range.x / aspectRatio;
+    }
+
+    switch (action) {
+      // Move crop box
+      case 'all':
+        left += range.x;
+        top += range.y;
+        break;
+
+      // Resize crop box
+      case ACTION_EAST:
+        if (range.x >= 0 && (right >= maxWidth || aspectRatio && (top <= minTop || bottom >= maxHeight))) {
+          renderable = false;
+          break;
+        }
+
+        width += range.x;
+
+        if (aspectRatio) {
+          height = width / aspectRatio;
+          top -= range.Y / 2;
+        }
+
+        if (width < 0) {
+          action = ACTION_WEST;
+          width = 0;
+        }
+
+        break;
+
+      case ACTION_NORTH:
+        if (range.y <= 0 && (top <= minTop || aspectRatio && (left <= minLeft || right >= maxWidth))) {
+          renderable = false;
+          break;
+        }
+
+        height -= range.y;
+        top += range.y;
+
+        if (aspectRatio) {
+          width = height * aspectRatio;
+          left += range.X / 2;
+        }
+
+        if (height < 0) {
+          action = ACTION_SOUTH;
+          height = 0;
+        }
+
+        break;
+
+      case ACTION_WEST:
+        if (range.x <= 0 && (left <= minLeft || aspectRatio && (top <= minTop || bottom >= maxHeight))) {
+          renderable = false;
+          break;
+        }
+
+        width -= range.x;
+        left += range.x;
+
+        if (aspectRatio) {
+          height = width / aspectRatio;
+          top += range.Y / 2;
+        }
+
+        if (width < 0) {
+          action = ACTION_EAST;
+          width = 0;
+        }
+
+        break;
+
+      case ACTION_SOUTH:
+        if (range.y >= 0 && (bottom >= maxHeight || aspectRatio && (left <= minLeft || right >= maxWidth))) {
+          renderable = false;
+          break;
+        }
+
+        height += range.y;
+
+        if (aspectRatio) {
+          width = height * aspectRatio;
+          left -= range.X / 2;
+        }
+
+        if (height < 0) {
+          action = ACTION_NORTH;
+          height = 0;
+        }
+
+        break;
+
+      case ACTION_NORTH_EAST:
+        if (aspectRatio) {
+          if (range.y <= 0 && (top <= minTop || right >= maxWidth)) {
+            renderable = false;
+            break;
+          }
+
+          height -= range.y;
+          top += range.y;
+          width = height * aspectRatio;
+        } else {
+          if (range.x >= 0) {
+            if (right < maxWidth) {
+              width += range.x;
+            } else if (range.y <= 0 && top <= minTop) {
+              renderable = false;
+            }
+          } else {
+            width += range.x;
+          }
+
+          if (range.y <= 0) {
+            if (top > minTop) {
+              height -= range.y;
+              top += range.y;
+            }
+          } else {
+            height -= range.y;
+            top += range.y;
+          }
+        }
+
+        if (width < 0 && height < 0) {
+          action = ACTION_SOUTH_WEST;
+          height = 0;
+          width = 0;
+        } else if (width < 0) {
+          action = ACTION_NORTH_WEST;
+          width = 0;
+        } else if (height < 0) {
+          action = ACTION_SOUTH_EAST;
+          height = 0;
+        }
+
+        break;
+
+      case ACTION_NORTH_WEST:
+        if (aspectRatio) {
+          if (range.y <= 0 && (top <= minTop || left <= minLeft)) {
+            renderable = false;
+            break;
+          }
+
+          height -= range.y;
+          top += range.y;
+          width = height * aspectRatio;
+          left += range.X;
+        } else {
+          if (range.x <= 0) {
+            if (left > minLeft) {
+              width -= range.x;
+              left += range.x;
+            } else if (range.y <= 0 && top <= minTop) {
+              renderable = false;
+            }
+          } else {
+            width -= range.x;
+            left += range.x;
+          }
+
+          if (range.y <= 0) {
+            if (top > minTop) {
+              height -= range.y;
+              top += range.y;
+            }
+          } else {
+            height -= range.y;
+            top += range.y;
+          }
+        }
+
+        if (width < 0 && height < 0) {
+          action = ACTION_SOUTH_EAST;
+          height = 0;
+          width = 0;
+        } else if (width < 0) {
+          action = ACTION_NORTH_EAST;
+          width = 0;
+        } else if (height < 0) {
+          action = ACTION_SOUTH_WEST;
+          height = 0;
+        }
+
+        break;
+
+      case ACTION_SOUTH_WEST:
+        if (aspectRatio) {
+          if (range.x <= 0 && (left <= minLeft || bottom >= maxHeight)) {
+            renderable = false;
+            break;
+          }
+
+          width -= range.x;
+          left += range.x;
+          height = width / aspectRatio;
+        } else {
+          if (range.x <= 0) {
+            if (left > minLeft) {
+              width -= range.x;
+              left += range.x;
+            } else if (range.y >= 0 && bottom >= maxHeight) {
+              renderable = false;
+            }
+          } else {
+            width -= range.x;
+            left += range.x;
+          }
+
+          if (range.y >= 0) {
+            if (bottom < maxHeight) {
+              height += range.y;
+            }
+          } else {
+            height += range.y;
+          }
+        }
+
+        if (width < 0 && height < 0) {
+          action = ACTION_NORTH_EAST;
+          height = 0;
+          width = 0;
+        } else if (width < 0) {
+          action = ACTION_SOUTH_EAST;
+          width = 0;
+        } else if (height < 0) {
+          action = ACTION_NORTH_WEST;
+          height = 0;
+        }
+
+        break;
+
+      case ACTION_SOUTH_EAST:
+        if (aspectRatio) {
+          if (range.x >= 0 && (right >= maxWidth || bottom >= maxHeight)) {
+            renderable = false;
+            break;
+          }
+
+          width += range.x;
+          height = width / aspectRatio;
+        } else {
+          if (range.x >= 0) {
+            if (right < maxWidth) {
+              width += range.x;
+            } else if (range.y >= 0 && bottom >= maxHeight) {
+              renderable = false;
+            }
+          } else {
+            width += range.x;
+          }
+
+          if (range.y >= 0) {
+            if (bottom < maxHeight) {
+              height += range.y;
+            }
+          } else {
+            height += range.y;
+          }
+        }
+
+        if (width < 0 && height < 0) {
+          action = ACTION_NORTH_WEST;
+          height = 0;
+          width = 0;
+        } else if (width < 0) {
+          action = ACTION_SOUTH_WEST;
+          width = 0;
+        } else if (height < 0) {
+          action = ACTION_NORTH_EAST;
+          height = 0;
+        }
+
+        break;
+
+      // Move canvas
+      case 'move':
+        self.move(range.x, range.y);
+        renderable = false;
+        break;
+
+      // Zoom canvas
+      case 'zoom':
+        self.zoom(getMaxZoomRatio(pointers), e);
+        renderable = false;
+        break;
+
+      // Create crop box
+      case 'crop':
+        if (!range.x || !range.y) {
+          renderable = false;
+          break;
+        }
+
+        offset = getOffset(self.cropper);
+        left = pointer.startX - offset.left;
+        top = pointer.startY - offset.top;
+        width = cropBoxData.minWidth;
+        height = cropBoxData.minHeight;
+
+        if (range.x > 0) {
+          action = range.y > 0 ? ACTION_SOUTH_EAST : ACTION_NORTH_EAST;
+        } else if (range.x < 0) {
+          left -= width;
+          action = range.y > 0 ? ACTION_SOUTH_WEST : ACTION_NORTH_WEST;
+        }
+
+        if (range.y < 0) {
+          top -= height;
+        }
+
+        // Show the crop box if is hidden
+        if (!self.cropped) {
+          removeClass(self.cropBox, 'cropper-hidden');
+          self.cropped = true;
+
+          if (self.limited) {
+            self.limitCropBox(true, true);
+          }
+        }
+
+        break;
+
+      // No default
+    }
+
+    if (renderable) {
+      cropBoxData.width = width;
+      cropBoxData.height = height;
+      cropBoxData.left = left;
+      cropBoxData.top = top;
+      self.action = action;
+
+      self.renderCropBox();
+    }
+
+    // Override
+    each(pointers, function (p) {
+      p.startX = p.endX;
+      p.startY = p.endY;
+    });
+  }
+};
+
+function getPointersCenter(pointers) {
+  var pageX = 0;
+  var pageY = 0;
+  var count = 0;
+
+  each(pointers, function (_ref) {
+    var startX = _ref.startX,
+        startY = _ref.startY;
+
+    pageX += startX;
+    pageY += startY;
+    count += 1;
+  });
+
+  pageX /= count;
+  pageY /= count;
+
+  return {
+    pageX: pageX,
+    pageY: pageY
+  };
+}
+
+var methods = {
+  // Show the crop box manually
+  crop: function crop() {
+    var self = this;
+
+    if (self.ready && !self.disabled) {
+      if (!self.cropped) {
+        self.cropped = true;
+        self.limitCropBox(true, true);
+
+        if (self.options.modal) {
+          addClass(self.dragBox, 'cropper-modal');
+        }
+
+        removeClass(self.cropBox, 'cropper-hidden');
+      }
+
+      self.setCropBoxData(self.initialCropBoxData);
+    }
+
+    return self;
+  },
+
+
+  // Reset the image and crop box to their initial states
+  reset: function reset() {
+    var self = this;
+
+    if (self.ready && !self.disabled) {
+      self.imageData = extend({}, self.initialImageData);
+      self.canvasData = extend({}, self.initialCanvasData);
+      self.cropBoxData = extend({}, self.initialCropBoxData);
+
+      self.renderCanvas();
+
+      if (self.cropped) {
+        self.renderCropBox();
+      }
+    }
+
+    return self;
+  },
+
+
+  // Clear the crop box
+  clear: function clear() {
+    var self = this;
+
+    if (self.cropped && !self.disabled) {
+      extend(self.cropBoxData, {
+        left: 0,
+        top: 0,
+        width: 0,
+        height: 0
+      });
+
+      self.cropped = false;
+      self.renderCropBox();
+
+      self.limitCanvas();
+
+      // Render canvas after crop box rendered
+      self.renderCanvas();
+
+      removeClass(self.dragBox, 'cropper-modal');
+      addClass(self.cropBox, 'cropper-hidden');
+    }
+
+    return self;
+  },
+
+
+  /**
+   * Replace the image's src and rebuild the cropper
+   *
+   * @param {String} url
+   * @param {Boolean} onlyColorChanged (optional)
+   */
+  replace: function replace(url, onlyColorChanged) {
+    var self = this;
+
+    if (!self.disabled && url) {
+      if (self.isImg) {
+        self.element.src = url;
+      }
+
+      if (onlyColorChanged) {
+        self.url = url;
+        self.image.src = url;
+
+        if (self.ready) {
+          self.image2.src = url;
+
+          each(self.previews, function (element) {
+            getByTag(element, 'img')[0].src = url;
+          });
+        }
+      } else {
+        if (self.isImg) {
+          self.replaced = true;
+        }
+
+        // Clear previous data
+        self.options.data = null;
+        self.load(url);
+      }
+    }
+
+    return self;
+  },
+
+
+  // Enable (unfreeze) the cropper
+  enable: function enable() {
+    var self = this;
+
+    if (self.ready) {
+      self.disabled = false;
+      removeClass(self.cropper, 'cropper-disabled');
+    }
+
+    return self;
+  },
+
+
+  // Disable (freeze) the cropper
+  disable: function disable() {
+    var self = this;
+
+    if (self.ready) {
+      self.disabled = true;
+      addClass(self.cropper, 'cropper-disabled');
+    }
+
+    return self;
+  },
+
+
+  // Destroy the cropper and remove the instance from the image
+  destroy: function destroy() {
+    var self = this;
+    var element = self.element;
+    var image = self.image;
+
+    if (self.loaded) {
+      if (self.isImg && self.replaced) {
+        element.src = self.originalUrl;
+      }
+
+      self.unbuild();
+      removeClass(element, 'cropper-hidden');
+    } else if (self.isImg) {
+      removeListener(element, 'load', self.onStart);
+    } else if (image) {
+      removeChild(image);
+    }
+
+    removeData(element, 'cropper');
+
+    return self;
+  },
+
+
+  /**
+   * Move the canvas with relative offsets
+   *
+   * @param {Number} offsetX
+   * @param {Number} offsetY (optional)
+   */
+  move: function move(offsetX, offsetY) {
+    var self = this;
+    var canvasData = self.canvasData;
+
+    return self.moveTo(isUndefined(offsetX) ? offsetX : canvasData.left + Number(offsetX), isUndefined(offsetY) ? offsetY : canvasData.top + Number(offsetY));
+  },
+
+
+  /**
+   * Move the canvas to an absolute point
+   *
+   * @param {Number} x
+   * @param {Number} y (optional)
+   */
+  moveTo: function moveTo(x, y) {
+    var self = this;
+    var canvasData = self.canvasData;
+    var changed = false;
+
+    // If "y" is not present, its default value is "x"
+    if (isUndefined(y)) {
+      y = x;
+    }
+
+    x = Number(x);
+    y = Number(y);
+
+    if (self.ready && !self.disabled && self.options.movable) {
+      if (isNumber(x)) {
+        canvasData.left = x;
+        changed = true;
+      }
+
+      if (isNumber(y)) {
+        canvasData.top = y;
+        changed = true;
+      }
+
+      if (changed) {
+        self.renderCanvas(true);
+      }
+    }
+
+    return self;
+  },
+
+
+  /**
+   * Zoom the canvas with a relative ratio
+   *
+   * @param {Number} ratio
+   * @param {Event} _originalEvent (private)
+   */
+  zoom: function zoom(ratio, _originalEvent) {
+    var self = this;
+    var canvasData = self.canvasData;
+
+    ratio = Number(ratio);
+
+    if (ratio < 0) {
+      ratio = 1 / (1 - ratio);
+    } else {
+      ratio = 1 + ratio;
+    }
+
+    return self.zoomTo(canvasData.width * ratio / canvasData.naturalWidth, _originalEvent);
+  },
+
+
+  /**
+   * Zoom the canvas to an absolute ratio
+   *
+   * @param {Number} ratio
+   * @param {Event} _originalEvent (private)
+   */
+  zoomTo: function zoomTo(ratio, _originalEvent) {
+    var self = this;
+    var options = self.options;
+    var canvasData = self.canvasData;
+    var width = canvasData.width;
+    var height = canvasData.height;
+    var naturalWidth = canvasData.naturalWidth;
+    var naturalHeight = canvasData.naturalHeight;
+
+    ratio = Number(ratio);
+
+    if (ratio >= 0 && self.ready && !self.disabled && options.zoomable) {
+      var newWidth = naturalWidth * ratio;
+      var newHeight = naturalHeight * ratio;
+
+      if (dispatchEvent(self.element, 'zoom', {
+        originalEvent: _originalEvent,
+        oldRatio: width / naturalWidth,
+        ratio: newWidth / naturalWidth
+      }) === false) {
+        return self;
+      }
+
+      if (_originalEvent) {
+        var pointers = self.pointers;
+        var offset = getOffset(self.cropper);
+        var center = pointers && Object.keys(pointers).length ? getPointersCenter(pointers) : {
+          pageX: _originalEvent.pageX,
+          pageY: _originalEvent.pageY
+        };
+
+        // Zoom from the triggering point of the event
+        canvasData.left -= (newWidth - width) * ((center.pageX - offset.left - canvasData.left) / width);
+        canvasData.top -= (newHeight - height) * ((center.pageY - offset.top - canvasData.top) / height);
+      } else {
+        // Zoom from the center of the canvas
+        canvasData.left -= (newWidth - width) / 2;
+        canvasData.top -= (newHeight - height) / 2;
+      }
+
+      canvasData.width = newWidth;
+      canvasData.height = newHeight;
+      self.renderCanvas(true);
+    }
+
+    return self;
+  },
+
+
+  /**
+   * Rotate the canvas with a relative degree
+   *
+   * @param {Number} degree
+   */
+  rotate: function rotate(degree) {
+    var self = this;
+
+    return self.rotateTo((self.imageData.rotate || 0) + Number(degree));
+  },
+
+
+  /**
+   * Rotate the canvas to an absolute degree
+   * https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function#rotate()
+   *
+   * @param {Number} degree
+   */
+  rotateTo: function rotateTo(degree) {
+    var self = this;
+
+    degree = Number(degree);
+
+    if (isNumber(degree) && self.ready && !self.disabled && self.options.rotatable) {
+      self.imageData.rotate = degree % 360;
+      self.rotated = true;
+      self.renderCanvas(true);
+    }
+
+    return self;
+  },
+
+
+  /**
+   * Scale the image
+   * https://developer.mozilla.org/en-US/docs/Web/CSS/transform-function#scale()
+   *
+   * @param {Number} scaleX
+   * @param {Number} scaleY (optional)
+   */
+  scale: function scale(scaleX, scaleY) {
+    var self = this;
+    var imageData = self.imageData;
+    var changed = false;
+
+    // If "scaleY" is not present, its default value is "scaleX"
+    if (isUndefined(scaleY)) {
+      scaleY = scaleX;
+    }
+
+    scaleX = Number(scaleX);
+    scaleY = Number(scaleY);
+
+    if (self.ready && !self.disabled && self.options.scalable) {
+      if (isNumber(scaleX)) {
+        imageData.scaleX = scaleX;
+        changed = true;
+      }
+
+      if (isNumber(scaleY)) {
+        imageData.scaleY = scaleY;
+        changed = true;
+      }
+
+      if (changed) {
+        self.renderImage(true);
+      }
+    }
+
+    return self;
+  },
+
+
+  /**
+   * Scale the abscissa of the image
+   *
+   * @param {Number} scaleX
+   */
+  scaleX: function scaleX(_scaleX) {
+    var self = this;
+    var scaleY = self.imageData.scaleY;
+
+    return self.scale(_scaleX, isNumber(scaleY) ? scaleY : 1);
+  },
+
+
+  /**
+   * Scale the ordinate of the image
+   *
+   * @param {Number} scaleY
+   */
+  scaleY: function scaleY(_scaleY) {
+    var self = this;
+    var scaleX = self.imageData.scaleX;
+
+    return self.scale(isNumber(scaleX) ? scaleX : 1, _scaleY);
+  },
+
+
+  /**
+   * Get the cropped area position and size data (base on the original image)
+   *
+   * @param {Boolean} rounded (optional)
+   * @return {Object} data
+   */
+  getData: function getData(rounded) {
+    var self = this;
+    var options = self.options;
+    var imageData = self.imageData;
+    var canvasData = self.canvasData;
+    var cropBoxData = self.cropBoxData;
+    var ratio = void 0;
+    var data = void 0;
+
+    if (self.ready && self.cropped) {
+      data = {
+        x: cropBoxData.left - canvasData.left,
+        y: cropBoxData.top - canvasData.top,
+        width: cropBoxData.width,
+        height: cropBoxData.height
+      };
+
+      ratio = imageData.width / imageData.naturalWidth;
+
+      each(data, function (n, i) {
+        n /= ratio;
+        data[i] = rounded ? Math.round(n) : n;
+      });
+    } else {
+      data = {
+        x: 0,
+        y: 0,
+        width: 0,
+        height: 0
+      };
+    }
+
+    if (options.rotatable) {
+      data.rotate = imageData.rotate || 0;
+    }
+
+    if (options.scalable) {
+      data.scaleX = imageData.scaleX || 1;
+      data.scaleY = imageData.scaleY || 1;
+    }
+
+    return data;
+  },
+
+
+  /**
+   * Set the cropped area position and size with new data
+   *
+   * @param {Object} data
+   */
+  setData: function setData(data) {
+    var self = this;
+    var options = self.options;
+    var imageData = self.imageData;
+    var canvasData = self.canvasData;
+    var cropBoxData = {};
+    var rotated = void 0;
+    var scaled = void 0;
+    var ratio = void 0;
+
+    if (isFunction(data)) {
+      data = data.call(self.element);
+    }
+
+    if (self.ready && !self.disabled && isPlainObject(data)) {
+      if (options.rotatable) {
+        if (isNumber(data.rotate) && data.rotate !== imageData.rotate) {
+          imageData.rotate = data.rotate;
+          self.rotated = rotated = true;
+        }
+      }
+
+      if (options.scalable) {
+        if (isNumber(data.scaleX) && data.scaleX !== imageData.scaleX) {
+          imageData.scaleX = data.scaleX;
+          scaled = true;
+        }
+
+        if (isNumber(data.scaleY) && data.scaleY !== imageData.scaleY) {
+          imageData.scaleY = data.scaleY;
+          scaled = true;
+        }
+      }
+
+      if (rotated) {
+        self.renderCanvas();
+      } else if (scaled) {
+        self.renderImage();
+      }
+
+      ratio = imageData.width / imageData.naturalWidth;
+
+      if (isNumber(data.x)) {
+        cropBoxData.left = data.x * ratio + canvasData.left;
+      }
+
+      if (isNumber(data.y)) {
+        cropBoxData.top = data.y * ratio + canvasData.top;
+      }
+
+      if (isNumber(data.width)) {
+        cropBoxData.width = data.width * ratio;
+      }
+
+      if (isNumber(data.height)) {
+        cropBoxData.height = data.height * ratio;
+      }
+
+      self.setCropBoxData(cropBoxData);
+    }
+
+    return self;
+  },
+
+
+  /**
+   * Get the container size data
+   *
+   * @return {Object} data
+   */
+  getContainerData: function getContainerData() {
+    var self = this;
+
+    return self.ready ? self.containerData : {};
+  },
+
+
+  /**
+   * Get the image position and size data
+   *
+   * @return {Object} data
+   */
+  getImageData: function getImageData() {
+    var self = this;
+
+    return self.loaded ? self.imageData : {};
+  },
+
+
+  /**
+   * Get the canvas position and size data
+   *
+   * @return {Object} data
+   */
+  getCanvasData: function getCanvasData() {
+    var self = this;
+    var canvasData = self.canvasData;
+    var data = {};
+
+    if (self.ready) {
+      each(['left', 'top', 'width', 'height', 'naturalWidth', 'naturalHeight'], function (n) {
+        data[n] = canvasData[n];
+      });
+    }
+
+    return data;
+  },
+
+
+  /**
+   * Set the canvas position and size with new data
+   *
+   * @param {Object} data
+   */
+  setCanvasData: function setCanvasData(data) {
+    var self = this;
+    var canvasData = self.canvasData;
+    var aspectRatio = canvasData.aspectRatio;
+
+    if (isFunction(data)) {
+      data = data.call(self.element);
+    }
+
+    if (self.ready && !self.disabled && isPlainObject(data)) {
+      if (isNumber(data.left)) {
+        canvasData.left = data.left;
+      }
+
+      if (isNumber(data.top)) {
+        canvasData.top = data.top;
+      }
+
+      if (isNumber(data.width)) {
+        canvasData.width = data.width;
+        canvasData.height = data.width / aspectRatio;
+      } else if (isNumber(data.height)) {
+        canvasData.height = data.height;
+        canvasData.width = data.height * aspectRatio;
+      }
+
+      self.renderCanvas(true);
+    }
+
+    return self;
+  },
+
+
+  /**
+   * Get the crop box position and size data
+   *
+   * @return {Object} data
+   */
+  getCropBoxData: function getCropBoxData() {
+    var self = this;
+    var cropBoxData = self.cropBoxData;
+    var data = void 0;
+
+    if (self.ready && self.cropped) {
+      data = {
+        left: cropBoxData.left,
+        top: cropBoxData.top,
+        width: cropBoxData.width,
+        height: cropBoxData.height
+      };
+    }
+
+    return data || {};
+  },
+
+
+  /**
+   * Set the crop box position and size with new data
+   *
+   * @param {Object} data
+   */
+  setCropBoxData: function setCropBoxData(data) {
+    var self = this;
+    var cropBoxData = self.cropBoxData;
+    var aspectRatio = self.options.aspectRatio;
+    var widthChanged = void 0;
+    var heightChanged = void 0;
+
+    if (isFunction(data)) {
+      data = data.call(self.element);
+    }
+
+    if (self.ready && self.cropped && !self.disabled && isPlainObject(data)) {
+      if (isNumber(data.left)) {
+        cropBoxData.left = data.left;
+      }
+
+      if (isNumber(data.top)) {
+        cropBoxData.top = data.top;
+      }
+
+      if (isNumber(data.width) && data.width !== cropBoxData.width) {
+        widthChanged = true;
+        cropBoxData.width = data.width;
+      }
+
+      if (isNumber(data.height) && data.height !== cropBoxData.height) {
+        heightChanged = true;
+        cropBoxData.height = data.height;
+      }
+
+      if (aspectRatio) {
+        if (widthChanged) {
+          cropBoxData.height = cropBoxData.width / aspectRatio;
+        } else if (heightChanged) {
+          cropBoxData.width = cropBoxData.height * aspectRatio;
+        }
+      }
+
+      self.renderCropBox();
+    }
+
+    return self;
+  },
+
+
+  /**
+   * Get a canvas drawn the cropped image
+   *
+   * @param {Object} options (optional)
+   * @return {HTMLCanvasElement} canvas
+   */
+  getCroppedCanvas: function getCroppedCanvas(options) {
+    var self = this;
+
+    if (!self.ready || !window.HTMLCanvasElement) {
+      return null;
+    }
+
+    // Return the whole canvas if not cropped
+    if (!self.cropped) {
+      return getSourceCanvas(self.image, self.imageData);
+    }
+
+    if (!isPlainObject(options)) {
+      options = {};
+    }
+
+    var data = self.getData();
+    var originalWidth = data.width;
+    var originalHeight = data.height;
+    var aspectRatio = originalWidth / originalHeight;
+    var scaledWidth = void 0;
+    var scaledHeight = void 0;
+    var scaledRatio = void 0;
+
+    if (isPlainObject(options)) {
+      scaledWidth = options.width;
+      scaledHeight = options.height;
+
+      if (scaledWidth) {
+        scaledHeight = scaledWidth / aspectRatio;
+        scaledRatio = scaledWidth / originalWidth;
+      } else if (scaledHeight) {
+        scaledWidth = scaledHeight * aspectRatio;
+        scaledRatio = scaledHeight / originalHeight;
+      }
+    }
+
+    // The canvas element will use `Math.floor` on a float number, so floor first
+    var canvasWidth = Math.floor(scaledWidth || originalWidth);
+    var canvasHeight = Math.floor(scaledHeight || originalHeight);
+
+    var canvas = createElement('canvas');
+    var context = canvas.getContext('2d');
+
+    canvas.width = canvasWidth;
+    canvas.height = canvasHeight;
+
+    if (options.fillColor) {
+      context.fillStyle = options.fillColor;
+      context.fillRect(0, 0, canvasWidth, canvasHeight);
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/API/CanvasRenderingContext2D.drawImage
+    var parameters = function () {
+      var source = getSourceCanvas(self.image, self.imageData);
+      var sourceWidth = source.width;
+      var sourceHeight = source.height;
+      var canvasData = self.canvasData;
+      var params = [source];
+
+      // Source canvas
+      var srcX = data.x + canvasData.naturalWidth * (Math.abs(data.scaleX || 1) - 1) / 2;
+      var srcY = data.y + canvasData.naturalHeight * (Math.abs(data.scaleY || 1) - 1) / 2;
+      var srcWidth = void 0;
+      var srcHeight = void 0;
+
+      // Destination canvas
+      var dstX = void 0;
+      var dstY = void 0;
+      var dstWidth = void 0;
+      var dstHeight = void 0;
+
+      if (srcX <= -originalWidth || srcX > sourceWidth) {
+        srcX = srcWidth = dstX = dstWidth = 0;
+      } else if (srcX <= 0) {
+        dstX = -srcX;
+        srcX = 0;
+        srcWidth = dstWidth = Math.min(sourceWidth, originalWidth + srcX);
+      } else if (srcX <= sourceWidth) {
+        dstX = 0;
+        srcWidth = dstWidth = Math.min(originalWidth, sourceWidth - srcX);
+      }
+
+      if (srcWidth <= 0 || srcY <= -originalHeight || srcY > sourceHeight) {
+        srcY = srcHeight = dstY = dstHeight = 0;
+      } else if (srcY <= 0) {
+        dstY = -srcY;
+        srcY = 0;
+        srcHeight = dstHeight = Math.min(sourceHeight, originalHeight + srcY);
+      } else if (srcY <= sourceHeight) {
+        dstY = 0;
+        srcHeight = dstHeight = Math.min(originalHeight, sourceHeight - srcY);
+      }
+
+      params.push(Math.floor(srcX), Math.floor(srcY), Math.floor(srcWidth), Math.floor(srcHeight));
+
+      // Scale destination sizes
+      if (scaledRatio) {
+        dstX *= scaledRatio;
+        dstY *= scaledRatio;
+        dstWidth *= scaledRatio;
+        dstHeight *= scaledRatio;
+      }
+
+      // Avoid "IndexSizeError" in IE and Firefox
+      if (dstWidth > 0 && dstHeight > 0) {
+        params.push(Math.floor(dstX), Math.floor(dstY), Math.floor(dstWidth), Math.floor(dstHeight));
+      }
+
+      return params;
+    }();
+
+    context.drawImage.apply(context, toConsumableArray(parameters));
+
+    return canvas;
+  },
+
+
+  /**
+   * Change the aspect ratio of the crop box
+   *
+   * @param {Number} aspectRatio
+   */
+  setAspectRatio: function setAspectRatio(aspectRatio) {
+    var self = this;
+    var options = self.options;
+
+    if (!self.disabled && !isUndefined(aspectRatio)) {
+      // 0 -> NaN
+      options.aspectRatio = Math.max(0, aspectRatio) || NaN;
+
+      if (self.ready) {
+        self.initCropBox();
+
+        if (self.cropped) {
+          self.renderCropBox();
+        }
+      }
+    }
+
+    return self;
+  },
+
+
+  /**
+   * Change the drag mode
+   *
+   * @param {String} mode (optional)
+   */
+  setDragMode: function setDragMode(mode) {
+    var self = this;
+    var options = self.options;
+    var dragBox = self.dragBox;
+    var face = self.face;
+    var croppable = void 0;
+    var movable = void 0;
+
+    if (self.loaded && !self.disabled) {
+      croppable = mode === 'crop';
+      movable = options.movable && mode === 'move';
+      mode = croppable || movable ? mode : 'none';
+
+      setData$1(dragBox, 'action', mode);
+      toggleClass(dragBox, 'cropper-crop', croppable);
+      toggleClass(dragBox, 'cropper-move', movable);
+
+      if (!options.cropBoxMovable) {
+        // Sync drag mode to crop box when it is not movable
+        setData$1(face, 'action', mode);
+        toggleClass(face, 'cropper-crop', croppable);
+        toggleClass(face, 'cropper-move', movable);
+      }
+    }
+
+    return self;
+  }
+};
+
+// Constants
+var NAMESPACE = 'cropper';
+
+// Classes
+var CLASS_HIDDEN = NAMESPACE + '-hidden';
+
+// Events
+var EVENT_ERROR = 'error';
+var EVENT_LOAD = 'load';
+var EVENT_READY = 'ready';
+var EVENT_CROP = 'crop';
+
+// RegExps
+var REGEXP_DATA_URL = /^data:/;
+var REGEXP_DATA_URL_JPEG = /^data:image\/jpeg;base64,/;
+
+var AnotherCropper = void 0;
+
+var Cropper = function () {
+  function Cropper(element, options) {
+    classCallCheck(this, Cropper);
+
+    var self = this;
+
+    self.element = element;
+    self.options = extend({}, DEFAULTS, isPlainObject(options) && options);
+    self.loaded = false;
+    self.ready = false;
+    self.complete = false;
+    self.rotated = false;
+    self.cropped = false;
+    self.disabled = false;
+    self.replaced = false;
+    self.limited = false;
+    self.wheeling = false;
+    self.isImg = false;
+    self.originalUrl = '';
+    self.canvasData = null;
+    self.cropBoxData = null;
+    self.previews = null;
+    self.pointers = {};
+    self.init();
+  }
+
+  createClass(Cropper, [{
+    key: 'init',
+    value: function init() {
+      var self = this;
+      var element = self.element;
+      var tagName = element.tagName.toLowerCase();
+      var url = void 0;
+
+      if (getData$1(element, NAMESPACE)) {
+        return;
+      }
+
+      setData$1(element, NAMESPACE, self);
+
+      if (tagName === 'img') {
+        self.isImg = true;
+
+        // e.g.: "img/picture.jpg"
+        self.originalUrl = url = element.getAttribute('src');
+
+        // Stop when it's a blank image
+        if (!url) {
+          return;
+        }
+
+        // e.g.: "http://example.com/img/picture.jpg"
+        url = element.src;
+      } else if (tagName === 'canvas' && window.HTMLCanvasElement) {
+        url = element.toDataURL();
+      }
+
+      self.load(url);
+    }
+  }, {
+    key: 'load',
+    value: function load(url) {
+      var self = this;
+      var options = self.options;
+      var element = self.element;
+
+      if (!url) {
+        return;
+      }
+
+      self.url = url;
+      self.imageData = {};
+
+      if (!options.checkOrientation || !window.ArrayBuffer) {
+        self.clone();
+        return;
+      }
+
+      // XMLHttpRequest disallows to open a Data URL in some browsers like IE11 and Safari
+      if (REGEXP_DATA_URL.test(url)) {
+        if (REGEXP_DATA_URL_JPEG) {
+          self.read(dataURLToArrayBuffer(url));
+        } else {
+          self.clone();
+        }
+        return;
+      }
+
+      var xhr = new XMLHttpRequest();
+
+      xhr.onerror = xhr.onabort = function () {
+        self.clone();
+      };
+
+      xhr.onload = function () {
+        self.read(xhr.response);
+      };
+
+      if (options.checkCrossOrigin && isCrossOriginURL(url) && element.crossOrigin) {
+        url = addTimestamp(url);
+      }
+
+      xhr.open('get', url);
+      xhr.responseType = 'arraybuffer';
+      xhr.withCredentials = element.crossOrigin === 'use-credentials';
+      xhr.send();
+    }
+  }, {
+    key: 'read',
+    value: function read(arrayBuffer) {
+      var self = this;
+      var options = self.options;
+      var orientation = getOrientation(arrayBuffer);
+      var imageData = self.imageData;
+      var rotate = 0;
+      var scaleX = 1;
+      var scaleY = 1;
+
+      if (orientation > 1) {
+        self.url = arrayBufferToDataURL(arrayBuffer);
+
+        switch (orientation) {
+
+          // flip horizontal
+          case 2:
+            scaleX = -1;
+            break;
+
+          // rotate left 180°
+          case 3:
+            rotate = -180;
+            break;
+
+          // flip vertical
+          case 4:
+            scaleY = -1;
+            break;
+
+          // flip vertical + rotate right 90°
+          case 5:
+            rotate = 90;
+            scaleY = -1;
+            break;
+
+          // rotate right 90°
+          case 6:
+            rotate = 90;
+            break;
+
+          // flip horizontal + rotate right 90°
+          case 7:
+            rotate = 90;
+            scaleX = -1;
+            break;
+
+          // rotate left 90°
+          case 8:
+            rotate = -90;
+            break;
+        }
+      }
+
+      if (options.rotatable) {
+        imageData.rotate = rotate;
+      }
+
+      if (options.scalable) {
+        imageData.scaleX = scaleX;
+        imageData.scaleY = scaleY;
+      }
+
+      self.clone();
+    }
+  }, {
+    key: 'clone',
+    value: function clone() {
+      var self = this;
+      var element = self.element;
+      var url = self.url;
+      var crossOrigin = void 0;
+      var crossOriginUrl = void 0;
+      var start = void 0;
+      var stop = void 0;
+
+      if (self.options.checkCrossOrigin && isCrossOriginURL(url)) {
+        crossOrigin = element.crossOrigin;
+
+        if (crossOrigin) {
+          crossOriginUrl = url;
+        } else {
+          crossOrigin = 'anonymous';
+
+          // Bust cache when there is not a "crossOrigin" property
+          crossOriginUrl = addTimestamp(url);
+        }
+      }
+
+      self.crossOrigin = crossOrigin;
+      self.crossOriginUrl = crossOriginUrl;
+
+      var image = createElement('img');
+
+      if (crossOrigin) {
+        image.crossOrigin = crossOrigin;
+      }
+
+      image.src = crossOriginUrl || url;
+      self.image = image;
+      self.onStart = start = proxy(self.start, self);
+      self.onStop = stop = proxy(self.stop, self);
+
+      if (self.isImg) {
+        if (element.complete) {
+          self.start();
+        } else {
+          addListener(element, EVENT_LOAD, start);
+        }
+      } else {
+        addListener(image, EVENT_LOAD, start);
+        addListener(image, EVENT_ERROR, stop);
+        addClass(image, 'cropper-hide');
+        element.parentNode.insertBefore(image, element.nextSibling);
+      }
+    }
+  }, {
+    key: 'start',
+    value: function start(event) {
+      var self = this;
+      var image = self.isImg ? self.element : self.image;
+
+      if (event) {
+        removeListener(image, EVENT_LOAD, self.onStart);
+        removeListener(image, EVENT_ERROR, self.onStop);
+      }
+
+      getImageSize(image, function (naturalWidth, naturalHeight) {
+        extend(self.imageData, {
+          naturalWidth: naturalWidth,
+          naturalHeight: naturalHeight,
+          aspectRatio: naturalWidth / naturalHeight
+        });
+
+        self.loaded = true;
+        self.build();
+      });
+    }
+  }, {
+    key: 'stop',
+    value: function stop() {
+      var self = this;
+      var image = self.image;
+
+      removeListener(image, EVENT_LOAD, self.onStart);
+      removeListener(image, EVENT_ERROR, self.onStop);
+
+      removeChild(image);
+      self.image = null;
+    }
+  }, {
+    key: 'build',
+    value: function build() {
+      var self = this;
+      var options = self.options;
+      var element = self.element;
+      var image = self.image;
+      var container = void 0;
+      var cropper = void 0;
+      var canvas = void 0;
+      var dragBox = void 0;
+      var cropBox = void 0;
+      var face = void 0;
+
+      if (!self.loaded) {
+        return;
+      }
+
+      // Unbuild first when replace
+      if (self.ready) {
+        self.unbuild();
+      }
+
+      var template = createElement('div');
+      template.innerHTML = TEMPLATE;
+
+      // Create cropper elements
+      self.container = container = element.parentNode;
+      self.cropper = cropper = getByClass(template, 'cropper-container')[0];
+      self.canvas = canvas = getByClass(cropper, 'cropper-canvas')[0];
+      self.dragBox = dragBox = getByClass(cropper, 'cropper-drag-box')[0];
+      self.cropBox = cropBox = getByClass(cropper, 'cropper-crop-box')[0];
+      self.viewBox = getByClass(cropper, 'cropper-view-box')[0];
+      self.face = face = getByClass(cropBox, 'cropper-face')[0];
+
+      appendChild(canvas, image);
+
+      // Hide the original image
+      addClass(element, CLASS_HIDDEN);
+
+      // Inserts the cropper after to the current image
+      container.insertBefore(cropper, element.nextSibling);
+
+      // Show the image if is hidden
+      if (!self.isImg) {
+        removeClass(image, 'cropper-hide');
+      }
+
+      self.initPreview();
+      self.bind();
+
+      options.aspectRatio = Math.max(0, options.aspectRatio) || NaN;
+      options.viewMode = Math.max(0, Math.min(3, Math.round(options.viewMode))) || 0;
+
+      self.cropped = options.autoCrop;
+
+      if (options.autoCrop) {
+        if (options.modal) {
+          addClass(dragBox, 'cropper-modal');
+        }
+      } else {
+        addClass(cropBox, CLASS_HIDDEN);
+      }
+
+      if (!options.guides) {
+        addClass(getByClass(cropBox, 'cropper-dashed'), CLASS_HIDDEN);
+      }
+
+      if (!options.center) {
+        addClass(getByClass(cropBox, 'cropper-center'), CLASS_HIDDEN);
+      }
+
+      if (options.background) {
+        addClass(cropper, 'cropper-bg');
+      }
+
+      if (!options.highlight) {
+        addClass(face, 'cropper-invisible');
+      }
+
+      if (options.cropBoxMovable) {
+        addClass(face, 'cropper-move');
+        setData$1(face, 'action', 'all');
+      }
+
+      if (!options.cropBoxResizable) {
+        addClass(getByClass(cropBox, 'cropper-line'), CLASS_HIDDEN);
+        addClass(getByClass(cropBox, 'cropper-point'), CLASS_HIDDEN);
+      }
+
+      self.setDragMode(options.dragMode);
+      self.render();
+      self.ready = true;
+      self.setData(options.data);
+
+      // Call the "ready" option asynchronously to keep "image.cropper" is defined
+      self.completing = setTimeout(function () {
+        if (isFunction(options.ready)) {
+          addListener(element, EVENT_READY, options.ready, true);
+        }
+
+        dispatchEvent(element, EVENT_READY);
+        dispatchEvent(element, EVENT_CROP, self.getData());
+
+        self.complete = true;
+      }, 0);
+    }
+  }, {
+    key: 'unbuild',
+    value: function unbuild() {
+      var self = this;
+
+      if (!self.ready) {
+        return;
+      }
+
+      if (!self.complete) {
+        clearTimeout(self.completing);
+      }
+
+      self.ready = false;
+      self.complete = false;
+      self.initialImageData = null;
+
+      // Clear `initialCanvasData` is necessary when replace
+      self.initialCanvasData = null;
+      self.initialCropBoxData = null;
+      self.containerData = null;
+      self.canvasData = null;
+
+      // Clear `cropBoxData` is necessary when replace
+      self.cropBoxData = null;
+      self.unbind();
+
+      self.resetPreview();
+      self.previews = null;
+
+      self.viewBox = null;
+      self.cropBox = null;
+      self.dragBox = null;
+      self.canvas = null;
+      self.container = null;
+
+      removeChild(self.cropper);
+      self.cropper = null;
+    }
+  }], [{
+    key: 'noConflict',
+    value: function noConflict() {
+      window.Cropper = AnotherCropper;
+      return Cropper;
+    }
+  }, {
+    key: 'setDefaults',
+    value: function setDefaults(options) {
+      extend(DEFAULTS, isPlainObject(options) && options);
+    }
+  }]);
+  return Cropper;
+}();
+
+extend(Cropper.prototype, render$1);
+extend(Cropper.prototype, preview$1);
+extend(Cropper.prototype, events);
+extend(Cropper.prototype, handlers);
+extend(Cropper.prototype, change$1);
+extend(Cropper.prototype, methods);
+
+if (typeof window !== 'undefined') {
+  AnotherCropper = window.Cropper;
+  window.Cropper = Cropper;
+}
+
+return Cropper;
+
+})));
+
+
 /***/ }),
-/* 39 */
+/* 43 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(3)();
+exports.push([module.i, "\n.btn {\n  margin-top: 5px;\n}\n.button-create{\n  margin-left: 10px;\n}\n", ""]);
+
+/***/ }),
+/* 44 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(3)();
+exports.push([module.i, "\n#user-component {\r\n  margin-top: 10px;\n}\n#profile {\r\n  margin-top: 5px;\n}\r\n", ""]);
+
+/***/ }),
+/* 45 */
+/***/ (function(module, exports, __webpack_require__) {
+
+exports = module.exports = __webpack_require__(3)();
+exports.push([module.i, "\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n", ""]);
+
+/***/ }),
+/* 46 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /* WEBPACK VAR INJECTION */(function(global, module) {var __WEBPACK_AMD_DEFINE_RESULT__;/**
@@ -31902,10 +35989,10 @@ module.exports = function() {
   }
 }.call(this));
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9), __webpack_require__(53)(module)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11), __webpack_require__(67)(module)))
 
 /***/ }),
-/* 40 */
+/* 47 */
 /***/ (function(module, exports) {
 
 // shim for using process in browser
@@ -32091,22 +36178,22 @@ process.umask = function() { return 0; };
 
 
 /***/ }),
-/* 41 */
+/* 48 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!function(e){!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(8)], __WEBPACK_AMD_DEFINE_RESULT__ = function(e){return function(){function t(e,t,n){return g({type:O.error,iconClass:m().iconClasses.error,message:e,optionsOverride:n,title:t})}function n(t,n){return t||(t=m()),v=e("#"+t.containerId),v.length?v:(n&&(v=u(t)),v)}function i(e,t,n){return g({type:O.info,iconClass:m().iconClasses.info,message:e,optionsOverride:n,title:t})}function o(e){w=e}function s(e,t,n){return g({type:O.success,iconClass:m().iconClasses.success,message:e,optionsOverride:n,title:t})}function a(e,t,n){return g({type:O.warning,iconClass:m().iconClasses.warning,message:e,optionsOverride:n,title:t})}function r(e,t){var i=m();v||n(i),l(e,i,t)||d(i)}function c(t){var i=m();return v||n(i),t&&0===e(":focus",t).length?void h(t):void(v.children().length&&v.remove())}function d(t){for(var n=v.children(),i=n.length-1;i>=0;i--)l(e(n[i]),t)}function l(t,n,i){var o=i&&i.force?i.force:!1;return t&&(o||0===e(":focus",t).length)?(t[n.hideMethod]({duration:n.hideDuration,easing:n.hideEasing,complete:function(){h(t)}}),!0):!1}function u(t){return v=e("<div/>").attr("id",t.containerId).addClass(t.positionClass).attr("aria-live","polite").attr("role","alert"),v.appendTo(e(t.target)),v}function p(){return{tapToDismiss:!0,toastClass:"toast",containerId:"toast-container",debug:!1,showMethod:"fadeIn",showDuration:300,showEasing:"swing",onShown:void 0,hideMethod:"fadeOut",hideDuration:1e3,hideEasing:"swing",onHidden:void 0,closeMethod:!1,closeDuration:!1,closeEasing:!1,extendedTimeOut:1e3,iconClasses:{error:"toast-error",info:"toast-info",success:"toast-success",warning:"toast-warning"},iconClass:"toast-info",positionClass:"toast-top-right",timeOut:5e3,titleClass:"toast-title",messageClass:"toast-message",escapeHtml:!1,target:"body",closeHtml:'<button type="button">&times;</button>',newestOnTop:!0,preventDuplicates:!1,progressBar:!1}}function f(e){w&&w(e)}function g(t){function i(e){return null==e&&(e=""),new String(e).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/'/g,"&#39;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}function o(){r(),d(),l(),u(),p(),c()}function s(){y.hover(b,O),!x.onclick&&x.tapToDismiss&&y.click(w),x.closeButton&&k&&k.click(function(e){e.stopPropagation?e.stopPropagation():void 0!==e.cancelBubble&&e.cancelBubble!==!0&&(e.cancelBubble=!0),w(!0)}),x.onclick&&y.click(function(e){x.onclick(e),w()})}function a(){y.hide(),y[x.showMethod]({duration:x.showDuration,easing:x.showEasing,complete:x.onShown}),x.timeOut>0&&(H=setTimeout(w,x.timeOut),q.maxHideTime=parseFloat(x.timeOut),q.hideEta=(new Date).getTime()+q.maxHideTime,x.progressBar&&(q.intervalId=setInterval(D,10)))}function r(){t.iconClass&&y.addClass(x.toastClass).addClass(E)}function c(){x.newestOnTop?v.prepend(y):v.append(y)}function d(){t.title&&(I.append(x.escapeHtml?i(t.title):t.title).addClass(x.titleClass),y.append(I))}function l(){t.message&&(M.append(x.escapeHtml?i(t.message):t.message).addClass(x.messageClass),y.append(M))}function u(){x.closeButton&&(k.addClass("toast-close-button").attr("role","button"),y.prepend(k))}function p(){x.progressBar&&(B.addClass("toast-progress"),y.prepend(B))}function g(e,t){if(e.preventDuplicates){if(t.message===C)return!0;C=t.message}return!1}function w(t){var n=t&&x.closeMethod!==!1?x.closeMethod:x.hideMethod,i=t&&x.closeDuration!==!1?x.closeDuration:x.hideDuration,o=t&&x.closeEasing!==!1?x.closeEasing:x.hideEasing;return!e(":focus",y).length||t?(clearTimeout(q.intervalId),y[n]({duration:i,easing:o,complete:function(){h(y),x.onHidden&&"hidden"!==j.state&&x.onHidden(),j.state="hidden",j.endTime=new Date,f(j)}})):void 0}function O(){(x.timeOut>0||x.extendedTimeOut>0)&&(H=setTimeout(w,x.extendedTimeOut),q.maxHideTime=parseFloat(x.extendedTimeOut),q.hideEta=(new Date).getTime()+q.maxHideTime)}function b(){clearTimeout(H),q.hideEta=0,y.stop(!0,!0)[x.showMethod]({duration:x.showDuration,easing:x.showEasing})}function D(){var e=(q.hideEta-(new Date).getTime())/q.maxHideTime*100;B.width(e+"%")}var x=m(),E=t.iconClass||x.iconClass;if("undefined"!=typeof t.optionsOverride&&(x=e.extend(x,t.optionsOverride),E=t.optionsOverride.iconClass||E),!g(x,t)){T++,v=n(x,!0);var H=null,y=e("<div/>"),I=e("<div/>"),M=e("<div/>"),B=e("<div/>"),k=e(x.closeHtml),q={intervalId:null,hideEta:null,maxHideTime:null},j={toastId:T,state:"visible",startTime:new Date,options:x,map:t};return o(),a(),s(),f(j),x.debug&&console&&console.log(j),y}}function m(){return e.extend({},p(),b.options)}function h(e){v||(v=n()),e.is(":visible")||(e.remove(),e=null,0===v.children().length&&(v.remove(),C=void 0))}var v,w,C,T=0,O={error:"error",info:"info",success:"success",warning:"warning"},b={clear:r,remove:c,error:t,getContainer:n,info:i,options:{},subscribe:o,success:s,version:"2.1.2",warning:a};return b}()}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
-				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))}(__webpack_require__(52));
+var __WEBPACK_AMD_DEFINE_ARRAY__, __WEBPACK_AMD_DEFINE_RESULT__;!function(e){!(__WEBPACK_AMD_DEFINE_ARRAY__ = [__webpack_require__(10)], __WEBPACK_AMD_DEFINE_RESULT__ = function(e){return function(){function t(e,t,n){return g({type:O.error,iconClass:m().iconClasses.error,message:e,optionsOverride:n,title:t})}function n(t,n){return t||(t=m()),v=e("#"+t.containerId),v.length?v:(n&&(v=u(t)),v)}function i(e,t,n){return g({type:O.info,iconClass:m().iconClasses.info,message:e,optionsOverride:n,title:t})}function o(e){w=e}function s(e,t,n){return g({type:O.success,iconClass:m().iconClasses.success,message:e,optionsOverride:n,title:t})}function a(e,t,n){return g({type:O.warning,iconClass:m().iconClasses.warning,message:e,optionsOverride:n,title:t})}function r(e,t){var i=m();v||n(i),l(e,i,t)||d(i)}function c(t){var i=m();return v||n(i),t&&0===e(":focus",t).length?void h(t):void(v.children().length&&v.remove())}function d(t){for(var n=v.children(),i=n.length-1;i>=0;i--)l(e(n[i]),t)}function l(t,n,i){var o=i&&i.force?i.force:!1;return t&&(o||0===e(":focus",t).length)?(t[n.hideMethod]({duration:n.hideDuration,easing:n.hideEasing,complete:function(){h(t)}}),!0):!1}function u(t){return v=e("<div/>").attr("id",t.containerId).addClass(t.positionClass).attr("aria-live","polite").attr("role","alert"),v.appendTo(e(t.target)),v}function p(){return{tapToDismiss:!0,toastClass:"toast",containerId:"toast-container",debug:!1,showMethod:"fadeIn",showDuration:300,showEasing:"swing",onShown:void 0,hideMethod:"fadeOut",hideDuration:1e3,hideEasing:"swing",onHidden:void 0,closeMethod:!1,closeDuration:!1,closeEasing:!1,extendedTimeOut:1e3,iconClasses:{error:"toast-error",info:"toast-info",success:"toast-success",warning:"toast-warning"},iconClass:"toast-info",positionClass:"toast-top-right",timeOut:5e3,titleClass:"toast-title",messageClass:"toast-message",escapeHtml:!1,target:"body",closeHtml:'<button type="button">&times;</button>',newestOnTop:!0,preventDuplicates:!1,progressBar:!1}}function f(e){w&&w(e)}function g(t){function i(e){return null==e&&(e=""),new String(e).replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/'/g,"&#39;").replace(/</g,"&lt;").replace(/>/g,"&gt;")}function o(){r(),d(),l(),u(),p(),c()}function s(){y.hover(b,O),!x.onclick&&x.tapToDismiss&&y.click(w),x.closeButton&&k&&k.click(function(e){e.stopPropagation?e.stopPropagation():void 0!==e.cancelBubble&&e.cancelBubble!==!0&&(e.cancelBubble=!0),w(!0)}),x.onclick&&y.click(function(e){x.onclick(e),w()})}function a(){y.hide(),y[x.showMethod]({duration:x.showDuration,easing:x.showEasing,complete:x.onShown}),x.timeOut>0&&(H=setTimeout(w,x.timeOut),q.maxHideTime=parseFloat(x.timeOut),q.hideEta=(new Date).getTime()+q.maxHideTime,x.progressBar&&(q.intervalId=setInterval(D,10)))}function r(){t.iconClass&&y.addClass(x.toastClass).addClass(E)}function c(){x.newestOnTop?v.prepend(y):v.append(y)}function d(){t.title&&(I.append(x.escapeHtml?i(t.title):t.title).addClass(x.titleClass),y.append(I))}function l(){t.message&&(M.append(x.escapeHtml?i(t.message):t.message).addClass(x.messageClass),y.append(M))}function u(){x.closeButton&&(k.addClass("toast-close-button").attr("role","button"),y.prepend(k))}function p(){x.progressBar&&(B.addClass("toast-progress"),y.prepend(B))}function g(e,t){if(e.preventDuplicates){if(t.message===C)return!0;C=t.message}return!1}function w(t){var n=t&&x.closeMethod!==!1?x.closeMethod:x.hideMethod,i=t&&x.closeDuration!==!1?x.closeDuration:x.hideDuration,o=t&&x.closeEasing!==!1?x.closeEasing:x.hideEasing;return!e(":focus",y).length||t?(clearTimeout(q.intervalId),y[n]({duration:i,easing:o,complete:function(){h(y),x.onHidden&&"hidden"!==j.state&&x.onHidden(),j.state="hidden",j.endTime=new Date,f(j)}})):void 0}function O(){(x.timeOut>0||x.extendedTimeOut>0)&&(H=setTimeout(w,x.extendedTimeOut),q.maxHideTime=parseFloat(x.extendedTimeOut),q.hideEta=(new Date).getTime()+q.maxHideTime)}function b(){clearTimeout(H),q.hideEta=0,y.stop(!0,!0)[x.showMethod]({duration:x.showDuration,easing:x.showEasing})}function D(){var e=(q.hideEta-(new Date).getTime())/q.maxHideTime*100;B.width(e+"%")}var x=m(),E=t.iconClass||x.iconClass;if("undefined"!=typeof t.optionsOverride&&(x=e.extend(x,t.optionsOverride),E=t.optionsOverride.iconClass||E),!g(x,t)){T++,v=n(x,!0);var H=null,y=e("<div/>"),I=e("<div/>"),M=e("<div/>"),B=e("<div/>"),k=e(x.closeHtml),q={intervalId:null,hideEta:null,maxHideTime:null},j={toastId:T,state:"visible",startTime:new Date,options:x,map:t};return o(),a(),s(),f(j),x.debug&&console&&console.log(j),y}}function m(){return e.extend({},p(),b.options)}function h(e){v||(v=n()),e.is(":visible")||(e.remove(),e=null,0===v.children().length&&(v.remove(),C=void 0))}var v,w,C,T=0,O={error:"error",info:"info",success:"success",warning:"warning"},b={clear:r,remove:c,error:t,getContainer:n,info:i,options:{},subscribe:o,success:s,version:"2.1.2",warning:a};return b}()}.apply(exports, __WEBPACK_AMD_DEFINE_ARRAY__),
+				__WEBPACK_AMD_DEFINE_RESULT__ !== undefined && (module.exports = __WEBPACK_AMD_DEFINE_RESULT__))}(__webpack_require__(66));
 //# sourceMappingURL=toastr.js.map
 
 /***/ }),
-/* 42 */
+/* 49 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Component = __webpack_require__(2)(
+var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(32),
+  __webpack_require__(34),
   /* template */
-  __webpack_require__(47),
+  __webpack_require__(60),
   /* scopeId */
   null,
   /* cssModules */
@@ -32133,18 +36220,18 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 43 */
+/* 50 */
 /***/ (function(module, exports, __webpack_require__) {
 
 
 /* styles */
-__webpack_require__(48)
+__webpack_require__(61)
 
-var Component = __webpack_require__(2)(
+var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(33),
+  __webpack_require__(35),
   /* template */
-  __webpack_require__(45),
+  __webpack_require__(55),
   /* scopeId */
   null,
   /* cssModules */
@@ -32171,14 +36258,124 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 44 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
-var Component = __webpack_require__(2)(
+
+/* styles */
+__webpack_require__(63)
+
+var Component = __webpack_require__(1)(
   /* script */
-  __webpack_require__(34),
+  __webpack_require__(36),
   /* template */
-  __webpack_require__(46),
+  __webpack_require__(59),
+  /* scopeId */
+  null,
+  /* cssModules */
+  null
+)
+Component.options.__file = "D:\\projetos\\radio-website\\resources\\assets\\js\\components\\user\\AvatarUpload.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] AvatarUpload.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-95a400c6", Component.options)
+  } else {
+    hotAPI.reload("data-v-95a400c6", Component.options)
+  }
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 52 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(37),
+  /* template */
+  __webpack_require__(58),
+  /* scopeId */
+  null,
+  /* cssModules */
+  null
+)
+Component.options.__file = "D:\\projetos\\radio-website\\resources\\assets\\js\\components\\user\\CreateModal.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] CreateModal.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-8a852304", Component.options)
+  } else {
+    hotAPI.reload("data-v-8a852304", Component.options)
+  }
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 53 */
+/***/ (function(module, exports, __webpack_require__) {
+
+
+/* styles */
+__webpack_require__(62)
+
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(38),
+  /* template */
+  __webpack_require__(57),
+  /* scopeId */
+  null,
+  /* cssModules */
+  null
+)
+Component.options.__file = "D:\\projetos\\radio-website\\resources\\assets\\js\\components\\user\\ProfileComponent.vue"
+if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
+if (Component.options.functional) {console.error("[vue-loader] ProfileComponent.vue: functional components are not supported with templates, they should use render functions.")}
+
+/* hot reload */
+if (false) {(function () {
+  var hotAPI = require("vue-hot-reload-api")
+  hotAPI.install(require("vue"), false)
+  if (!hotAPI.compatible) return
+  module.hot.accept()
+  if (!module.hot.data) {
+    hotAPI.createRecord("data-v-43ff71b7", Component.options)
+  } else {
+    hotAPI.reload("data-v-43ff71b7", Component.options)
+  }
+})()}
+
+module.exports = Component.exports
+
+
+/***/ }),
+/* 54 */
+/***/ (function(module, exports, __webpack_require__) {
+
+var Component = __webpack_require__(1)(
+  /* script */
+  __webpack_require__(39),
+  /* template */
+  __webpack_require__(56),
   /* scopeId */
   null,
   /* cssModules */
@@ -32205,7 +36402,7 @@ module.exports = Component.exports
 
 
 /***/ }),
-/* 45 */
+/* 55 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -32271,7 +36468,7 @@ if (false) {
 }
 
 /***/ }),
-/* 46 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -32412,7 +36609,400 @@ if (false) {
 }
 
 /***/ }),
-/* 47 */
+/* 57 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    attrs: {
+      "id": "user-component"
+    }
+  }, [_vm._m(0), _vm._v(" "), _c('div', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.tab == 'profile'),
+      expression: "tab == 'profile'"
+    }],
+    staticClass: "col-lg-8",
+    attrs: {
+      "id": "component-content"
+    }
+  }, [_c('div', {
+    staticClass: "box box-primary"
+  }, [_c('div', {
+    attrs: {
+      "id": "profile"
+    }
+  }, [_c('div', {
+    staticClass: "box box-widget widget-user"
+  }, [_c('div', {
+    staticClass: "widget-user-header bg-aqua-active"
+  }, [_c('h3', {
+    staticClass: "widget-user-username",
+    domProps: {
+      "textContent": _vm._s(_vm.user.name)
+    }
+  }), _vm._v(" "), _c('span', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.user.is_master),
+      expression: "user.is_master"
+    }],
+    staticClass: "label label-danger"
+  }, [_vm._v("Master")])]), _vm._v(" "), _c('div', {
+    staticClass: "widget-user-image"
+  }, [_c('img', {
+    staticClass: "img-circle",
+    attrs: {
+      "src": _vm.user.avatar,
+      "alt": "User Avatar"
+    }
+  })]), _vm._v(" "), _c('div', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.isLoading),
+      expression: "isLoading"
+    }],
+    staticClass: "overlay"
+  }, [_c('i', {
+    staticClass: "fa fa-refresh fa-spin"
+  })]), _vm._v(" "), _c('div', {
+    staticClass: "box-footer"
+  }, [_c('div', {
+    staticClass: "row"
+  }, [_c('div', {
+    staticClass: "col-sm-4 border"
+  }, [_c('div', {
+    staticClass: "description-block"
+  }, [_c('h5', {
+    staticClass: "description-header",
+    domProps: {
+      "textContent": _vm._s(_vm.user.id)
+    }
+  }), _vm._v(" "), _c('span', {
+    staticClass: "description-text"
+  }, [_vm._v("Id")])])]), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-4 border"
+  }, [_c('div', {
+    staticClass: "description-block"
+  }, [_c('h5', {
+    staticClass: "description-header",
+    domProps: {
+      "textContent": _vm._s(_vm.user.email)
+    }
+  }), _vm._v(" "), _c('span', {
+    staticClass: "description-text"
+  }, [_vm._v("Email")])])]), _vm._v(" "), _c('div', {
+    staticClass: "col-sm-4"
+  }, [_c('div', {
+    staticClass: "description-block"
+  }, [_c('h5', {
+    staticClass: "description-header",
+    domProps: {
+      "textContent": _vm._s(_vm.user.created_date)
+    }
+  }), _vm._v(" "), _c('span', {
+    staticClass: "description-text"
+  }, [_vm._v("Data do cadastrado")])])])])])])])])])])
+},staticRenderFns: [function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('div', {
+    staticClass: "col-lg-3 col-md-3 col-sm-3 col-xs-3"
+  }, [_c('ul', {
+    staticClass: "nav nav-pills nav-stacked"
+  }, [_c('li', {
+    staticClass: "[(tab == 'profile')? active]",
+    attrs: {
+      "role": "presentation"
+    }
+  }, [_c('a', {
+    attrs: {
+      "href": "#"
+    }
+  }, [_vm._v("Perfil")])]), _vm._v(" "), _c('li', {
+    attrs: {
+      "role": "presentation"
+    }
+  }, [_c('a', {
+    attrs: {
+      "href": "#"
+    }
+  }, [_vm._v("Senha")])])])])
+}]}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-43ff71b7", module.exports)
+  }
+}
+
+/***/ }),
+/* 58 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('transition', {
+    attrs: {
+      "name": "custom-classes-transition",
+      "enter-active-class": "animated fadeIn"
+    }
+  }, [_c('div', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.isVisible),
+      expression: "isVisible"
+    }],
+    staticClass: "modal",
+    staticStyle: {
+      "display": "block"
+    }
+  }, [_c('div', {
+    staticClass: "modal-dialog",
+    attrs: {
+      "role": "document"
+    }
+  }, [_c('div', {
+    staticClass: "modal-content"
+  }, [_c('div', {
+    staticClass: "modal-header"
+  }, [_c('button', {
+    staticClass: "close",
+    attrs: {
+      "type": "button",
+      "data-dismiss": "modal",
+      "aria-label": "Close"
+    },
+    on: {
+      "click": _vm.closeModal
+    }
+  }, [_c('span', {
+    attrs: {
+      "aria-hidden": "true"
+    }
+  }, [_vm._v("×")])]), _vm._v(" "), _c('h4', {
+    staticClass: "modal-title",
+    domProps: {
+      "textContent": _vm._s(_vm.title)
+    }
+  })]), _vm._v(" "), _c('div', {
+    staticClass: "modal-body"
+  }, [_c('div', {
+    staticClass: "box box-info"
+  }, [_c('div', {
+    staticClass: "box-body"
+  }, [_c('form', {
+    attrs: {
+      "role": "form"
+    },
+    on: {
+      "keydown": function($event) {
+        _vm.clearError($event.target.name)
+      },
+      "keyup": function($event) {
+        if (!('button' in $event) && _vm._k($event.keyCode, "enter", 13)) { return null; }
+        _vm.sendForm($event)
+      }
+    }
+  }, [_c('div', {
+    staticClass: "form-group",
+    class: {
+      'has-error': _vm.getError('name')
+    }
+  }, [_c('label', [_vm._v("Nome")]), _vm._v(" "), _c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.user.name),
+      expression: "user.name"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      "type": "text",
+      "placeholder": "Nome do usuário",
+      "name": "name"
+    },
+    domProps: {
+      "value": (_vm.user.name)
+    },
+    on: {
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.user.name = $event.target.value
+      }
+    }
+  }), _vm._v(" "), (_vm.getError('name')) ? _c('span', {
+    staticClass: "help-block",
+    domProps: {
+      "textContent": _vm._s(_vm.getError('name'))
+    }
+  }) : _vm._e()]), _vm._v(" "), _c('div', {
+    staticClass: "form-group",
+    class: {
+      'has-error': _vm.getError('email')
+    }
+  }, [_c('label', {
+    attrs: {
+      "for": "email"
+    }
+  }, [_vm._v("Email")]), _vm._v(" "), _c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.user.email),
+      expression: "user.email"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      "type": "email",
+      "id": "email",
+      "placeholder": "Email do usuário",
+      "name": "email"
+    },
+    domProps: {
+      "value": (_vm.user.email)
+    },
+    on: {
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.user.email = $event.target.value
+      }
+    }
+  }), _vm._v(" "), (_vm.getError('email')) ? _c('span', {
+    staticClass: "help-block",
+    domProps: {
+      "textContent": _vm._s(_vm.getError('email'))
+    }
+  }) : _vm._e()]), _vm._v(" "), _c('div', {
+    staticClass: "form-group",
+    class: {
+      'has-error': _vm.getError('password')
+    }
+  }, [_c('label', {
+    attrs: {
+      "for": "password"
+    }
+  }, [_vm._v("Senha")]), _vm._v(" "), _c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.user.password),
+      expression: "user.password"
+    }],
+    staticClass: "form-control",
+    attrs: {
+      "type": "password",
+      "id": "password",
+      "placeholder": "Senha do usuário",
+      "name": "password"
+    },
+    domProps: {
+      "value": (_vm.user.password)
+    },
+    on: {
+      "input": function($event) {
+        if ($event.target.composing) { return; }
+        _vm.user.password = $event.target.value
+      }
+    }
+  }), _vm._v(" "), (_vm.getError('password')) ? _c('span', {
+    staticClass: "help-block",
+    domProps: {
+      "textContent": _vm._s(_vm.getError('password'))
+    }
+  }) : _vm._e()]), _vm._v(" "), _c('div', {
+    staticClass: "checkbox"
+  }, [_c('label', [_c('input', {
+    directives: [{
+      name: "model",
+      rawName: "v-model",
+      value: (_vm.user.is_master),
+      expression: "user.is_master"
+    }],
+    attrs: {
+      "type": "checkbox"
+    },
+    domProps: {
+      "checked": Array.isArray(_vm.user.is_master) ? _vm._i(_vm.user.is_master, null) > -1 : (_vm.user.is_master)
+    },
+    on: {
+      "__c": function($event) {
+        var $$a = _vm.user.is_master,
+          $$el = $event.target,
+          $$c = $$el.checked ? (true) : (false);
+        if (Array.isArray($$a)) {
+          var $$v = null,
+            $$i = _vm._i($$a, $$v);
+          if ($$c) {
+            $$i < 0 && (_vm.user.is_master = $$a.concat($$v))
+          } else {
+            $$i > -1 && (_vm.user.is_master = $$a.slice(0, $$i).concat($$a.slice($$i + 1)))
+          }
+        } else {
+          _vm.user.is_master = $$c
+        }
+      }
+    }
+  }), _vm._v(" Master\r\n                  ")])])])])])]), _vm._v(" "), _c('div', {
+    staticClass: "modal-footer"
+  }, [_c('button', {
+    staticClass: "btn btn-default",
+    attrs: {
+      "type": "button",
+      "data-dismiss": "modal"
+    },
+    on: {
+      "click": _vm.closeModal
+    }
+  }, [_vm._v("Cancelar")]), _vm._v(" "), _c('button', {
+    staticClass: "btn btn-primary",
+    attrs: {
+      "type": "button"
+    },
+    on: {
+      "click": function($event) {
+        $event.preventDefault();
+        _vm.sendForm($event)
+      }
+    }
+  }, [_c('i', {
+    directives: [{
+      name: "show",
+      rawName: "v-show",
+      value: (_vm.isLoading),
+      expression: "isLoading"
+    }],
+    staticClass: "fa fa-refresh fa-spin"
+  }), _vm._v(" Confirmar")])])])])])])
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-8a852304", module.exports)
+  }
+}
+
+/***/ }),
+/* 59 */
+/***/ (function(module, exports, __webpack_require__) {
+
+module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c("div")
+},staticRenderFns: []}
+module.exports.render._withStripped = true
+if (false) {
+  module.hot.accept()
+  if (module.hot.data) {
+     require("vue-hot-reload-api").rerender("data-v-95a400c6", module.exports)
+  }
+}
+
+/***/ }),
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
@@ -32471,17 +37061,17 @@ if (false) {
 }
 
 /***/ }),
-/* 48 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(37);
+var content = __webpack_require__(43);
 if(typeof content === 'string') content = [[module.i, content, '']];
 if(content.locals) module.exports = content.locals;
 // add the styles to the DOM
-var update = __webpack_require__(49)("693912d9", content, false);
+var update = __webpack_require__(4)("693912d9", content, false);
 // Hot Module Replacement
 if(false) {
  // When the styles change, update the <style> tags
@@ -32497,228 +37087,59 @@ if(false) {
 }
 
 /***/ }),
-/* 49 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
-/*
-  MIT License http://www.opensource.org/licenses/mit-license.php
-  Author Tobias Koppers @sokra
-  Modified by Evan You @yyx990803
-*/
+// style-loader: Adds some css to the DOM by adding a <style> tag
 
-var hasDocument = typeof document !== 'undefined'
-
-if (typeof DEBUG !== 'undefined' && DEBUG) {
-  if (!hasDocument) {
-    throw new Error(
-    'vue-style-loader cannot be used in a non-browser environment. ' +
-    "Use { target: 'node' } in your Webpack config to indicate a server-rendering environment."
-  ) }
+// load the styles
+var content = __webpack_require__(44);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(4)("71d8aeb2", content, false);
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../../node_modules/css-loader/index.js!../../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"id\":\"data-v-43ff71b7\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./ProfileComponent.vue", function() {
+     var newContent = require("!!../../../../../node_modules/css-loader/index.js!../../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"id\":\"data-v-43ff71b7\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./ProfileComponent.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
 }
-
-var listToStyles = __webpack_require__(50)
-
-/*
-type StyleObject = {
-  id: number;
-  parts: Array<StyleObjectPart>
-}
-
-type StyleObjectPart = {
-  css: string;
-  media: string;
-  sourceMap: ?string
-}
-*/
-
-var stylesInDom = {/*
-  [id: number]: {
-    id: number,
-    refs: number,
-    parts: Array<(obj?: StyleObjectPart) => void>
-  }
-*/}
-
-var head = hasDocument && (document.head || document.getElementsByTagName('head')[0])
-var singletonElement = null
-var singletonCounter = 0
-var isProduction = false
-var noop = function () {}
-
-// Force single-tag solution on IE6-9, which has a hard limit on the # of <style>
-// tags it will allow on a page
-var isOldIE = typeof navigator !== 'undefined' && /msie [6-9]\b/.test(navigator.userAgent.toLowerCase())
-
-module.exports = function (parentId, list, _isProduction) {
-  isProduction = _isProduction
-
-  var styles = listToStyles(parentId, list)
-  addStylesToDom(styles)
-
-  return function update (newList) {
-    var mayRemove = []
-    for (var i = 0; i < styles.length; i++) {
-      var item = styles[i]
-      var domStyle = stylesInDom[item.id]
-      domStyle.refs--
-      mayRemove.push(domStyle)
-    }
-    if (newList) {
-      styles = listToStyles(parentId, newList)
-      addStylesToDom(styles)
-    } else {
-      styles = []
-    }
-    for (var i = 0; i < mayRemove.length; i++) {
-      var domStyle = mayRemove[i]
-      if (domStyle.refs === 0) {
-        for (var j = 0; j < domStyle.parts.length; j++) {
-          domStyle.parts[j]()
-        }
-        delete stylesInDom[domStyle.id]
-      }
-    }
-  }
-}
-
-function addStylesToDom (styles /* Array<StyleObject> */) {
-  for (var i = 0; i < styles.length; i++) {
-    var item = styles[i]
-    var domStyle = stylesInDom[item.id]
-    if (domStyle) {
-      domStyle.refs++
-      for (var j = 0; j < domStyle.parts.length; j++) {
-        domStyle.parts[j](item.parts[j])
-      }
-      for (; j < item.parts.length; j++) {
-        domStyle.parts.push(addStyle(item.parts[j]))
-      }
-      if (domStyle.parts.length > item.parts.length) {
-        domStyle.parts.length = item.parts.length
-      }
-    } else {
-      var parts = []
-      for (var j = 0; j < item.parts.length; j++) {
-        parts.push(addStyle(item.parts[j]))
-      }
-      stylesInDom[item.id] = { id: item.id, refs: 1, parts: parts }
-    }
-  }
-}
-
-function createStyleElement () {
-  var styleElement = document.createElement('style')
-  styleElement.type = 'text/css'
-  head.appendChild(styleElement)
-  return styleElement
-}
-
-function addStyle (obj /* StyleObjectPart */) {
-  var update, remove
-  var styleElement = document.querySelector('style[data-vue-ssr-id~="' + obj.id + '"]')
-
-  if (styleElement) {
-    if (isProduction) {
-      // has SSR styles and in production mode.
-      // simply do nothing.
-      return noop
-    } else {
-      // has SSR styles but in dev mode.
-      // for some reason Chrome can't handle source map in server-rendered
-      // style tags - source maps in <style> only works if the style tag is
-      // created and inserted dynamically. So we remove the server rendered
-      // styles and inject new ones.
-      styleElement.parentNode.removeChild(styleElement)
-    }
-  }
-
-  if (isOldIE) {
-    // use singleton mode for IE9.
-    var styleIndex = singletonCounter++
-    styleElement = singletonElement || (singletonElement = createStyleElement())
-    update = applyToSingletonTag.bind(null, styleElement, styleIndex, false)
-    remove = applyToSingletonTag.bind(null, styleElement, styleIndex, true)
-  } else {
-    // use multi-style-tag mode in all other cases
-    styleElement = createStyleElement()
-    update = applyToTag.bind(null, styleElement)
-    remove = function () {
-      styleElement.parentNode.removeChild(styleElement)
-    }
-  }
-
-  update(obj)
-
-  return function updateStyle (newObj /* StyleObjectPart */) {
-    if (newObj) {
-      if (newObj.css === obj.css &&
-          newObj.media === obj.media &&
-          newObj.sourceMap === obj.sourceMap) {
-        return
-      }
-      update(obj = newObj)
-    } else {
-      remove()
-    }
-  }
-}
-
-var replaceText = (function () {
-  var textStore = []
-
-  return function (index, replacement) {
-    textStore[index] = replacement
-    return textStore.filter(Boolean).join('\n')
-  }
-})()
-
-function applyToSingletonTag (styleElement, index, remove, obj) {
-  var css = remove ? '' : obj.css
-
-  if (styleElement.styleSheet) {
-    styleElement.styleSheet.cssText = replaceText(index, css)
-  } else {
-    var cssNode = document.createTextNode(css)
-    var childNodes = styleElement.childNodes
-    if (childNodes[index]) styleElement.removeChild(childNodes[index])
-    if (childNodes.length) {
-      styleElement.insertBefore(cssNode, childNodes[index])
-    } else {
-      styleElement.appendChild(cssNode)
-    }
-  }
-}
-
-function applyToTag (styleElement, obj) {
-  var css = obj.css
-  var media = obj.media
-  var sourceMap = obj.sourceMap
-
-  if (media) {
-    styleElement.setAttribute('media', media)
-  }
-
-  if (sourceMap) {
-    // https://developer.chrome.com/devtools/docs/javascript-debugging
-    // this makes source maps inside style tags work properly in Chrome
-    css += '\n/*# sourceURL=' + sourceMap.sources[0] + ' */'
-    // http://stackoverflow.com/a/26603875
-    css += '\n/*# sourceMappingURL=data:application/json;base64,' + btoa(unescape(encodeURIComponent(JSON.stringify(sourceMap)))) + ' */'
-  }
-
-  if (styleElement.styleSheet) {
-    styleElement.styleSheet.cssText = css
-  } else {
-    while (styleElement.firstChild) {
-      styleElement.removeChild(styleElement.firstChild)
-    }
-    styleElement.appendChild(document.createTextNode(css))
-  }
-}
-
 
 /***/ }),
-/* 50 */
+/* 63 */
+/***/ (function(module, exports, __webpack_require__) {
+
+// style-loader: Adds some css to the DOM by adding a <style> tag
+
+// load the styles
+var content = __webpack_require__(45);
+if(typeof content === 'string') content = [[module.i, content, '']];
+if(content.locals) module.exports = content.locals;
+// add the styles to the DOM
+var update = __webpack_require__(4)("1831cc56", content, false);
+// Hot Module Replacement
+if(false) {
+ // When the styles change, update the <style> tags
+ if(!content.locals) {
+   module.hot.accept("!!../../../../../node_modules/css-loader/index.js!../../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"id\":\"data-v-95a400c6\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./AvatarUpload.vue", function() {
+     var newContent = require("!!../../../../../node_modules/css-loader/index.js!../../../../../node_modules/vue-loader/lib/style-compiler/index.js?{\"id\":\"data-v-95a400c6\",\"scoped\":false,\"hasInlineConfig\":true}!../../../../../node_modules/vue-loader/lib/selector.js?type=styles&index=0!./AvatarUpload.vue");
+     if(typeof newContent === 'string') newContent = [[module.id, newContent, '']];
+     update(newContent);
+   });
+ }
+ // When the module is disposed, remove the <style> tags
+ module.hot.dispose(function() { update(); });
+}
+
+/***/ }),
+/* 64 */
 /***/ (function(module, exports) {
 
 /**
@@ -32751,7 +37172,7 @@ module.exports = function listToStyles (parentId, list) {
 
 
 /***/ }),
-/* 51 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -42076,10 +46497,10 @@ Vue$3.compile = compileToFunctions;
 
 module.exports = Vue$3;
 
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(9)))
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(11)))
 
 /***/ }),
-/* 52 */
+/* 66 */
 /***/ (function(module, exports) {
 
 module.exports = function() {
@@ -42088,7 +46509,7 @@ module.exports = function() {
 
 
 /***/ }),
-/* 53 */
+/* 67 */
 /***/ (function(module, exports) {
 
 module.exports = function(module) {
@@ -42116,376 +46537,14 @@ module.exports = function(module) {
 
 
 /***/ }),
-/* 54 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(10);
 __webpack_require__(12);
-__webpack_require__(13);
-module.exports = __webpack_require__(11);
+__webpack_require__(14);
+__webpack_require__(15);
+module.exports = __webpack_require__(13);
 
-
-/***/ }),
-/* 55 */,
-/* 56 */,
-/* 57 */,
-/* 58 */,
-/* 59 */,
-/* 60 */,
-/* 61 */,
-/* 62 */,
-/* 63 */,
-/* 64 */,
-/* 65 */,
-/* 66 */,
-/* 67 */,
-/* 68 */,
-/* 69 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
-
-"use strict";
-Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-//
-
-/* harmony default export */ __webpack_exports__["default"] = ({
-  props: ['title'],
-  data: function data() {
-    return {
-      isVisible: false,
-      isLoading: false,
-      user: {
-        name: '',
-        email: '',
-        password: '',
-        is_master: false
-      }
-    };
-  },
-  created: function created() {
-    Event.$on("open-create-modal", function (data) {
-      this.isVisible = true;
-      this.isLoading = true;
-    }.bind(this));
-  },
-  mounted: function mounted() {
-    //event listener para sair com o esc do modal
-    window.addEventListener('keyup', function (event) {
-      // If esc was pressed...
-      if (event.keyCode == 27) {
-        this.closeModal();
-      }
-    }.bind(this));
-  },
-
-
-  methods: {
-    closeModal: function closeModal() {
-      this.isVisible = false;
-    },
-
-    sendForm: function sendForm() {
-      var userData = this.user;
-      userData.is_master = userData.is_master == false ? "0" : "1";
-      axios.post('users/create', userData).then(function (response) {
-        console.log(response);
-        toastr.success("Usuário criado com sucesso!");
-      }).catch(function (error) {
-        console.log(error.response);
-      });
-    }
-  }
-});
-
-/***/ }),
-/* 70 */
-/***/ (function(module, exports, __webpack_require__) {
-
-var Component = __webpack_require__(2)(
-  /* script */
-  __webpack_require__(69),
-  /* template */
-  __webpack_require__(71),
-  /* scopeId */
-  null,
-  /* cssModules */
-  null
-)
-Component.options.__file = "D:\\projetos\\radio-website\\resources\\assets\\js\\components\\user\\CreateModal.vue"
-if (Component.esModule && Object.keys(Component.esModule).some(function (key) {return key !== "default" && key !== "__esModule"})) {console.error("named exports are not supported in *.vue files.")}
-if (Component.options.functional) {console.error("[vue-loader] CreateModal.vue: functional components are not supported with templates, they should use render functions.")}
-
-/* hot reload */
-if (false) {(function () {
-  var hotAPI = require("vue-hot-reload-api")
-  hotAPI.install(require("vue"), false)
-  if (!hotAPI.compatible) return
-  module.hot.accept()
-  if (!module.hot.data) {
-    hotAPI.createRecord("data-v-8a852304", Component.options)
-  } else {
-    hotAPI.reload("data-v-8a852304", Component.options)
-  }
-})()}
-
-module.exports = Component.exports
-
-
-/***/ }),
-/* 71 */
-/***/ (function(module, exports, __webpack_require__) {
-
-module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
-  return _c('transition', {
-    attrs: {
-      "name": "custom-classes-transition",
-      "enter-active-class": "animated fadeIn"
-    }
-  }, [_c('div', {
-    directives: [{
-      name: "show",
-      rawName: "v-show",
-      value: (_vm.isVisible),
-      expression: "isVisible"
-    }],
-    staticClass: "modal",
-    staticStyle: {
-      "display": "block"
-    }
-  }, [_c('div', {
-    staticClass: "modal-dialog",
-    attrs: {
-      "role": "document"
-    }
-  }, [_c('div', {
-    staticClass: "modal-content"
-  }, [_c('div', {
-    staticClass: "modal-header"
-  }, [_c('button', {
-    staticClass: "close",
-    attrs: {
-      "type": "button",
-      "data-dismiss": "modal",
-      "aria-label": "Close"
-    },
-    on: {
-      "click": _vm.closeModal
-    }
-  }, [_c('span', {
-    attrs: {
-      "aria-hidden": "true"
-    }
-  }, [_vm._v("×")])]), _vm._v(" "), _c('h4', {
-    staticClass: "modal-title",
-    domProps: {
-      "textContent": _vm._s(_vm.title)
-    }
-  })]), _vm._v(" "), _c('div', {
-    staticClass: "modal-body"
-  }, [_c('div', {
-    staticClass: "box box-info"
-  }, [_c('div', {
-    staticClass: "box-body"
-  }, [_c('form', {
-    attrs: {
-      "role": "form"
-    }
-  }, [_c('div', {
-    staticClass: "form-group"
-  }, [_c('label', [_vm._v("Nome")]), _vm._v(" "), _c('input', {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.user.name),
-      expression: "user.name"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      "type": "text",
-      "placeholder": "Nome do usuário"
-    },
-    domProps: {
-      "value": (_vm.user.name)
-    },
-    on: {
-      "input": function($event) {
-        if ($event.target.composing) { return; }
-        _vm.user.name = $event.target.value
-      }
-    }
-  })]), _vm._v(" "), _c('div', {
-    staticClass: "form-group"
-  }, [_c('label', {
-    attrs: {
-      "for": "email"
-    }
-  }, [_vm._v("Email")]), _vm._v(" "), _c('input', {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.user.email),
-      expression: "user.email"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      "type": "email",
-      "id": "email",
-      "placeholder": "Email do usuário"
-    },
-    domProps: {
-      "value": (_vm.user.email)
-    },
-    on: {
-      "input": function($event) {
-        if ($event.target.composing) { return; }
-        _vm.user.email = $event.target.value
-      }
-    }
-  })]), _vm._v(" "), _c('div', {
-    staticClass: "form-group"
-  }, [_c('label', {
-    attrs: {
-      "for": "password"
-    }
-  }, [_vm._v("Senha")]), _vm._v(" "), _c('input', {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.user.password),
-      expression: "user.password"
-    }],
-    staticClass: "form-control",
-    attrs: {
-      "type": "password",
-      "id": "password",
-      "placeholder": "Senha do usuário"
-    },
-    domProps: {
-      "value": (_vm.user.password)
-    },
-    on: {
-      "input": function($event) {
-        if ($event.target.composing) { return; }
-        _vm.user.password = $event.target.value
-      }
-    }
-  })]), _vm._v(" "), _c('div', {
-    staticClass: "checkbox"
-  }, [_c('label', [_c('input', {
-    directives: [{
-      name: "model",
-      rawName: "v-model",
-      value: (_vm.user.is_master),
-      expression: "user.is_master"
-    }],
-    attrs: {
-      "type": "checkbox"
-    },
-    domProps: {
-      "checked": Array.isArray(_vm.user.is_master) ? _vm._i(_vm.user.is_master, null) > -1 : (_vm.user.is_master)
-    },
-    on: {
-      "__c": function($event) {
-        var $$a = _vm.user.is_master,
-          $$el = $event.target,
-          $$c = $$el.checked ? (true) : (false);
-        if (Array.isArray($$a)) {
-          var $$v = null,
-            $$i = _vm._i($$a, $$v);
-          if ($$c) {
-            $$i < 0 && (_vm.user.is_master = $$a.concat($$v))
-          } else {
-            $$i > -1 && (_vm.user.is_master = $$a.slice(0, $$i).concat($$a.slice($$i + 1)))
-          }
-        } else {
-          _vm.user.is_master = $$c
-        }
-      }
-    }
-  }), _vm._v(" Master\r\n                  ")])])])])])]), _vm._v(" "), _c('div', {
-    staticClass: "modal-footer"
-  }, [_c('button', {
-    staticClass: "btn btn-default",
-    attrs: {
-      "type": "button",
-      "data-dismiss": "modal"
-    },
-    on: {
-      "click": _vm.closeModal
-    }
-  }, [_vm._v("Cancelar")]), _vm._v(" "), _c('button', {
-    staticClass: "btn btn-primary",
-    attrs: {
-      "type": "button"
-    },
-    on: {
-      "click": function($event) {
-        $event.preventDefault();
-        _vm.sendForm($event)
-      }
-    }
-  }, [_vm._v("Confirmar")])])])])])])
-},staticRenderFns: []}
-module.exports.render._withStripped = true
-if (false) {
-  module.hot.accept()
-  if (module.hot.data) {
-     require("vue-hot-reload-api").rerender("data-v-8a852304", module.exports)
-  }
-}
 
 /***/ })
 /******/ ]);

@@ -1,3 +1,4 @@
+
 //import UserTable from './components/user/UsersTable.vue';
 /**
  * First we will load all of this project's JavaScript dependencies which
@@ -32,10 +33,11 @@ window.toastr.options = {
 Vue.component('vue-table', require('./components/partials/VueTable.vue'));
 Vue.component('user-view-modal', require('./components/user/ViewModal.vue'));
 Vue.component('user-create-modal', require('./components/user/CreateModal.vue'));
-
+Vue.component('user-profile', require('./components/user/ProfileComponent.vue'));
+Vue.component('avatar', require('./components/user/AvatarUpload.vue'));
 
 const app = new Vue({
-    el: '#app'
+    el: '#app'    
 });
 
 

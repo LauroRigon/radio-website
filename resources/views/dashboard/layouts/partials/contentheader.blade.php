@@ -5,7 +5,6 @@
         <small>@yield('contentheader_description')</small>
     </h1>
     <ol class="breadcrumb">
-        <li><a href="#"><i class="fa fa-dashboard"></i> Content header</a></li>
-        <li class="active">Content header 2</li>
+        @yield('content_header')
     </ol>
 </section>

@@ -82,18 +82,22 @@
                   var response = serverResponse.data[0];
                   this.isLoading = false;
 
-                  this.filterUsersData(response);                  
+                  this.filterData(response);                  
                 }.bind(this))
                 .catch(function() {
                   toastr.error("Ocorreu um erro ao tentar encontrar usuários!");
                 });
+
+                Event.$on('set-new-tdata', function(tdata) {
+                  this.tdatas.push(tdata)
+                }.bind(this));
             },
 
             methods: {
               /*
               * filtra os campos que serão preenchidos baseado na opção fillable. Deletando qualquer dado exedente
               */
-              filterUsersData: function(data) {
+              filterData: function(data) {
                 this.tdatas = data.filter(function(val) {
                   for (var attName in val){
                     if(this.fillable.indexOf(attName) === -1){

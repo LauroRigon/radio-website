@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\User;
 use App\Http\UploadManager;
 use App\Post;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -62,9 +63,9 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show()
     {
-        //
+        return view('dashboard.user.show')->with('user');
     }
 
 
@@ -166,6 +167,11 @@ class UserController extends Controller
      */
     public function destroy(User $id)
     {
+        if($id->id == Auth::id()) {
+            return response()->json([
+                'status' => 'Não é possível deletar você mesmo!'
+            ], 422);
+        }
         $id->delete();
 
         return response()->json([
@@ -207,6 +213,20 @@ class UserController extends Controller
         $user->created_date = $user->created_at->format('d-m-Y');
 
         //$user->is_master = ($user->is_master)? "Sim" : "Não";
+        return response()->json([
+            $user
+        ], 200);
+    }
+
+    /**
+     * Retorna informações completas sobre um único usuário como numero de posts e infos básicas...
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function getCurrentUserData() {
+        $user = User::find(Auth::user()->id);
+    $user->created_date = $user->created_at->format('d-m-Y');
         return response()->json([
             $user
         ], 200);
