@@ -58,14 +58,16 @@ class UserController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Mostra o perfil do user
      *
-     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function show()
     {
-        return view('dashboard.user.show')->with('user');
+        $user = User::find(Auth::user()->id);
+        $user->created_date = $user->created_at->format('d-m-Y');
+
+        return view('dashboard.user.show')->with('user', $user);
     }
 
 
@@ -134,10 +136,12 @@ class UserController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function uploadAvatar(Request $request, User $id)
+    public function uploadAvatar(Request $request)
     {
         //dd($request->all());
         //dd($request->user()->id);     usar isso se possivel quando tiver login
+        $user = User::find($request->user()->id);
+
         $validator = Validator::make($request->all(), [
             'avatar' => 'mimes:jpeg,bmp,png,jpg'
         ]);
@@ -149,10 +153,10 @@ class UserController extends Controller
             ]);
         }
 
-        $path = UploadManager:: storeAvatar($id, $request->file('avatar'));
+        $path = UploadManager:: storeAvatar($user, $request->file('avatar'));
 
-        $id->avatar = $path;
-        $id->update();
+        $user->avatar = $path;
+        $user->update();
 
         return response()->json([
             'status' => 'Avatar atualizado com sucesso!'
@@ -213,20 +217,6 @@ class UserController extends Controller
         $user->created_date = $user->created_at->format('d-m-Y');
 
         //$user->is_master = ($user->is_master)? "Sim" : "Não";
-        return response()->json([
-            $user
-        ], 200);
-    }
-
-    /**
-     * Retorna informações completas sobre um único usuário como numero de posts e infos básicas...
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function getCurrentUserData() {
-        $user = User::find(Auth::user()->id);
-    $user->created_date = $user->created_at->format('d-m-Y');
         return response()->json([
             $user
         ], 200);

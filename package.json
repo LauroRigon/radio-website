@@ -27,7 +27,6 @@
     "toastr": "^2.1.2"
   },
   "dependencies": {
-    "cropperjs": "^1.0.0-beta.2",
     "accounting": "^0.4.1",
     "moment": "^2.18.1",
     "vue-events": "^3.0.1"
