@@ -8,7 +8,7 @@ use App\Http\UploadManager;
 use App\Post;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
@@ -109,25 +109,34 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function changePassword(Request $request, User $id)
+    public function changePassword(Request $request)
     {
+
         $validator = Validator::make($request->all(), [
-            'new_password' => 'required|min:6'
+            'senhaatual' => 'required|min:6',
+            'novasenha' => 'required|min:6',
+            'confirmarsenha' => 'required|min:6'
         ]);
 
         /*Retorna os erros se ouver*/
         if ($validator->fails()){
-            return response()->json([
-                $validator->errors()
-            ]);
+            return back()->withErrors($validator->errors());
         }
 
-        $id->password = bcrypt($request['new_password']);
-        $id->update();
+        if(!Hash::check($request['senhaatual'], $request->user()->password)){
+            return back()->withErrors('Senha atual errada');
+        }
 
-        return response()->json([
-            'status' => 'Senha alterada com sucesso!'
-        ], 200);
+        if($request['novasenha'] != $request['confirmarsenha']){
+            return back()->withErrors('Nova senha e confirmação não conferem');
+        }
+
+        $user = User::find($request->user()->id);
+        $user->password = bcrypt($request['novasenha']);
+        $user->update();
+
+        $request->session()->flash('success', 'Senha atualizada com sucesso!');
+        return back();
     }
 
     /**
@@ -143,14 +152,12 @@ class UserController extends Controller
         $user = User::find($request->user()->id);
 
         $validator = Validator::make($request->all(), [
-            'avatar' => 'mimes:jpeg,bmp,png,jpg'
+            'avatar' => 'required|mimes:jpeg,bmp,png,jpg'
         ]);
 
         /*Retorna os erros se ouver*/
         if ($validator->fails()){
-            return response()->json([
-                $validator->errors()
-            ]);
+            return back()->withErrors($validator->errors());
         }
 
         $path = UploadManager:: storeAvatar($user, $request->file('avatar'));
@@ -158,13 +165,12 @@ class UserController extends Controller
         $user->avatar = $path;
         $user->update();
 
-        return response()->json([
-            'status' => 'Avatar atualizado com sucesso!'
-        ], 200);
+        $request->session()->flash('success', 'Avatar atualizado com sucesso');
+        return back();
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove um usuário
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response

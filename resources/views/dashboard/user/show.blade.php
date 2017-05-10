@@ -11,6 +11,28 @@
 
 @section('main-content')
 <div class="col-md-8">
+
+	@if (count($errors) > 0)
+		<div class="alert alert-danger alert-dismissible">
+			<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+			<ul>
+				@foreach ($errors->all() as $error)
+					<li>{{ $error }}</li>
+
+				@endforeach
+			</ul>
+		</div>
+	@endif
+
+	@if (count(session('success')) > 0)
+		<div class="alert alert-success alert-dismissible">
+			<button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+			<ul>
+				{{ session('success') }}
+			</ul>
+		</div>
+	@endif
+
 	<tabs>
 		<tab name="Perfil" :selected="true">
 			<div id="profile">
@@ -65,7 +87,41 @@
 			</avatar-upload>
 		</tab>
 		<tab name="Senha">
-			Comigo
+
+				<form class="form-horizontal" method="POST" action="changePassword">
+					{{ csrf_field() }}
+					<div class="box-body">
+
+						<div class="form-group">
+							<label for="senhaAtual" class="col-sm-4 control-label">Senha atual</label>
+
+							<div class="col-sm-6">
+								<input type="password" class="form-control" id="senhaAtual" name="senhaatual">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="novaSenha" class="col-sm-4 control-label">Nova senha</label>
+
+							<div class="col-sm-6">
+								<input type="password" class="form-control" id="novaSenha" name="novasenha">
+							</div>
+						</div>
+
+						<div class="form-group">
+							<label for="confirm" class="col-sm-4 control-label">Confirmar senha</label>
+
+							<div class="col-sm-6">
+								<input type="password" class="form-control" id="confirm" name="confirmarsenha">
+							</div>
+						</div>
+					</div>
+					<!-- /.box-body -->
+					<div class="box-footer">
+						<button type="submit" class="btn btn-primary">Enviar</button>
+					</div>
+					<!-- /.box-footer -->
+				</form>
 		</tab>
 	</tabs>
 </div>

@@ -31,7 +31,7 @@ Route::group(['prefix' => 'admin'], function () {
         Route::delete('/delete/{id}', 'UserController@destroy')->middleware('master'); //deleta usuário
 
         Route::get('/profile', 'UserController@show')->name('user_profile');
-        Route::put('/changePassword/{id}', 'UserController@changePassword'); //troca senha
+        Route::post('/changePassword', 'UserController@changePassword'); //troca senha
         Route::post('/uploadAvatar', 'UserController@uploadAvatar'); //upload do avatar
 
         Route::get('/getUsers', 'UserController@getUsers')->middleware('master'); //get all users

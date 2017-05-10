@@ -2,13 +2,14 @@
 	<div class="box box-widget">
 		<form action="uploadAvatar" method="POST" enctype="multipart/form-data">
 			<slot name="token"></slot>
+
 			<div class="form-group">
-				<label for="file">Escolha sua foto: </label>
+				<label for="file" class="control-label">Escolha sua foto: </label>
 				<input id="file" type="file" name="avatar" @change="onFileChange">
 			</div>
 			<div class="row">
 				<div class="col-lg-3">
-					<img class="img-circle img-responsive" :src="image">
+					<img class="thumbnail img-responsive" :src="image">
 				</div>
 			</div>
 			<button class="btn btn-primary">Enviar</button>

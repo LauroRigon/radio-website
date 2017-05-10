@@ -2,9 +2,9 @@
 
 namespace App\Http;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\File;
+use Intervention\Image\Facades\Image;
+//use Illuminate\Support\Facades\File;
 
 class UploadManager
 {
@@ -19,8 +19,11 @@ class UploadManager
             Storage::delete($oldAvatar);
         }
 
+
         $fileName = $user->id . "." . $avatar->getClientOriginalExtension();
-        $avatar->storeAs('/avatars', $fileName);
+        $img = Image::make($avatar->getLinkTarget())->resize(800, 800);
+        $img->save(storage_path('app/public/avatars/' . $fileName));
+        //$avatar->storeAs('/avatars', $fileName);
 
         $path = '/storage/avatars/' . $fileName;
         return $path;

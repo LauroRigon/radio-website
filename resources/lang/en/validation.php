@@ -114,6 +114,10 @@ return [
     |
     */
 
-    'attributes' => [],
+    'attributes' => [
+        'novasenha' => 'Nova senha',
+        'senhaatual' => 'Senha atual',
+        'confirmarsenha' => 'Confirmar senha',
+    ],
 
 ];
