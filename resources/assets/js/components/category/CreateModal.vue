@@ -15,7 +15,7 @@
         <div class="box box-info">
             <!-- /.box-header -->
             <div class="box-body">
-              <form role="form" @keydown="clearError($event.target.name)" @keyup.enter="sendForm">
+              <form role="form" @keydown="clearError($event.target.name)" @keyup.enter.prevent="">
                 <div class="form-group" :class="{'has-error': getError('name')}">
                   <label>Nome</label>
                   <input type="text" class="form-control" placeholder="Nome da categoria" v-model="category.name" name="name">

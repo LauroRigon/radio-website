@@ -34080,7 +34080,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       },
       "keyup": function($event) {
         if (!('button' in $event) && _vm._k($event.keyCode, "enter", 13)) { return null; }
-        _vm.sendForm($event)
+        $event.preventDefault();
       }
     }
   }, [_c('div', {

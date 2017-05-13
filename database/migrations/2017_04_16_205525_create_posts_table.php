@@ -18,7 +18,7 @@ class CreatePostsTable extends Migration
             $table->increments('id');
             $table->string('title');
             $table->string('subtitle')->nullable();
-            $table->string('content');
+            $table->text('content');
             $table->integer('category_id')->unsigned();
             $table->integer('user_id')->unsigned();
             $table->string('thumbnail')->nullable();
@@ -39,7 +39,7 @@ class CreatePostsTable extends Migration
      * Reverse the migrations.
      *
      * @return void
-     */
+ */
     public function down()
     {
         Schema::dropIfExists('posts');
