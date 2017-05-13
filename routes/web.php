@@ -41,16 +41,21 @@ Route::group(['prefix' => 'admin'], function () {
 
     //Rotas para gerenciamento de categoritas
     Route::group(['prefix' => 'categories'], function() {
-        Route::get('/', 'CategoryController@index');  //pagina de categorias
-        Route::post('/', 'CategoryController@store');  //criar categoria
-        Route::put('/{id}', 'CategoryController@update'); //atualiza categoria
-        Route::delete('/{id}', 'CategoryController@destroy'); //deleta categoria
+        Route::get('/', 'CategoryController@index')->name('categories');  //pagina de categorias
+        Route::post('/create', 'CategoryController@store');  //criar categoria
+        Route::put('/edit/{id}', 'CategoryController@update'); //atualiza categoria
+        Route::delete('delete/{id}', 'CategoryController@destroy'); //deleta categoria
+
+        Route::get('/getCategories', 'CategoryController@getCategories');
     });
 
     //Rotas de gerenciamento de posts
     Route::group(['prefix' => 'posts'], function() {
         Route::get('/', 'PostController@index');  //pagina de posts
+
+        Route::get('/create', 'PostController@create')->name('post_create');//formulário para criar post
         Route::post('/', 'PostController@store');  //criar post
+
         Route::put('/{id}', 'PostController@update'); //atualiza post
         Route::delete('/{id}', 'PostController@destroy'); //deleta post
 

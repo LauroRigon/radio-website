@@ -67,7 +67,7 @@
 <div class="login-box">
     <div class="login-box-body">
             <p class="login-box-msg">Faça o login para começar uma sessão</p>
-
+{{bcrypt('123456')}}
         <form action="{{ route('login') }}" method="POST">
             {{ csrf_field() }}
             <div class="form-group has-feedback {{ $errors->has('email') ? ' has-error' : '' }}">

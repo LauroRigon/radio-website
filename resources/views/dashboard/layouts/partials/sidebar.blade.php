@@ -19,12 +19,11 @@
 			@if(Auth::user()->is_master == 1)
 				<li class="{{ Route::currentRouteName() == 'user_index'? 'active' : ''}}"><a href="{{route('user_index')}}"><i class="fa fa-user-circle-o"></i> <span>Usuários</span></a></li>
 			@endif
-            <li><a href=""><i class='fa fa-link'></i> <span>Content</span></a></li>
-            <li><a href="#"><i class='fa fa-link'></i> <span>Content</span></a></li>
-            <li class="treeview">
-                <a href="#"><i class='fa fa-link'></i> <span>Content</span> <i class="fa fa-angle-left pull-right"></i></a>
+            <li class="treeview {{ Route::currentRouteName() == 'categories'? 'active' : ''}}">
+                <a href="#"><i class='fa fa-files-o'></i> <span>Postagens</span> <i class="fa fa-angle-left pull-right"></i></a>
                 <ul class="treeview-menu">
-                    <li><a href="#">Content</a></li>
+                    <li class="{{ Route::currentRouteName() == 'categories'? 'active' : ''}}"><a href="{{route('categories')}}">Categorias</a></li>
+                    <li class="{{ Route::currentRouteName() == 'post_create'? 'active' : ''}}"><a href="{{route('post_create')}}">Criar postagem</a></li>
                     <li><a href="#">Content</a></li>
                 </ul>
             </li>

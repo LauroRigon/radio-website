@@ -31,11 +31,16 @@ window.toastr.options = {
 };
 
 Vue.component('vue-table', require('./components/partials/VueTable.vue'));
+
 Vue.component('user-view-modal', require('./components/user/ViewModal.vue'));
 Vue.component('user-create-modal', require('./components/user/CreateModal.vue'));
+
 Vue.component('tab', require('./components/partials/Tab.vue'));
 Vue.component('tabs', require('./components/partials/Tabs.vue'));
+
 Vue.component('avatar-upload', require('./components/user/AvatarUpload.vue'));
+Vue.component('category-create-modal', require('./components/category/CreateModal.vue'));
+Vue.component('category-edit-modal', require('./components/category/EditModal.vue'));
 
 
 

@@ -89,7 +89,7 @@
                 });
 
                 Event.$on('set-new-tdata', function(tdata) {
-                  this.tdatas.push(tdata)
+                  this.tdatas.push(tdata);
                 }.bind(this));
             },
 

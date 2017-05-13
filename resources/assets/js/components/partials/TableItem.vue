@@ -57,7 +57,7 @@
 			},
 
 			editAction: function(data) {
-				console.log(data);
+				Event.$emit("open-edit-modal", data);
 			},
 
 			deleteAction: function(data) {
@@ -68,12 +68,12 @@
 				axios.delete(this.deleteApi + data.id)
 				.then(function() {
 					this.isVisible = false
-					toastr.success("Usuário deletado com sucesso!")
+					toastr.success("Deletado com sucesso!")
 				}.bind(this))
 
 				.catch(function(error){
 					if(error.response.status == 500){
-						toastr.warning("Usuário tem postagens cadastradas!")
+						toastr.warning("Item tem dependências cadastradas!")
 					}else{
 						toastr.error(error.response.data['status'], "Ocorreu um erro ao deletar!")
 					}

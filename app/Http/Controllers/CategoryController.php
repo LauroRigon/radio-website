@@ -15,8 +15,7 @@ class CategoryController extends Controller
      */
     public function index()
     {
-        $categories = Category::all();
-        return view('dashboard.category.index')->with('categories', $categories);
+        return view('dashboard.category.index');
     }
 
     /**
@@ -34,16 +33,19 @@ class CategoryController extends Controller
             'description' => 'required'
         ]);
 
+        /*Retorna os erros se ouver*/
         if ($validator->fails()){
-            return response()->json([
+            return response()->json(
                 $validator->errors()
-            ]);
+                , 422);
         }
 
         $createdCategory = Category::create([
             'name' => ucfirst($data['name']),
             'description' => ucfirst($data['description'])
         ]);
+
+        $createdCategory->created_date = $createdCategory->created_at->format('d-m-Y');
 
         return $createdCategory;
 
@@ -76,7 +78,7 @@ class CategoryController extends Controller
             'name' => ucfirst($data['name']),
             'description' => ucfirst($data['description'])
         ]);
-
+        dd($updatedCategory);
         return response()->json([
             'status' => 'Atualizado com sucesso!'
         ], 200);
@@ -93,7 +95,25 @@ class CategoryController extends Controller
         $id->delete();
 
         return response()->json([
-            'status' => 'Deletado com sucesso!'
+            'status' => 'Deletada com sucesso!'
+        ], 200);
+    }
+
+    /**
+     * Retorna todas as categorias
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getCategories() {
+        $categories = Category::all();
+
+        $categories->filter(function($val){
+            $val->created_date = $val->created_at->format('d-m-Y');
+            return $val;
+        });
+
+        return response()->json([
+            $categories
         ], 200);
     }
 }
