@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Input;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Http\UploadManager;
 use App\Post;
+use App\Category;
 
 class PostController extends Controller
 {
@@ -24,9 +26,16 @@ class PostController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function create()
+    public function create(Request $request)
     {
-        return view('dashboard.post.create');
+        $categories = Category::all();
+
+        $galleryKey = time() . $request->user()->id;
+
+        return view('dashboard.post.create')->with([
+            'categories' => $categories,
+            'galleryKey' => $galleryKey
+        ]);
     }
 
     /**

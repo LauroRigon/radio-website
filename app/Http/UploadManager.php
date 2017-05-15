@@ -44,4 +44,14 @@ class UploadManager
     public static function deleteFile($filePath) {
         Storage::delete($filePath);
     }
+
+    public static function storeTempImg($img, $key) {
+        //dd($img);
+        $fileName = $img->getClientOriginalName();
+
+        $img->storeAs('gallery/temp/' . $key, $fileName);
+
+        $path = '/storage/gallery/' . $fileName;
+        return $path;
+    }
 }

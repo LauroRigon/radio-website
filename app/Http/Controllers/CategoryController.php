@@ -29,7 +29,7 @@ class CategoryController extends Controller
         $data = $request->input();
 
         $validator = Validator::make($data, [
-            'name' => 'required',
+            'name' => 'required|unique:categories',
             'description' => 'required'
         ]);
 

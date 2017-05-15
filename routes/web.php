@@ -20,7 +20,7 @@ Auth::routes();
 /*
  * Rotas da área de admin do site
  * */
-Route::group(['prefix' => 'admin'], function () {
+Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::get('/dashboard', 'DashboardController@index');
 
     //Rotas para gerenciamento de usuário
@@ -59,8 +59,13 @@ Route::group(['prefix' => 'admin'], function () {
         Route::put('/{id}', 'PostController@update'); //atualiza post
         Route::delete('/{id}', 'PostController@destroy'); //deleta post
 
-        Route::post('/allowPost/{id}', 'PostController@allowPost');
-        Route::post('/setAbout/{id}', 'PostController@setAsAbout');
+        Route::post('/allowPost/{id}', 'PostController@allowPost')->middleware('master');//permite um post se publicado
+        Route::post('/setAbout/{id}', 'PostController@setAsAbout')->middleware('master');//coloca um post como conteúdo da sessão sobre
+
+        //Rotas para gerenciamento de galeria de imagens
+        Route::group(['prefix' => 'gallery'], function () {
+            Route::post('/sendGalleryImg', 'GalleryController@storeTempGallery')->name('send_gallery');//guarda galeria em pasta temp
+        });
     });
 
     Route::group(['prefix' => 'polls'], function() {

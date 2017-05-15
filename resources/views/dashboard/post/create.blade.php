@@ -1,5 +1,20 @@
 @extends('dashboard.layouts.app')
 
+@section('page-links')
+<link rel="stylesheet" type="text/css" href="{{ asset('js/dashboard/plugins/dropzone/dist/dropzone.css') }}">
+
+<style>
+.dz-remove{
+  background-color: #D4D8DF;
+  width: 80px;
+  height: 20px;
+  margin: 0 auto;
+  border-radius: 10%;
+  box-shadow: 2px 2px 5px black;
+}
+</style>
+@endsection
+
 @section('content_title')
     Criar postagem
 @endsection
@@ -11,16 +26,91 @@
 
 @section('main-content')
 <div class="box">
-        <div class="box-body" style="display: block;">
-          Start creating your amazing application!
+	<div class="box-body">
+      <form role="form" action="{{route('post_create')}}" id="post-form">
+      {{ csrf_field() }}
+      <input name="galleryKey" type="hidden" value="{{ $galleryKey }}">
+        <!-- text input -->
+        <div class="form-group">
+          <label>Título</label>
+          <input type="text" class="form-control" name="title" placeholder="Digite aqui o título da postagem">
         </div>
-        <!-- /.box-body -->
-        <div class="box-footer" style="display: block;">
-          Footer
+
+        <div class="form-group">
+          <label>Subtítulo</label>
+          <input type="text" class="form-control" name="subtitle" placeholder="Digite aqui o subtítulo da postagem">
         </div>
-        <!-- /.box-footer-->
+		
+		<div class="form-group">
+          <label>Categoria</label>
+          <select class="form-control" name="category_id">
+            @foreach($categories as $category)
+              <option>Selecione uma categoria</option>
+              <option value="{{$category->id}}">{{ $category->name  }}</option>
+              @endforeach
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Foto de capa</label>
+          <input type="file" id="exampleInputFile" name="thumbnail">
+
+          <p class="help-block">Essa será a capa da postagem.</p>
+        </div>
+
+        <!-- textarea -->
+        <div class="form-group">
+          <label>Conteúdo</label>
+          <textarea name="content" id="editor1" rows="1" cols="80" class="form-control">
+            
+        </textarea>
+        </div>
+
+        
+      </form>
+
+      <div class="form-group">
+        <label>Galeria</label>
+        <form action="{{route('send_gallery')}}" method="post" class="dropzone" id="dropzone-id">
+        {{ csrf_field() }}
+        <input name="galleryKey" type="hidden" value="{{ $galleryKey }}">
+            <div class="dz-message">
+                Clique aqui ou arraste as imagens para envia-las
+            </div>
+
+            <div class="fallback">
+                <input name="images" type="file" enctype="multipart/form-data" />
+            </div>
+        </form>
+
+        <div class="box-footer">
+          <button type="submit" class="btn btn-primary" form="post-form">Enviar</button>
+        </div>
       </div>
+    </div>
+
+  
+</div>
+
 @endsection
 @section('page-scripts')
+<script type="text/javascript" src="{{ asset('js/dashboard/plugins/ckeditor/ckeditor.js') }}"></script>
+<script type="text/javascript" src="{{ asset('js/dashboard/plugins/dropzone/dist/dropzone.js') }}"></script>
+<script>
+                // Replace the <textarea id="editor1"> with a CKEditor
+                // instance, using default configuration.
+    CKEDITOR.replace( 'editor1' );
+</script>
+
+<script>
+Dropzone.options.dropzoneId = {
+  paramName: "images", // Name que será usado para mandar as imagens
+  maxFilesize: 12, // MB
+  addRemoveLinks: true,
+  acceptedFiles: ".png,.jpg,.bmp,.jpeg",
+  dictRemoveFile: 'Remover',
+
+};
+</script>
 
 @endsection

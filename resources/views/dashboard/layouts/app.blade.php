@@ -7,6 +7,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
 @section('htmlheader')
     @include('dashboard.layouts.partials.htmlheader')
+
+    @yield('page-links')
 @show
 
 <body class="skin-blue sidebar-mini">
