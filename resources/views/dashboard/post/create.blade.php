@@ -4,6 +4,10 @@
 <link rel="stylesheet" type="text/css" href="{{ asset('js/dashboard/plugins/dropzone/dist/dropzone.css') }}">
 
 <style>
+.fa-3{
+  font-size: 50px;
+}
+
 .dz-remove{
   background-color: #D4D8DF;
   width: 80px;
@@ -25,7 +29,7 @@
 @endsection
 
 @section('main-content')
-<div class="box">
+<div class="box box-primary">
 	<div class="box-body">
       <form role="form" action="{{route('post_create')}}" id="post-form">
       {{ csrf_field() }}
@@ -73,9 +77,9 @@
         <label>Galeria</label>
         <form action="{{route('send_gallery')}}" method="post" class="dropzone" id="dropzone-id">
         {{ csrf_field() }}
-        <input name="galleryKey" type="hidden" value="{{ $galleryKey }}">
+        <input id="galleryKey" name="galleryKey" type="hidden" value="{{ $galleryKey }}">
             <div class="dz-message">
-                Clique aqui ou arraste as imagens para envia-las
+                <i class="fa fa-cloud-upload fa-3" aria-hidden="true"></i><h3>Clique aqui ou arraste as imagens para envia-las</h3>
             </div>
 
             <div class="fallback">
@@ -84,7 +88,7 @@
         </form>
 
         <div class="box-footer">
-          <button type="submit" class="btn btn-primary" form="post-form">Enviar</button>
+          <button type="submit" class="btn btn-primary" form="post-form" id="sendForm">Enviar</button>
         </div>
       </div>
     </div>
@@ -109,8 +113,25 @@ Dropzone.options.dropzoneId = {
   addRemoveLinks: true,
   acceptedFiles: ".png,.jpg,.bmp,.jpeg",
   dictRemoveFile: 'Remover',
-
+  myDropzone: this,
+  
+  init: function() {
+    this.on("removedfile", function(file) {
+      console.log();
+      if(file.status == 'success'){
+        axios.delete('gallery/deleteGalleryImg', {
+          galleryKey: $("#galleryKey").val(),
+          fileName: file.name
+        });
+      }
+    });
+  }
 };
+
+$("#sendForm").on('click', function(e){
+  e.preventDefault();
+  console.log(Dropzone);
+})
 </script>
 
 @endsection

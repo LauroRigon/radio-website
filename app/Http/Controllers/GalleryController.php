@@ -86,13 +86,13 @@ class GalleryController extends Controller
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Deleta uma imagem da pasta temporaria
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy(Request $imgInfo)
     {
-        //
+        dd($imgInfo->input());
     }
 }

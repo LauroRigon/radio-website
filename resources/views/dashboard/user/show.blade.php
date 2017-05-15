@@ -10,7 +10,7 @@
 @endsection
 
 @section('main-content')
-<div class="col-md-8">
+<div class="col-md-12">
 
 	@if (count($errors) > 0)
 		<div class="alert alert-danger alert-dismissible">
@@ -93,34 +93,32 @@
 					<div class="box-body">
 
 						<div class="form-group">
-							<label for="senhaAtual" class="col-sm-4 control-label">Senha atual</label>
+							<label for="senhaAtual" class="col-sm-2">Senha atual</label>
 
-							<div class="col-sm-6">
+							<div class="col-sm-4">
 								<input type="password" class="form-control" id="senhaAtual" name="senhaatual">
 							</div>
 						</div>
 
 						<div class="form-group">
-							<label for="novaSenha" class="col-sm-4 control-label">Nova senha</label>
+							<label for="novaSenha" class="col-sm-2">Nova senha</label>
 
-							<div class="col-sm-6">
+							<div class="col-sm-4">
 								<input type="password" class="form-control" id="novaSenha" name="novasenha">
 							</div>
 						</div>
 
 						<div class="form-group">
-							<label for="confirm" class="col-sm-4 control-label">Confirmar senha</label>
+							<label for="confirm" class="col-sm-2">Confirmar senha</label>
 
-							<div class="col-sm-6">
+							<div class="col-sm-4">
 								<input type="password" class="form-control" id="confirm" name="confirmarsenha">
 							</div>
 						</div>
 					</div>
-					<!-- /.box-body -->
 					<div class="box-footer">
 						<button type="submit" class="btn btn-primary">Enviar</button>
 					</div>
-					<!-- /.box-footer -->
 				</form>
 		</tab>
 	</tabs>

@@ -65,6 +65,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         //Rotas para gerenciamento de galeria de imagens
         Route::group(['prefix' => 'gallery'], function () {
             Route::post('/sendGalleryImg', 'GalleryController@storeTempGallery')->name('send_gallery');//guarda galeria em pasta temp
+            Route::delete('/deleteGalleryImg', 'GalleryController@destroy');//guarda galeria em pasta temp
         });
     });
 
