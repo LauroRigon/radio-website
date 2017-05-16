@@ -54,7 +54,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         Route::get('/', 'PostController@index');  //pagina de posts
 
         Route::get('/create', 'PostController@create')->name('post_create');//formulário para criar post
-        Route::post('/', 'PostController@store');  //criar post
+        Route::post('/store', 'PostController@store')->name('post_store');  //criar post
 
         Route::put('/{id}', 'PostController@update'); //atualiza post
         Route::delete('/{id}', 'PostController@destroy'); //deleta post

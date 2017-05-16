@@ -31,9 +31,10 @@
 @section('main-content')
 <div class="box box-primary">
 	<div class="box-body">
-      <form role="form" action="{{route('post_create')}}" id="post-form">
+      <form role="form" action="{{route('post_store')}}" id="post-form" method="POST" enctype="multipart/form-data">
       {{ csrf_field() }}
       <input name="galleryKey" type="hidden" value="{{ $galleryKey }}">
+      <input name="PostGalleryImgs" type="hidden" value="">
         <!-- text input -->
         <div class="form-group">
           <label>Título</label>
@@ -48,8 +49,8 @@
 		<div class="form-group">
           <label>Categoria</label>
           <select class="form-control" name="category_id">
-            @foreach($categories as $category)
-              <option>Selecione uma categoria</option>
+          <option>Selecione uma categoria</option>
+            @foreach($categories as $category)              
               <option value="{{$category->id}}">{{ $category->name  }}</option>
               @endforeach
           </select>
@@ -107,32 +108,43 @@
 </script>
 
 <script>
-Dropzone.options.dropzoneId = {
+var myDropzone = new Dropzone("form#dropzone-id", { 
   paramName: "images", // Name que será usado para mandar as imagens
   maxFilesize: 12, // MB
   addRemoveLinks: true,
   acceptedFiles: ".png,.jpg,.bmp,.jpeg",
-  dictRemoveFile: 'Remover',
-  myDropzone: this,
-  
-  init: function() {
-    this.on("removedfile", function(file) {
-      console.log();
+  dictRemoveFile: 'Remover'  
+  });
+
+  myDropzone.on("removedfile", function(file) {
+      console.log(this);
       if(file.status == 'success'){
         axios.post('gallery/deleteGalleryImg', {
           galleryKey: $("#galleryKey").val(),
           fileName: file.name
-        }).then(function(response){
-          console.log(response);
+        })
+
+        .then(function(response){
+          toastr.success(response.data['status']);
+        })
+        .catch(function(error){
+          toastr.error("Ocorreu um erro ao deletar arquivo")
         });
       }
     });
-  }
-};
 
 $("#sendForm").on('click', function(e){
   e.preventDefault();
-  console.log(Dropzone);
+  var acceptedFiles = myDropzone.getAcceptedFiles();
+  
+  var filesName = [];
+    for(i=0; i<acceptedFiles.length; i++){
+      filesName[i] = acceptedFiles[i]['name'];  
+    }
+
+  $("[name='PostGalleryImgs']").val(filesName);
+
+  e.target.form.submit();
 })
 </script>
 

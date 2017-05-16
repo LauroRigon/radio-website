@@ -88,11 +88,19 @@ class GalleryController extends Controller
     /**
      * Deleta uma imagem da pasta temporaria
      *
-     * @param  int  $id
+     * @param  Request  $imgInfo('galleryKey', 'fotoName')
      * @return \Illuminate\Http\Response
      */
     public function destroy(Request $imgInfo)
     {
-        UploadManager::destroyTempImg($imgInfo->fileName, $imgInfo->galleryKey);
+        if(!UploadManager::destroyTempImg($imgInfo->fileName, $imgInfo->galleryKey)){
+            return response()->json([
+                'status' => 'Erro ao deletar imagem!'
+            ], 422);
+        }
+
+        return response()->json([
+            'status' => 'Imagem removida com sucesso!'
+        ], 200);
     }
 }

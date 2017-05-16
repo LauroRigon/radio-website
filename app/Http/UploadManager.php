@@ -42,7 +42,7 @@ class UploadManager
     }
 
     public static function deleteFile($filePath) {
-        Storage::delete($filePath);
+        return Storage::delete($filePath);
     }
 
     public static function storeTempImg($img, $key) {
@@ -57,7 +57,6 @@ class UploadManager
 
     public static function destroyTempImg($img, $key) {
         //dd($img);
-        dd(Storage::delete('gallery/temp/' . $key . '/' . $img));
-        return true;
+        return Storage::delete('gallery/temp/' . $key . '/' . $img);
     }
 }

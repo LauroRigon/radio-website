@@ -46,12 +46,12 @@ class PostController extends Controller
      */
     public function store(Request $request) {
         $data = $request->all();
+
         $validator = Validator::make($data, [
             'title' => 'required',
             'subtitle' => 'required',
             'content' => 'required',
             'category_id' => 'required',
-            'user_id' => 'required',
             'thumbnail' => 'mimes:jpeg,bmp,png,jpg'
         ]);
 
@@ -66,13 +66,14 @@ class PostController extends Controller
             'subtitle' => $data['subtitle'],
             'content' => $data['content'],
             'category_id' => $data['category_id'],
-            'user_id' => $data['user_id']
+            'user_id' => $request->user()->id
         ]);
 
-        $path = UploadManager::storeThumbnail($postCreated, $data['thumbnail']);
-
-        $postCreated->thumbnail = $path;
-        $postCreated->update();
+        if(isset($data['thumbnail'])){
+            $path = UploadManager::storeThumbnail($postCreated, $data['thumbnail']);
+            $postCreated->thumbnail = $path;
+            $postCreated->update();
+        }        
 
         return response()->json([
             'status' => 'Notícia armazenada com sucesso. Aguardando aprovação!'
