@@ -8,6 +8,8 @@ use Illuminate\Support\Facades\Validator;
 use App\Http\UploadManager;
 use App\Post;
 use App\Category;
+use App\Http\HelperFunctions;
+use Illuminate\Support\Facades\DB;
 
 class PostController extends Controller
 {
@@ -73,7 +75,10 @@ class PostController extends Controller
             $path = UploadManager::storeThumbnail($postCreated, $data['thumbnail']);
             $postCreated->thumbnail = $path;
             $postCreated->update();
-        }        
+        }
+
+        $galleryImgsStoredPath = UploadManager::recoveryImg($postCreated->id, $data['galleryKey'], $data['PostGalleryImgs']);
+        DB::table('galleries')->insert( HelperFunctions::prepateImgsToDb($postCreated->id, $galleryImgsStoredPath) );
 
         return response()->json([
             'status' => 'Notícia armazenada com sucesso. Aguardando aprovação!'

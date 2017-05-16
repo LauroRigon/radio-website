@@ -36,8 +36,9 @@ class UploadManager
         }
 
         $fileName = $post->id . "." . $thumbnail->getClientOriginalExtension();
-        $path = $thumbnail->storeAs('/thumbnails', $fileName);
+        $thumbnail->storeAs('thumbnails/', $fileName);
 
+        $path = '/storage/thumbnails/' . $fileName;
         return $path;
     }
 
@@ -58,5 +59,20 @@ class UploadManager
     public static function destroyTempImg($img, $key) {
         //dd($img);
         return Storage::delete('gallery/temp/' . $key . '/' . $img);
+    }
+
+    /**
+     * Recupera imagens da pasta temp
+     *
+     * @param $post id do post
+     * @param $key key da galeria
+     * @param $imgs string com o nome das imagens separados por uma vírgula
+     * @return \Illuminate\Http\Response
+     */
+    public static function recoveryImg($post, $key, $imgs) {
+        $imgs = explode(',', $imgs);
+
+        Storage::move('gallery/temp/' . $key, 'gallery/stored/' . $post);
+        return Storage::allFiles('gallery/stored/' . $post);
     }
 }
