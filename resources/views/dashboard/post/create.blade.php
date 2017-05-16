@@ -119,9 +119,11 @@ Dropzone.options.dropzoneId = {
     this.on("removedfile", function(file) {
       console.log();
       if(file.status == 'success'){
-        axios.delete('gallery/deleteGalleryImg', {
+        axios.post('gallery/deleteGalleryImg', {
           galleryKey: $("#galleryKey").val(),
           fileName: file.name
+        }).then(function(response){
+          console.log(response);
         });
       }
     });

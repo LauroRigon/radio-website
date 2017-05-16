@@ -93,6 +93,6 @@ class GalleryController extends Controller
      */
     public function destroy(Request $imgInfo)
     {
-        dd($imgInfo->input());
+        UploadManager::destroyTempImg($imgInfo->fileName, $imgInfo->galleryKey);
     }
 }

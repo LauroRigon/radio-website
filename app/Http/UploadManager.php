@@ -54,4 +54,10 @@ class UploadManager
         $path = '/storage/gallery/' . $fileName;
         return $path;
     }
+
+    public static function destroyTempImg($img, $key) {
+        //dd($img);
+        dd(Storage::delete('gallery/temp/' . $key . '/' . $img));
+        return true;
+    }
 }
