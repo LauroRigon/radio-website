@@ -71,7 +71,9 @@ class UploadManager
      */
     public static function recoveryImg($post, $key, $imgs) {
         $imgs = explode(',', $imgs);
-
+        if(!Storage::exists('gallery/temp/' . $key)){
+            return false;
+        }
         Storage::move('gallery/temp/' . $key, 'gallery/stored/' . $post);
         return Storage::allFiles('gallery/stored/' . $post);
     }

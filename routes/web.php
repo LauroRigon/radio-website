@@ -52,6 +52,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     //Rotas de gerenciamento de posts
     Route::group(['prefix' => 'posts'], function() {
         Route::get('/', 'PostController@index');  //pagina de posts
+        Route::get('/preview/{post}', 'PostController@preview')->name('post_preview');
 
         Route::get('/create', 'PostController@create')->name('post_create');//formulário para criar post
         Route::post('/store', 'PostController@store')->name('post_store');  //criar post

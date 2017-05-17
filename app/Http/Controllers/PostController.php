@@ -53,14 +53,12 @@ class PostController extends Controller
             'title' => 'required',
             'subtitle' => 'required',
             'content' => 'required',
-            'category_id' => 'required',
+            'category_id' => 'required|exists:categories,id',
             'thumbnail' => 'mimes:jpeg,bmp,png,jpg'
         ]);
 
         if($validator->fails()){
-            return response()->json([
-                $validator->errors()
-            ]);
+            return back()->withErrors($validator->errors());
         }
 
         $postCreated = Post::create([
@@ -77,12 +75,13 @@ class PostController extends Controller
             $postCreated->update();
         }
 
-        $galleryImgsStoredPath = UploadManager::recoveryImg($postCreated->id, $data['galleryKey'], $data['PostGalleryImgs']);
-        DB::table('galleries')->insert( HelperFunctions::prepateImgsToDb($postCreated->id, $galleryImgsStoredPath) );
+        //Se o diretório da key existe enão é copiado os arquivos e cadastrado a galeria no banco
+        if($galleryImgsStoredPath = UploadManager::recoveryImg($postCreated->id, $data['galleryKey'], $data['PostGalleryImgs'])) {
+            DB::table('galleries')->insert(HelperFunctions::prepateImgsToDb($postCreated->id, $galleryImgsStoredPath));
+        }
 
-        return response()->json([
-            'status' => 'Notícia armazenada com sucesso. Aguardando aprovação!'
-        ], 200);
+        $request->session()->flash('alert', 'Postagem cadastrada com sucesso! Será publicada assim que um usuário master a revisar.');
+        return redirect()->route('post_preview', ['post' => $postCreated->id]);
     }
 
     /**
@@ -96,6 +95,16 @@ class PostController extends Controller
         //
     }
 
+    /**
+     * Mostra um preview de um determinado post na parte de adm
+     *
+     * @param  int  $postid
+     * @return \Illuminate\Http\Response
+     */
+    public function preview($post)
+    {
+        return view('dashboard.post.preview');
+    }
     /**
      * Show the form for editing the specified resource.
      *
