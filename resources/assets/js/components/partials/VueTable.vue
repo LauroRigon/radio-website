@@ -65,7 +65,10 @@
                   type: String
                 },
                 actions: {
-                  type: Array
+                  type: Array,
+                  default(){
+                    return []
+                  }
                 }
 
             },
@@ -109,6 +112,7 @@
             },
 
             hasAction: function(action) {
+
               return this.actions.find(function(act) {
                 return (act == action)? true: false;
               });

@@ -16,7 +16,7 @@
             <!-- Add the bg color to the header using any of the bg-* classes -->
             <div class="widget-user-header bg-aqua-active">
               <h3 class="widget-user-username" v-text="data.name"></h3>
-              <span class="label label-danger" v-show="data.is_master">Master</span>
+              <span class="label label-danger" v-show="data.is_master == 'Sim'">Master</span>
             </div>
             <div class="widget-user-image">
               <img class="img-circle" :src="data.avatar" alt="User Avatar">
@@ -44,7 +44,7 @@
                 <!-- /.col -->
                 <div class="col-sm-4">
                   <div class="description-block">
-                    <h5 class="description-header" v-text="data.created_date"></h5>
+                    <h5 class="description-header" v-text="data.created_at"></h5>
                     <span class="description-text">Data do cadastrado</span>
                   </div>
                   <!-- /.description-block -->

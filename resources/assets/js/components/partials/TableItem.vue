@@ -61,7 +61,7 @@
 			},
 
 			deleteAction: function(data) {
-				if(confirm("Tem certeza que deseja deletar esse usuário?") != 1) {
+				if(confirm("Tem certeza que deseja deletar esse item?") != 1) {
 					return false;
 				}
 

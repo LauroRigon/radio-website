@@ -26,4 +26,18 @@ class User extends Authenticatable
     protected $hidden = [
         'password', 'remember_token',
     ];
+
+    public function getCreatedAtAttribute($value)
+    {
+        if($value) {
+            $date = date_create($value);
+
+            return date_format($date, 'd-m-Y');
+        }
+    }
+
+    public function getIsMasterAttribute($value)
+    {
+        return ($value == 1)? 'Sim': 'Não';
+    }
 }

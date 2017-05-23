@@ -13,7 +13,7 @@
     <vue-table title="Tabela de categorias"
                :has-actions="true"
                :fields="['Id', 'Nome', 'Descrição', 'Criado em', 'Ação']"
-               :fillable="['id', 'name', 'description', 'created_date']"
+               :fillable="['id', 'name', 'description', 'created_at']"
                source-data="categories/getCategories"
                delete-api="categories/delete/"
                :actions="['edit', 'remove', 'create']"></vue-table>

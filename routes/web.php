@@ -51,17 +51,20 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
 
     //Rotas de gerenciamento de posts
     Route::group(['prefix' => 'posts'], function() {
-        Route::get('/', 'PostController@index');  //pagina de posts
+        Route::get('/', 'PostController@index')->name('post_index');  //pagina de posts
         Route::get('/preview/{post}', 'PostController@preview')->name('post_preview');
 
         Route::get('/create', 'PostController@create')->name('post_create');//formulário para criar post
         Route::post('/store', 'PostController@store')->name('post_store');  //criar post
 
-        Route::put('/{id}', 'PostController@update'); //atualiza post
+        Route::get('/edit/{post}', 'PostController@edit');//form pra atualizar
+        Route::post('/update/{post}', 'PostController@update')->name('post_update'); //atualiza post
         Route::delete('/{id}', 'PostController@destroy'); //deleta post
 
         Route::post('/allowPost/{id}', 'PostController@allowPost')->middleware('master');//permite um post se publicado
         Route::post('/setAbout/{id}', 'PostController@setAsAbout')->middleware('master');//coloca um post como conteúdo da sessão sobre
+
+        Route::get('/getMyPosts', 'PostController@getMyPosts');//retorna todos posts do user logado
 
         //Rotas para gerenciamento de galeria de imagens
         Route::group(['prefix' => 'gallery'], function () {

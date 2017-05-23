@@ -45,7 +45,6 @@ class CategoryController extends Controller
             'description' => ucfirst($data['description'])
         ]);
 
-        $createdCategory->created_date = $createdCategory->created_at->format('d-m-Y');
 
         return $createdCategory;
 
@@ -106,11 +105,6 @@ class CategoryController extends Controller
      */
     public function getCategories() {
         $categories = Category::all();
-
-        $categories->filter(function($val){
-            $val->created_date = $val->created_at->format('d-m-Y');
-            return $val;
-        });
 
         return response()->json([
             $categories

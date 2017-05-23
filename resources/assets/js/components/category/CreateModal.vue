@@ -124,7 +124,7 @@ export default {
         id: categoryd.id, 
         name: categoryd.name, 
         description: categoryd.description,
-        created_date: categoryd.created_date
+        created_date: categoryd.created_at
       });
     }
   }

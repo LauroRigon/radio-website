@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Input;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -20,7 +21,7 @@ class PostController extends Controller
      */
     public function index()
     {
-        //
+        return view('dashboard.post.index');
     }
 
     /**
@@ -101,9 +102,9 @@ class PostController extends Controller
      * @param  int  $postid
      * @return \Illuminate\Http\Response
      */
-    public function preview($post)
+    public function preview(Post $post)
     {
-        return view('dashboard.post.preview');
+        return view('dashboard.post.preview')->with('post', $post);
     }
     /**
      * Show the form for editing the specified resource.
@@ -111,9 +112,17 @@ class PostController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit(Post $post)
     {
-        //
+        if(Auth::id() != $post->user_id){
+            return redirect('admin/dashboard');
+        }
+        $categories = Category::all();
+
+        return view('dashboard.post.edit')->with([
+            'post' => $post,
+            'categories' => $categories
+        ]);
     }
 
     /**
@@ -123,13 +132,14 @@ class PostController extends Controller
      * @param  int  $id (postId)
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, Post $id) {
+    public function update(Request $request, Post $post) {
         $data = $request->all();
         $validator = Validator::make($data, [
             'title' => 'required',
             'subtitle' => 'required',
             'content' => 'required',
-            'category_id' => 'required'
+            'category_id' => 'required',
+            'thumbnail' => 'mimes:jpeg,bmp,png,jpg'
         ]);
 
         if($validator->fails()){
@@ -138,16 +148,19 @@ class PostController extends Controller
             ]);
         }
 
-        $id->update([
-            'title' => $data['title'],
-            'subtitle' => $data['subtitle'],
-            'content' => $data['content'],
-            'category_id' => $data['category_id']
-        ]);
+        if(isset($data['thumbnail'])){
+            $path = UploadManager::storeThumbnail($post, $data['thumbnail']);
+            $post->thumbnail = $path;
+        }
 
-        return response()->json([
-            'status' => 'Notícia atualizada com sucesso!'
-        ], 200);
+        $post->title = $data['title'];
+        $post->subtitle = $data['subtitle'];
+        $post->content = $data['content'];
+        $post->category_id = $data['category_id'];
+        $post->update();
+
+        $request->session()->flash('success', 'Postagem atualizada com sucesso.');
+        return redirect()->route('post_preview', ['post' => $post->id]);
     }
 
     /**
@@ -209,6 +222,20 @@ class PostController extends Controller
 
         return response()->json([
             'status' => 'Sessão Sobre atualizada com sucesso!'
+        ], 200);
+    }
+
+    /**
+     * Retorna todos os posts do usuário logado
+     * @param  Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getMyPosts(Request $request) {
+        $posts = Post::where('user_id', $request->user()->id)->get();
+
+
+        return response()->json([
+            $posts
         ], 200);
     }
 }

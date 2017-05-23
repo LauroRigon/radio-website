@@ -40,7 +40,7 @@
 	            <!-- Add the bg color to the header using any of the bg-* classes -->
 	            <div class="widget-user-header bg-aqua-active">
 	              <h3 class="widget-user-username">{{$user->name}}</h3>
-	              @if($user->is_master)
+	              @if($user->is_master == 'Sim')
 	                <span class="label label-danger">Master</span>
 	              @endif
 	            </div>
@@ -67,7 +67,7 @@
 	                <!-- /.col -->
 	                <div class="col-sm-4">
 	                  <div class="description-block">
-	                    <h5 class="description-header">{{$user->created_date}}</h5>
+	                    <h5 class="description-header">{{$user->created_at}}</h5>
 	                    <span class="description-text">Data do cadastrado</span>
 	                  </div>
 	                  <!-- /.description-block -->

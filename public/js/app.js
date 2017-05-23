@@ -12398,7 +12398,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
         id: categoryd.id,
         name: categoryd.name,
         description: categoryd.description,
-        created_date: categoryd.created_date
+        created_date: categoryd.created_at
       });
     }
   }
@@ -12689,7 +12689,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 		},
 
 		deleteAction: function deleteAction(data) {
-			if (confirm("Tem certeza que deseja deletar esse usuário?") != 1) {
+			if (confirm("Tem certeza que deseja deletar esse item?") != 1) {
 				return false;
 			}
 
@@ -12833,7 +12833,10 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       type: String
     },
     actions: {
-      type: Array
+      type: Array,
+      default: function _default() {
+        return [];
+      }
     }
 
   },
@@ -12875,6 +12878,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     },
 
     hasAction: function hasAction(action) {
+
       return this.actions.find(function (act) {
         return act == action ? true : false;
       });
@@ -33493,8 +33497,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     directives: [{
       name: "show",
       rawName: "v-show",
-      value: (_vm.data.is_master),
-      expression: "data.is_master"
+      value: (_vm.data.is_master == 'Sim'),
+      expression: "data.is_master == 'Sim'"
     }],
     staticClass: "label label-danger"
   }, [_vm._v("Master")])]), _vm._v(" "), _c('div', {
@@ -33548,7 +33552,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [_c('h5', {
     staticClass: "description-header",
     domProps: {
-      "textContent": _vm._s(_vm.data.created_date)
+      "textContent": _vm._s(_vm.data.created_at)
     }
   }), _vm._v(" "), _c('span', {
     staticClass: "description-text"
