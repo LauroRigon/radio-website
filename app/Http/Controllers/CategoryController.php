@@ -94,7 +94,7 @@ class CategoryController extends Controller
         $id->delete();
 
         return response()->json([
-            'status' => 'Deletada com sucesso!'
+            'status' => 'Categoria deletada com sucesso!'
         ], 200);
     }
 

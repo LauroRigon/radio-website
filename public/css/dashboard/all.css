@@ -2538,6 +2538,8 @@ a:focus {
  */
 .alert {
   border-radius: 3px;
+  margin-top: 10px;
+  margin-left: 10px;
 }
 .alert h4 {
   font-weight: 600;

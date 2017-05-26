@@ -59,7 +59,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
 
         Route::get('/edit/{post}', 'PostController@edit');//form pra atualizar
         Route::post('/update/{post}', 'PostController@update')->name('post_update'); //atualiza post
-        Route::delete('/{id}', 'PostController@destroy'); //deleta post
+        Route::delete('/delete/{id}', 'PostController@destroy'); //deleta post
 
         Route::post('/allowPost/{id}', 'PostController@allowPost')->middleware('master');//permite um post se publicado
         Route::post('/setAbout/{id}', 'PostController@setAsAbout')->middleware('master');//coloca um post como conteúdo da sessão sobre
@@ -74,7 +74,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     });
 
     Route::group(['prefix' => 'polls'], function() {
-        Route::post('/', 'PollController@store');
+        Route::get('/create', 'PollController@create')->name('poll_create');
+        Route::post('/store', 'PollController@store');
         Route::delete('/{id}', 'PollController@destroy');
 
         Route::post('/addVote/{pollId}', 'PollController@addVote');

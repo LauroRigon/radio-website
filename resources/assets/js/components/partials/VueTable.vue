@@ -126,7 +126,7 @@
     </script>
 
     <style>
-      .btn {
+      td >.btn {
         margin-top: 5px; 
       }
       .button-create{

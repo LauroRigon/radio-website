@@ -66,9 +66,9 @@
 				}
 
 				axios.delete(this.deleteApi + data.id)
-				.then(function() {
+				.then(function(response) {
 					this.isVisible = false
-					toastr.success("Deletado com sucesso!")
+					toastr.success(response.data['status'])
 				}.bind(this))
 
 				.catch(function(error){

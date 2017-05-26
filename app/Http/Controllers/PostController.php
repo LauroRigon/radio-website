@@ -174,7 +174,7 @@ class PostController extends Controller
         $id->delete();
 
         return response()->json([
-            'status' => 'Noticia deletada com sucesso!'
+            'status' => 'Notícia deletada com sucesso!'
         ], 200);
     }
 

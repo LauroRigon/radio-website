@@ -15,7 +15,7 @@ class MustBeMaster
      */
     public function handle($request, Closure $next)
     {
-        if (Auth::user()->is_master == 0) {
+        if (Auth::user()->is_master == "Não") {
             return redirect('admin/dashboard');
         }
         return $next($request);

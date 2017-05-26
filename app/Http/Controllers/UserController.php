@@ -65,7 +65,6 @@ class UserController extends Controller
     public function show()
     {
         $user = User::find(Auth::user()->id);
-        $user->created_date = $user->created_at->format('d-m-Y');
 
         return view('dashboard.user.show')->with('user', $user);
     }
@@ -185,7 +184,7 @@ class UserController extends Controller
         $id->delete();
 
         return response()->json([
-            'status' => 'Deletado com sucesso!'
+            'status' => 'Usuário deletado com sucesso!'
         ], 200);
     }
 
@@ -196,16 +195,6 @@ class UserController extends Controller
      */
     public function getUsers() {
         $users = User::all();
-
-        //filtra o array trocando os valores 1 por 0 na posição is_master
-        $users->filter(function($val){
-            if ($val->is_master == 1){
-                $val->is_master = "Sim";
-            }else{
-                $val->is_master = "Não";
-            }
-            return $val;
-        });
 
         return response()->json([
         $users
@@ -220,7 +209,6 @@ class UserController extends Controller
      */
     public function getUserComplete(User $user) {
         $user->post_count = Post::where('user_id', $user->id)->where('allowed', 1)->count();
-        $user->created_date = $user->created_at->format('d-m-Y');
 
         //$user->is_master = ($user->is_master)? "Sim" : "Não";
         return response()->json([

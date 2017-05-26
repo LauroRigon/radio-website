@@ -16,7 +16,7 @@ class PollController extends Controller
      */
     public function index()
     {
-        //
+
     }
 
     /**
@@ -26,11 +26,11 @@ class PollController extends Controller
      */
     public function create()
     {
-        //
+        return view('dashboard.poll.create');
     }
 
     /**
-     * Armazena no banco uma enquete
+     * Armazena no banco uma votação
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
@@ -38,7 +38,8 @@ class PollController extends Controller
     public function store(Request $request) {
         $data = $request->input();
         $validator = Validator::make($data, [
-            'title' => 'required'
+            'title' => 'required',
+            'options' => 'required'
         ]);
 
         if ($validator->fails()){

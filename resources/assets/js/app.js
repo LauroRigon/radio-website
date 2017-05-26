@@ -42,10 +42,12 @@ Vue.component('avatar-upload', require('./components/user/AvatarUpload.vue'));
 Vue.component('category-create-modal', require('./components/category/CreateModal.vue'));
 Vue.component('category-edit-modal', require('./components/category/EditModal.vue'));
 
-Vue.component('dropzone', require('./components/partials/Dropzone.vue'));
+Vue.component('poll-create', require('./components/poll/PollCreate.vue'));
+
+Vue.component('redirector', require('./helpers/Redirector.vue'));
 
 const app = new Vue({
-    el: '#app'    
+    el: '#app'
 });
 
 
