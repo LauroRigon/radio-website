@@ -100,7 +100,7 @@
         </form>
 
         <div class="box-footer">
-          <button type="submit" class="btn btn-primary" form="post-form" id="sendForm">Enviar</button>
+          <button type="submit" class="btn btn-primary" form="post-form" id="sendForm">Concluir</button>
         </div>
       </div>
     </div>

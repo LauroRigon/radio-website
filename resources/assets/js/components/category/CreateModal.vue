@@ -35,7 +35,7 @@
 
       <div class="modal-footer">
         <button type="button" class="btn btn-default" data-dismiss="modal" @click="closeModal">Cancelar</button>
-        <button type="button" class="btn btn-primary" @click.prevent="sendForm"><i class="fa fa-refresh fa-spin" v-show="isLoading"></i> Confirmar</button>
+        <button type="button" class="btn btn-primary" @click.prevent="sendForm" :disabled="isLoading"><i class="fa fa-refresh fa-spin" v-show="isLoading"></i> Confirmar</button>
       </div>
     </div>
   </div>

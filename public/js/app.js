@@ -12875,6 +12875,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
 	data: function data() {
@@ -12884,7 +12886,8 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 				title: '',
 				options: []
 			},
-			isLoading: false
+			isLoading: false,
+			errors: []
 		};
 	},
 
@@ -12902,14 +12905,34 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
 			axios.post('store', this.poll).then(function (response) {
 				toastr.success('Votação cadastrada com sucesso!');
-			});
+				this.clearFields();
+				this.isLoading = false;
+			}.bind(this)).catch(function (error) {
+				this.errors = error.response.data[0];
 
-			this.isLoading = false;
+				this.isLoading = false;
+			}.bind(this));
 		},
 
 		clearFields: function clearFields() {
 			this.poll.title = '';
 			this.poll.options = [];
+		},
+
+		deleteItem: function deleteItem(item) {
+			this.poll.options.shift(item);
+		},
+
+		getError: function getError(error) {
+			if (this.errors[error]) {
+				return this.errors[error][0];
+			} else {
+				return false;
+			}
+		},
+
+		clearError: function clearError(error) {
+			delete this.errors[error];
 		}
 	}
 });
@@ -13083,7 +13106,6 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 
         toastr.success("Usuário criado com sucesso!");
       }.bind(this)).catch(function (error) {
-        console.log(error.response);
         this.errors = error.response.data;
         this.isLoading = false;
       }.bind(this));
@@ -33879,6 +33901,9 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     on: {
       "submit": function($event) {
         $event.preventDefault();
+      },
+      "keydown": function($event) {
+        _vm.clearError($event.target.name)
       }
     }
   }, [_c('div', {
@@ -33886,7 +33911,10 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [_c('div', {
     staticClass: "row"
   }, [_c('div', {
-    staticClass: "form-group col-md-8"
+    staticClass: "form-group col-md-8",
+    class: {
+      'has-error': _vm.getError('title')
+    }
   }, [_c('label', {
     attrs: {
       "for": "title"
@@ -33898,7 +33926,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       value: (_vm.poll.title),
       expression: "poll.title"
     }],
-    staticClass: "form-control",
+    staticClass: "form-control has-error",
     attrs: {
       "type": "text",
       "id": "title",
@@ -33914,14 +33942,30 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
         _vm.poll.title = $event.target.value
       }
     }
-  })])]), _vm._v(" "), _c('label', [_vm._v("Opções da votação")]), _vm._v(" "), _c('ul', [_vm._l((_vm.poll.options), function(option) {
+  }), _vm._v(" "), (_vm.getError('title')) ? _c('span', {
+    staticClass: "help-block",
+    domProps: {
+      "textContent": _vm._s(_vm.getError('title'))
+    }
+  }) : _vm._e()])]), _vm._v(" "), _c('label', [_vm._v("Opções da votação")]), _vm._v(" "), _c('ol', _vm._l((_vm.poll.options), function(option, index) {
     return _c('li', {
-      domProps: {
-        "textContent": _vm._s(option)
+      staticClass: "li-item"
+    }, [_vm._v(_vm._s(option) + " "), _c('button', {
+      staticClass: "close",
+      attrs: {
+        "type": "button"
+      },
+      on: {
+        "click": function($event) {
+          _vm.deleteItem(index)
+        }
       }
-    })
-  }), _vm._v(" "), _c('div', {
-    staticClass: "input-group"
+    }, [_vm._v("×")])])
+  })), _vm._v(" "), _c('div', {
+    staticClass: "input-group",
+    class: {
+      'has-error': _vm.getError('options')
+    }
   }, [_c('input', {
     directives: [{
       name: "model",
@@ -33932,7 +33976,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "form-control",
     attrs: {
       "type": "text",
-      "name": "option",
+      "name": "options",
       "placeholder": "Digite uma opção para a votação aqui"
     },
     domProps: {
@@ -33958,12 +34002,13 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     on: {
       "click": _vm.addOption
     }
-  }, [_vm._v("Adicionar!")])])])], 2), _vm._v(" "), _c('div', {
-    staticClass: "form-group"
+  }, [_vm._v("Adicionar!")])])]), _vm._v(" "), _c('div', {
+    staticClass: "box-footer"
   }, [_c('button', {
     staticClass: "btn btn-primary",
     attrs: {
-      "type": "button"
+      "type": "button",
+      "disabled": _vm.isLoading
     },
     on: {
       "click": _vm.sendForm
@@ -33976,7 +34021,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       expression: "isLoading"
     }],
     staticClass: "fa fa-refresh fa-spin"
-  }), _vm._v(" Enviar")]), _vm._v(" "), _c('button', {
+  }), _vm._v(" Concluir")]), _vm._v(" "), _c('button', {
     staticClass: "btn btn-warning pull-right",
     attrs: {
       "type": "button"
@@ -34215,7 +34260,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [_vm._v("Cancelar")]), _vm._v(" "), _c('button', {
     staticClass: "btn btn-primary",
     attrs: {
-      "type": "button"
+      "type": "button",
+      "disabled": _vm.isLoading
     },
     on: {
       "click": function($event) {
@@ -34501,7 +34547,8 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [_vm._v("Cancelar")]), _vm._v(" "), _c('button', {
     staticClass: "btn btn-primary",
     attrs: {
-      "type": "button"
+      "type": "button",
+      "disabled": _vm.isLoading
     },
     on: {
       "click": function($event) {
@@ -44058,7 +44105,7 @@ module.exports = __webpack_require__(13);
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(2)();
-exports.push([module.i, "\nul{\n\tpadding:0px;\n}\n\n", ""]);
+exports.push([module.i, "\nul{\n\tpadding:0px;\n}\n.li-item{\n\tmargin-bottom:10px;\n\tpadding: 4px;\n\tbackground: transparent;\n\tbackground: rgba(0, 0, 0, 0.1);\n\tborder: 1px solid #d2d6de;\n\tborder-radius: 6px;\n}\n\n", ""]);
 
 /***/ }),
 /* 100 */

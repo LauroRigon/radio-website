@@ -45,7 +45,7 @@ class PollController extends Controller
         if ($validator->fails()){
             return response()->json([
                 $validator->errors()
-            ]);
+            ], 422);
         }
 
         $newPoll = Poll::create([
