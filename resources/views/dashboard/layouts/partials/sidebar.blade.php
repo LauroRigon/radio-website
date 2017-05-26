@@ -32,6 +32,7 @@
                 <a href="#"><i class='fa fa-files-o'></i> <span>Votações</span> <i class="fa fa-angle-left pull-right"></i></a>
                 <ul class="treeview-menu">
                     <li class="{{ Route::currentRouteName() == 'categories'? 'active' : ''}}"><a href="{{route('poll_create')}}">Criar votação</a></li>
+                    <li class="{{ Route::currentRouteName() == 'categories'? 'active' : ''}}"><a href="{{route('poll_create')}}">Criar votação</a></li>
                 </ul>
             </li>
         </ul><!-- /.sidebar-menu -->
