@@ -12,15 +12,39 @@ Usuários
 @section('main-content')
     <vue-table title="Tabela de usuários"
 				:has-actions="true"
-				:fields="['Id', 'Nome', 'Email', 'Master', 'Ação']"
-				:fillable="['id', 'name', 'email', 'is_master']"
+				:fields="[
+                  {
+                    name: 'Id',
+                    dbName: 'id'
+                  },
+                  {
+                    name: 'Nome',
+                    dbName: 'name'
+                  },
+                  {
+                    name: 'Email',
+                    dbName: 'email'
+                  },
+                  {
+                    name: 'Master',
+                    dbName: 'is_master'
+                  },
+                  {
+                    name: '__actions'
+                  }
+               ]"
 				source-data="users/getUsers"
 				delete-api="users/delete/"
-				:actions="['view', 'remove', 'create']"></vue-table>
+        :tb-buttons="[
+                    { name: 'create-button', class: 'btn btn-primary', emit: 'open-create-modal', text: 'Criar'},
+                ]"
+				:actions="[
+                    { name: 'view-item', icon: 'glyphicon glyphicon-search', class: 'btn btn-info', emit: 'open-view-modal'},
+                    { name: 'delete-item', icon: 'glyphicon glyphicon-trash', class: 'btn btn-danger'}
+                ]"></vue-table>
 
 	<user-view-modal title="Detalhes do usuário"></user-view-modal>
 	<user-create-modal title="Cadastrar novo usuário"></user-create-modal>
-	
 @endsection
 @section('page-scripts')
 

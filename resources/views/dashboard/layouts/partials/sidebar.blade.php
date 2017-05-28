@@ -22,9 +22,9 @@
             <li class="treeview {{ Route::currentRouteName() == 'categories'? 'active' : ''}}">
                 <a href="#"><i class='fa fa-files-o'></i> <span>Postagens</span> <i class="fa fa-angle-left pull-right"></i></a>
                 <ul class="treeview-menu">
-                    <li class="{{ Route::currentRouteName() == 'categories'? 'active' : ''}}"><a href="{{route('categories')}}">Categorias</a></li>
                     <li class="{{ Route::currentRouteName() == 'post_index'? 'active' : ''}}"><a href="{{route('post_index')}}">Minhas postagens</a></li>
                     <li class="{{ Route::currentRouteName() == 'post_create'? 'active' : ''}}"><a href="{{route('post_create')}}">Criar postagem</a></li>
+                    <li class="{{ Route::currentRouteName() == 'categories'? 'active' : ''}}"><a href="{{route('categories')}}">Categorias</a></li>
                 </ul>
             </li>
 

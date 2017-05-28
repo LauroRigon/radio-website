@@ -87,11 +87,10 @@ export default {
 
       axios.post('categories/create', this.category)
       .then(function(serverResponse) {
-        this.appendToTable(serverResponse.data)
-
-        this.isLoading = false
+        this.isLoading = false;
         this.clearFields();
 
+        this.updateTable();
         toastr.success("Categoria criada com sucesso!");      
       }.bind(this))
 
@@ -119,13 +118,8 @@ export default {
       this.category.name = '';
     },
 
-    appendToTable: function(categoryd) {
-      Event.$emit('set-new-tdata', {
-        id: categoryd.id, 
-        name: categoryd.name, 
-        description: categoryd.description,
-        created_date: categoryd.created_at
-      });
+    updateTable() {
+      Event.$emit('reload-table');
     }
   }
 

@@ -4,23 +4,48 @@
     <div class="box-header with-border">
       <h3 class="box-title">{{title}}</h3>
     </div>
-    <div class="button-create" v-if="hasAction('create')">
-      <button class="btn btn-primary" @click="createAction">Criar</button>
+    <div class="button-create">
+      <template v-for="button in tbButtons">
+        <a :class="button.class" @click="executeAction(button)">{{button.text}}</a>
+      </template>
     </div>
     <!-- /.box-header -->
       <div class="box-body">
         <table class="table table-bordered">
-          <tbody>
+          <thead>
             <tr>
-              <th style="width: 10px" v-for="field in fields" v-text="field"></th>
+              <template v-for="field in fields">
+                <template v-if="isSpecialField(field.name)">
+                  <th style="width: 10px" v-if="field.name == '__actions'">Ações</th>
+                </template>
+                <template v-else>
+                  <th style="width: 10px" v-text="field.name"></th>
+                </template>
+              </template>
             </tr>
             <div class="overlay" v-show="isLoading">
               <i class="fa fa-refresh fa-spin"></i>
             </div>
-            <table-item v-for="(item, index) in tdatas" :key="index" :datas = "item" :actions="actions" :delete-api="deleteApi">
-              <td v-for="singleData in item" v-text="singleData"></td>
-                
-            </table-item>
+          </thead>
+          <tbody>
+            <template v-if="items.length > 0">
+              <tr v-for="item in items">
+                <template v-for="field in fields">
+                  <template v-if="isSpecialField(field.name)">
+                    <td class="text-center">
+                      <div class="btn-group">
+                        <template v-for="action in actions">
+                          <a :class="action.class" @click="(action.name == 'delete-item')? deleteItem(item): executeAction(action, item)"><i :class="action.icon"></i></a>
+                        </template>
+                      </div>
+                    </td>
+                  </template>
+                  <template v-else>
+                    <td v-text="item[field.dbName]"></td>
+                  </template>
+                </template>
+              </tr>
+            </template>
           </tbody>
           </table>
       </div>
@@ -29,32 +54,15 @@
 </template>
 
     <script>
-      import TableItem from './TableItem.vue'
-
         export default {
-            components: { TableItem },
             props: {
-                showPaginate: {
-                    type: Boolean,
-                    dafault() {
-                        return false
-                    }
-                },
                 title: {
                     type: String,
                     default() {
                         return ''
                     }
                 },
-                hasActions: {
-                  type: Boolean,
-                  default: false
-                },
                 fields: {
-                  type: Array,
-                  required: true
-                },
-                fillable: {
                   type: Array,
                   required: true
                 },
@@ -69,58 +77,80 @@
                   default(){
                     return []
                   }
+                },
+                tbButtons: {
+                  type: Array,
+                  default(){
+                    return []
+                  }
                 }
 
             },
             data() {
                 return {
-                    tdatas: [],
+                    items: [],
                     isLoading: true
                 }
             },
 
             mounted() {
-                axios.get(this.sourceData)
-                .then(function(serverResponse) {
-                  var response = serverResponse.data[0];
-                  this.isLoading = false;
+              console.log(window.location.href);
+              this.loadData();
 
-                  this.filterData(response);                  
-                }.bind(this))
-                .catch(function() {
-                  toastr.error("Ocorreu um erro ao tentar encontrar usuários!");
-                });
-
-                Event.$on('set-new-tdata', function(tdata) {
-                  this.tdatas.push(tdata);
-                }.bind(this));
+              Event.$on('reload-table', function(){
+                this.loadData();
+              }.bind(this));
             },
 
             methods: {
-              /*
-              * filtra os campos que serão preenchidos baseado na opção fillable. Deletando qualquer dado exedente
-              */
-              filterData: function(data) {
-                this.tdatas = data.filter(function(val) {
-                  for (var attName in val){
-                    if(this.fillable.indexOf(attName) === -1){
-                      delete val[attName];
-                    }
+              loadData(){
+                this.isLoading = true;
+                axios.get(this.sourceData)
+                .then(function(serverResponse) {
+                  this.isLoading = false;
+
+                  this.items = serverResponse.data[0];                  
+                }.bind(this))
+                .catch(function() {
+                  this.isLoading = false;
+                  toastr.error("Ocorreu um erro ao tentar encontrar usuários!");
+                });
+              },
+
+              /*executa a action de uma determinada action */
+              executeAction(action, item = null) {
+                if(action.hasOwnProperty('href')){
+                    window.location.href = window.location.href + '/' + action.href + ((action.param)? item.id: '');  //redireciona para a href a partir do caminho atual
+
+                }else if(action.hasOwnProperty('emit')){
+                  Event.$emit(action.emit, item);
+                }
+              },
+
+              deleteItem(item) {
+                if(confirm("Tem certeza que deseja deletar esse item?") != 1) {
+                  return false;
+                }
+
+                axios.delete(this.deleteApi + item.id)
+                .then(function(response) {
+                  this.loadData();
+                  toastr.success(response.data['status']);
+                }.bind(this))
+
+                .catch(function(error){
+                  if(error.response.status == 500){
+                    toastr.warning("Item tem dependências cadastradas!")
+                  }else{
+                    toastr.error(error.response.data['status'], "Ocorreu um erro ao deletar!")
                   }
-                  return val;
-                }.bind(this));
-            },
+                });
+              },
 
-            hasAction: function(action) {
-
-              return this.actions.find(function(act) {
-                return (act == action)? true: false;
-              });
-            },
-
-            createAction: function() {
-              Event.$emit('open-create-modal');
-            }
+              /*Verifica se é um item especial como Actions*/
+              isSpecialField(name) {
+                return name.slice(0, 2) === '__'
+              }
         }
       }
     </script>

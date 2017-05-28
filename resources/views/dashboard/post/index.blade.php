@@ -17,18 +17,42 @@
 
 @section('main-content')
     <vue-table title="Tabela de posts"
-               :has-actions="true"
-               :fields="['Id', 'Titulo', 'Categoria', 'Visualizações', 'Publicado em', 'Ação']"
-               :fillable="['id', 'title', 'category_id', 'published_at', 'view_count']"
+               :fields="[
+                  {
+                    name: 'Id',
+                    dbName: 'id'
+                  },
+                  {
+                    name: 'Título',
+                    dbName: 'title'
+                  },
+                  {
+                    name: 'Categoria',
+                    dbName: 'category_id'
+                  },
+                  {
+                    name: 'Visualizações',
+                    dbName: 'view_count'
+                  },
+                  {
+                    name: 'Publicado em',
+                    dbName: 'published_at'
+                  },
+                  {
+                    name: '__actions'
+                  }
+               ]"
                source-data="posts/getMyPosts"
                delete-api="posts/delete/"
-               :actions="['view', 'remove', 'create', 'edit']"
+               :tb-buttons="[
+                    { name: 'create-button', class: 'btn btn-primary', href: 'create', text: 'Criar'},
+                ]"
+               :actions="[
+                    { name: 'view-item', icon: 'glyphicon glyphicon-search', class: 'btn btn-info', href: 'preview/', param: 'true'},
+                    { name: 'edit-item', icon: 'glyphicon glyphicon-pencil', class: 'btn btn-warning', href: 'edit/', param: 'true'},
+                    { name: 'delete-item', icon: 'glyphicon glyphicon-trash', class: 'btn btn-danger'}
+                ]"
                ></vue-table>
-
-    <redirector trigger="open-create-modal"
-                @trigged="redirectToEdit"
-                path="posts/edit/"></redirector>
-
 @endsection
 @section('page-scripts')
 <script type="text/javascript" src="{{ asset('js/dashboard/plugins/ckeditor/ckeditor.js') }}"></script>

@@ -102,11 +102,11 @@ export default {
 
       axios.post('users/create', this.user)
       .then(function(serverResponse) {
-        this.appendToTable(serverResponse.data)
 
         this.isLoading = false
         this.clearFields();
 
+        this.updateTable();
         toastr.success("Usuário criado com sucesso!");      
       }.bind(this))
 
@@ -135,13 +135,8 @@ export default {
       this.user.password = '';
     },
 
-    appendToTable: function(userd) {
-      Event.$emit('set-new-tdata', {
-        id: userd.id, 
-        name: userd.name, 
-        email: userd.email, 
-        is_master: (userd.is_master)? "Sim": "Não"
-      });
+    updateTable() {
+      Event.$emit('reload-table');
     }
   }
 
