@@ -7,12 +7,12 @@
 @endsection
 
 @section('content_title')
-    Minhas ostagem
+    Minhas postagens
 @endsection
 
 @section('content_header')
     <li><a href="/admin/dashboard"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-    <li class="active">Minhas ostagem</li>
+    <li class="active">Minhas postagens</li>
 @endsection
 
 @section('main-content')

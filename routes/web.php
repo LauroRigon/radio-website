@@ -74,11 +74,14 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     });
 
     Route::group(['prefix' => 'polls'], function() {
+        Route::get('/', 'PollController@index')->name('poll_index');
         Route::get('/create', 'PollController@create')->name('poll_create');
         Route::post('/store', 'PollController@store');
-        Route::delete('/{id}', 'PollController@destroy');
+        Route::delete('delete/{id}', 'PollController@destroy');
 
         Route::post('/addVote/{pollId}', 'PollController@addVote');
+
+        Route::get('/getMyPolls', 'PollController@getMyPolls');
     });
 });
 

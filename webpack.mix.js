@@ -11,19 +11,19 @@ const { mix } = require('laravel-mix');
  |
  */
 
-mix.js('resources/assets/js/app.js', 'public/js')
-   .sass('resources/assets/sass/app.scss', 'public/css')
-   .sass('node_modules/bootstrap-sass/assets/stylesheets/_bootstrap.scss', 'public/css/bootstrap.css')
-   .sass('node_modules/font-awesome/scss/font-awesome.scss', 'public/css/font-awesome.css')
-   .combine([
+mix.js('resources/assets/js/dashboard/app.js', 'public/js/dashboard')
+    .sass('resources/assets/sass/app.scss', 'public/css')
+    .sass('node_modules/bootstrap-sass/assets/stylesheets/_bootstrap.scss', 'public/css/bootstrap.css')
+    .sass('node_modules/font-awesome/scss/font-awesome.scss', 'public/css/font-awesome.css')
+    .combine([
        'resources/assets/css/skins/skin-blue.css',
        'resources/assets/css/AdminLTE.css',
        'public/css/font-awesome.css',
        'node_modules/animate.css/animate.min.css',
        'node_modules/toastr/build/toastr.min.css'
-   ], 'public/css/dashboard/all.css')
-   .combine([
-       'resources/assets/js/adminLTEapp.js',
-   ], 'public/js/dashboard/all.js')
+    ], 'public/css/dashboard/all.css')
+    .combine([
+       'resources/assets/js/dashboard/adminLTEapp.js',
+    ], 'public/js/dashboard/all.js')
     .copy('node_modules/font-awesome/fonts/*.*', 'public/fonts/')
     .copy('node_modules/ionicons/dist/fonts/*.*', 'public/fonts/');

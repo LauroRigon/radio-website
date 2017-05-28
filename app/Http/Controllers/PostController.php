@@ -65,6 +65,7 @@ class PostController extends Controller
         $postCreated = Post::create([
             'title' => $data['title'],
             'subtitle' => $data['subtitle'],
+            'slug' => str_slug($data['title']),
             'content' => $data['content'],
             'category_id' => $data['category_id'],
             'user_id' => $request->user()->id
@@ -76,7 +77,7 @@ class PostController extends Controller
             $postCreated->update();
         }
 
-        //Se o diretório da key existe enão é copiado os arquivos e cadastrado a galeria no banco
+        //Se o diretório da key existe então é copiado os arquivos e cadastrado a galeria no banco
         if($galleryImgsStoredPath = UploadManager::recoveryImg($postCreated->id, $data['galleryKey'], $data['PostGalleryImgs'])) {
             DB::table('galleries')->insert(HelperFunctions::prepateImgsToDb($postCreated->id, $galleryImgsStoredPath));
         }
@@ -232,7 +233,6 @@ class PostController extends Controller
      */
     public function getMyPosts(Request $request) {
         $posts = Post::where('user_id', $request->user()->id)->get();
-
 
         return response()->json([
             $posts

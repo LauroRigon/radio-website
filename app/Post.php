@@ -7,7 +7,7 @@ use App\Category;
 
 class Post extends Model
 {
-    protected $fillable = ['title', 'subtitle', 'content', 'category_id', 'user_id', 'thumbnail', 'is_about'];
+    protected $fillable = ['title', 'subtitle', 'slug', 'content', 'category_id', 'user_id', 'thumbnail', 'is_about'];
 
     public function getCategoryIdAttribute($value)
     {

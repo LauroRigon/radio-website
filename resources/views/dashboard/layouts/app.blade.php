@@ -21,6 +21,9 @@ scratch. This page gets rid of all links and provides the needed markup only.
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
+        @include('dashboard.layouts.partials.contentheader')
+
+        <!-- MOSTRA OS FLASHS DE SESSÃO -->
         <div>
         @if (count($errors) > 0)
             <div class="alert alert-danger alert-dismissible">
@@ -42,8 +45,16 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 </ul>
             </div>
         @endif
+
+        @if (count(session('alert')) > 0)
+            <div class="alert alert-info alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <ul>
+                    {{ session('alert') }}
+                </ul>
+            </div>
+        @endif
         </div>
-        @include('dashboard.layouts.partials.contentheader')
 
         <!-- Main content -->
         <section class="content" id="content">

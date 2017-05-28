@@ -8,8 +8,25 @@ use Illuminate\Support\Facades\DB;
 class Poll extends Model
 {
     protected $fillable =  [
-        'title'
+        'title', 'user_id'
     ];
+
+    /*MUTATORS*/
+
+    public function getCreatedAtAttribute($value)
+    {
+        $date = date_create($value);
+
+        return date_format($date, 'd-m-Y');
+    }
+
+    public function getStatusAttribute($value)
+    {
+        if($value){
+            return 'Aberta';
+        }
+        return 'Fechada';
+    }
 
     /*
      * Armazena as opções de uma enquete

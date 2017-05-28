@@ -16,7 +16,7 @@ class PollController extends Controller
      */
     public function index()
     {
-
+        return view('dashboard.poll.index');
     }
 
     /**
@@ -47,9 +47,9 @@ class PollController extends Controller
                 $validator->errors()
             ], 422);
         }
-
         $newPoll = Poll::create([
-            'title' => $data['title']
+            'title' => $data['title'],
+            'user_id' => $request->user()->id
         ]);
 
         $newPoll->storePollOptions($data['options']);
@@ -123,6 +123,19 @@ class PollController extends Controller
 
         return response()->json([
             'status' => 'Voto efetuado com sucesso!'
+        ], 200);
+    }
+
+    /**
+     * Retorna todas as votações do usuário logado
+     * @param  Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getMyPolls(Request $request) {
+        $polls = Poll::where('user_id', $request->user()->id)->get();
+
+        return response()->json([
+            $polls
         ], 200);
     }
 }
