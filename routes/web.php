@@ -61,7 +61,10 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         Route::post('/update/{post}', 'PostController@update')->name('post_update'); //atualiza post
         Route::delete('/delete/{id}', 'PostController@destroy'); //deleta post
 
-        Route::post('/allowPost/{id}', 'PostController@allowPost')->middleware('master');//permite um post se publicado
+        Route::get('/pending', 'PostController@pending')->name('post_pending')->middleware('master');  //pagina de posts nao autorizados
+        Route::get('/getPendingPosts', 'PostController@getPendingPosts');
+
+        Route::post('/allowPost/{post}', 'PostController@allowPost')->name('post_allow')->middleware('master');//permite um post ser publicado
         Route::post('/setAbout/{id}', 'PostController@setAsAbout')->middleware('master');//coloca um post como conteúdo da sessão sobre
 
         Route::get('/getMyPosts', 'PostController@getMyPosts');//retorna todos posts do user logado
@@ -78,6 +81,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         Route::get('/create', 'PollController@create')->name('poll_create');
         Route::post('/store', 'PollController@store');
         Route::delete('delete/{id}', 'PollController@destroy');
+
+        Route::get('/view/{poll}', 'PollController@show')->name('poll_view');
 
         Route::post('/addVote/{pollId}', 'PollController@addVote');
 

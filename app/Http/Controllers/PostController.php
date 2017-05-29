@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Input;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Http\UploadManager;
@@ -22,6 +22,15 @@ class PostController extends Controller
     public function index()
     {
         return view('dashboard.post.index');
+    }
+
+    /**
+     * Mostra a página de posts pendentes de aprovação
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function pending() {
+        return view('dashboard.post.pending');
     }
 
     /**
@@ -105,6 +114,7 @@ class PostController extends Controller
      */
     public function preview(Post $post)
     {
+        $data = Carbon::create();
         return view('dashboard.post.preview')->with('post', $post);
     }
     /**
@@ -186,26 +196,22 @@ class PostController extends Controller
      * @param  Request  $request (allowed(bool), published_at = Y-m-d H:i:s)
      * @return \Illuminate\Http\Response
      */
-    public function allowPost(Request $request, Post $id){
+    public function allowPost(Request $request, Post $post){
         $data = $request->input();
         $validator = Validator::make($data, [
-            'allowed' => 'required',
-            'published_at' => 'required|date_format:Y-m-d H:i:s'
+            'allowed' => 'required'
         ]);
 
         if($validator->fails()){
-            return response()->json([
-                $validator->errors()
-            ]);
+            return redirect()->back()->withErrors($validator->errors());
         }
 
-        $id->published_at = $data['published_at'];
-        $id->allowed = $data['allowed'];
-        $id->save();
+        $post->published_at = Carbon::create();
+        $post->allowed = $data['allowed'];
+        $post->save();
 
-        return response()->json([
-            'status' => 'Noticia postada com sucesso!'
-        ], 200);
+        $request->session()->flash('success', 'Postagem publicada com sucesso!');
+        return redirect()->back();
     }
 
     /**
@@ -233,6 +239,19 @@ class PostController extends Controller
      */
     public function getMyPosts(Request $request) {
         $posts = Post::where('user_id', $request->user()->id)->get();
+
+        return response()->json([
+            $posts
+        ], 200);
+    }
+
+    /**
+     * Retorna todos os posts ainda não autorizados
+     * @param  Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getPendingPosts() {
+        $posts = Post::where('allowed', 0)->get();
 
         return response()->json([
             $posts

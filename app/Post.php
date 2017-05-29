@@ -24,4 +24,18 @@ class Post extends Model
             return "Não publicado";
         }
     }
+
+    public function getCreatedAtAttribute($value)
+    {
+        $date = date_create($value);
+
+        return date_format($date, 'd-m-Y / H:i:s');
+    }
+
+    public function getUpdatedAtAttribute($value)
+    {
+        $date = date_create($value);
+
+        return date_format($date, 'd-m-Y / H:i:s');
+    }
 }

@@ -12734,7 +12734,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
       var item = arguments.length > 1 && arguments[1] !== undefined ? arguments[1] : null;
 
       if (action.hasOwnProperty('href')) {
-        window.location.href = window.location.href + '/' + action.href + (action.param ? item.id : ''); //redireciona para a href a partir do caminho atual
+        window.location.href = 'http://' + window.location.host + '/' + action.href + (action.param ? item.id : ''); //redireciona para a href a partir do caminho atual
       } else if (action.hasOwnProperty('emit')) {
         Event.$emit(action.emit, item);
       }

@@ -120,7 +120,7 @@
               /*executa a action de uma determinada action */
               executeAction(action, item = null) {
                 if(action.hasOwnProperty('href')){
-                    window.location.href = window.location.href + '/' + action.href + ((action.param)? item.id: '');  //redireciona para a href a partir do caminho atual
+                  window.location.href = ('http://' + window.location.host + '/' + action.href + ((action.param)? item.id: ''));  //redireciona para a href a partir do caminho atual
 
                 }else if(action.hasOwnProperty('emit')){
                   Event.$emit(action.emit, item);

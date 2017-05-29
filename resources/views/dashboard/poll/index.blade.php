@@ -16,16 +16,38 @@
 @section('main-content')
     <div class="box box-primary">
         <div class="box-body">
-
             <vue-table title="Tabela de votações"
-               :has-actions="true"
-               :fields="['Id', 'Titulo', 'Situação', 'Criada em', 'Ação']"
-               :fillable="['id', 'title', 'status', 'created_at']"
-               source-data="polls/getMyPolls"
-               delete-api="polls/delete/"
-               :actions="['view', 'remove']"
-               ></vue-table>
-
+                       :has-actions="true"
+                       :fields="[
+                          {
+                            name: 'Id',
+                            dbName: 'id'
+                          },
+                          {
+                            name: 'Titulo',
+                            dbName: 'title'
+                          },
+                          {
+                            name: 'Situação',
+                            dbName: 'status'
+                          },
+                          {
+                            name: 'Criada em',
+                            dbName: 'created_at'
+                          },
+                          {
+                            name: '__actions'
+                          }
+                       ]"
+                       source-data="polls/getMyPolls"
+                       delete-api="polls/delete/"
+                       :tb-buttons="[
+                            { name: 'create-button', class: 'btn btn-primary', href: 'admin/polls/create', text: 'Criar'},
+                        ]"
+                       :actions="[
+                    { name: 'view-item', icon: 'glyphicon glyphicon-search', class: 'btn btn-info', href: 'admin/polls/view/', param: 'true'},
+                    { name: 'delete-item', icon: 'glyphicon glyphicon-trash', class: 'btn btn-danger'}
+                ]"></vue-table>
         </div>
     </div>
 

@@ -31,28 +31,23 @@
                     dbName: 'category_id'
                   },
                   {
-                    name: 'Visualizações',
-                    dbName: 'view_count'
+                    name: 'Criado em',
+                    dbName: 'created_at'
                   },
                   {
-                    name: 'Publicado em',
-                    dbName: 'published_at'
+                    name: 'Ultima atualização',
+                    dbName: 'updated_at'
                   },
                   {
                     name: '__actions'
                   }
                ]"
-               source-data="posts/getMyPosts"
-               delete-api="posts/delete/"
-               :tb-buttons="[
-                    { name: 'create-button', class: 'btn btn-primary', href: 'create', text: 'Criar'},
-                ]"
+               source-data="/admin/posts/getPendingPosts"
                :actions="[
-                    { name: 'view-item', icon: 'glyphicon glyphicon-search', class: 'btn btn-info', href: 'admin/posts/preview/', param: 'true'},
-                    { name: 'edit-item', icon: 'glyphicon glyphicon-pencil', class: 'btn btn-warning', href: 'admin/posts/edit/', param: 'true'},
-                    { name: 'delete-item', icon: 'glyphicon glyphicon-trash', class: 'btn btn-danger'}
+                    { name: 'view-item', icon: 'glyphicon glyphicon-search', class: 'btn btn-info', href: 'admin/posts/preview/', param: 'true'}
                 ]"
                ></vue-table>
+
 @endsection
 @section('page-scripts')
 <script type="text/javascript" src="{{ asset('js/dashboard/plugins/ckeditor/ckeditor.js') }}"></script>

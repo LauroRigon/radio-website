@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Poll;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -60,12 +61,15 @@ class PollController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param  int  $id
+     * @param  int  $poll
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show(Poll $poll)
     {
-        //
+        if($poll->user_id != Auth::user()->id && Auth::user()->is_master == 'Não'){
+            return redirect()->back();
+        }
+        return view('dashboard.poll.show')->with('poll', $poll);
     }
 
     /**
