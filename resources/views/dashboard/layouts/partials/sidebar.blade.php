@@ -16,8 +16,9 @@
         <!-- Sidebar Menu -->
         <ul class="sidebar-menu">
             <li class="header">Menu</li>
+            <li class="{{ Route::currentRouteName() == 'dashboard'? 'active' : ''}}"><a href="{{route('dashboard')}}"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
 			@if(Auth::user()->is_master == 'Sim')
-				<li class="{{ Route::currentRouteName() == 'user_index'? 'active' : ''}}"><a href="{{route('user_index')}}"><i class="fa fa-user-circle-o"></i> <span>Usuários</span></a></li>
+				<li class="{{ Route::currentRouteName() == 'user_index'? 'active' : ''}}"><a href="{{route('user_index')}}"><i class="fa fa-users"></i> <span>Usuários</span></a></li>
 			@endif
             <li class="treeview {{ Route::currentRouteName() == 'categories'? 'active' : ''}}">
                 <a href="#"><i class='fa fa-files-o'></i> <span>Postagens</span> <i class="fa fa-angle-left pull-right"></i></a>
@@ -32,7 +33,7 @@
             </li>
 
             <li class="treeview">
-                <a href="#"><i class='fa fa-files-o'></i> <span>Votações</span> <i class="fa fa-angle-left pull-right"></i></a>
+                <a href="#"><i class='fa fa-tags'></i> <span>Votações</span> <i class="fa fa-angle-left pull-right"></i></a>
                 <ul class="treeview-menu">
                     <li class="{{ Route::currentRouteName() == 'categories'? 'active' : ''}}"><a href="{{route('poll_create')}}">Criar votação</a></li>
                     <li class="{{ Route::currentRouteName() == 'categories'? 'active' : ''}}"><a href="{{route('poll_index')}}">Minhas votações</a></li>

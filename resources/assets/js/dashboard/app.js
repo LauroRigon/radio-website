@@ -16,6 +16,7 @@ window.Event = new Vue();	//Instância que é usada pra comunicação entre os c
 
 window.toastr = require('toastr/build/toastr.min.js');
 
+
 window.toastr.options = {
     positionClass: "toast-top-right",
     showDuration: "300",
@@ -43,8 +44,6 @@ Vue.component('category-create-modal', require('./components/category/CreateModa
 Vue.component('category-edit-modal', require('./components/category/EditModal.vue'));
 
 Vue.component('poll-create', require('./components/poll/PollCreate.vue'));
-
-Vue.component('redirector', require('./helpers/Redirector.vue'));
 
 const app = new Vue({
     el: '#app'

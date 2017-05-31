@@ -10,7 +10,7 @@
 @endsection
 
 @section('main-content')
-<div class="col-md-12">
+<div class="col-md-12 col-md-offset-2">
 	<tabs>
 		<tab name="Perfil" :selected="true">
 			<div id="profile">
@@ -65,39 +65,38 @@
 			</avatar-upload>
 		</tab>
 		<tab name="Senha">
+			<form class="form-horizontal" method="POST" action="changePassword">
+				{{ csrf_field() }}
+				<div class="box-body">
 
-				<form class="form-horizontal" method="POST" action="changePassword">
-					{{ csrf_field() }}
-					<div class="box-body">
+					<div class="form-group">
+						<label for="senhaAtual" class="col-sm-2">Senha atual</label>
 
-						<div class="form-group">
-							<label for="senhaAtual" class="col-sm-2">Senha atual</label>
-
-							<div class="col-sm-4">
-								<input type="password" class="form-control" id="senhaAtual" name="senhaatual">
-							</div>
-						</div>
-
-						<div class="form-group">
-							<label for="novaSenha" class="col-sm-2">Nova senha</label>
-
-							<div class="col-sm-4">
-								<input type="password" class="form-control" id="novaSenha" name="novasenha">
-							</div>
-						</div>
-
-						<div class="form-group">
-							<label for="confirm" class="col-sm-2">Confirmar senha</label>
-
-							<div class="col-sm-4">
-								<input type="password" class="form-control" id="confirm" name="confirmarsenha">
-							</div>
+						<div class="col-sm-4">
+							<input type="password" class="form-control" id="senhaAtual" name="senhaatual">
 						</div>
 					</div>
-					<div class="box-footer">
-						<button type="submit" class="btn btn-primary">Enviar</button>
+
+					<div class="form-group">
+						<label for="novaSenha" class="col-sm-2">Nova senha</label>
+
+						<div class="col-sm-4">
+							<input type="password" class="form-control" id="novaSenha" name="novasenha">
+						</div>
 					</div>
-				</form>
+
+					<div class="form-group">
+						<label for="confirm" class="col-sm-2">Confirmar senha</label>
+
+						<div class="col-sm-4">
+							<input type="password" class="form-control" id="confirm" name="confirmarsenha">
+						</div>
+					</div>
+				</div>
+				<div class="box-footer">
+					<button type="submit" class="btn btn-primary">Enviar</button>
+				</div>
+			</form>
 		</tab>
 	</tabs>
 </div>

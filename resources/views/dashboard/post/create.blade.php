@@ -39,12 +39,12 @@
         <!-- text input -->
         <div class="form-group">
           <label>Título</label>
-          <input type="text" class="form-control" name="title" placeholder="Digite aqui o título da postagem">
+          <input type="text" class="form-control" id="title" name="title" placeholder="Digite aqui o título da postagem" value="{{ old('title') }}">
         </div>
 
         <div class="form-group">
           <label>Subtítulo</label>
-          <input type="text" class="form-control" name="subtitle" placeholder="Digite aqui o subtítulo da postagem">
+          <input type="text" class="form-control" id="subtitle" name="subtitle" placeholder="Digite aqui o subtítulo da postagem" value="{{ old('subtitle') }}">
         </div>
 		
 		<div class="form-group">
@@ -52,7 +52,7 @@
           <select class="form-control" name="category_id">
           <option>Selecione uma categoria</option>
             @foreach($categories as $category)              
-              <option value="{{$category->id}}">{{ $category->name  }}</option>
+              <option value="{{$category->id}}" {{ (old('category_id')? 'selected': '') }}>{{ $category->name }}</option>
               @endforeach
           </select>
         </div>
@@ -112,10 +112,31 @@
 var myDropzone = new Dropzone("form#dropzone-id", { 
   paramName: "images", // Name que será usado para mandar as imagens
   maxFilesize: 12, // MB
-  addRemoveLinks: true,
-  acceptedFiles: ".png,.jpg,.bmp,.jpeg",
-  dictRemoveFile: 'Remover'  
+  acceptedFiles: ".png,.jpg,.bmp,.jpeg"
   });
+  
+  //criar botao de remover
+  myDropzone.on("addedfile", function(file) {
+      // Create the remove button
+        var removeButton = Dropzone.createElement("<button class='btn btn-danger btn-sm center-block'>Remover</button>");
+        // Capture the Dropzone instance as closure.
+        var _this = this;
+
+        // Listen to the click event
+        removeButton.addEventListener("click", function(e) {
+          // Make sure the button click doesn't submit the form:
+          e.preventDefault();
+          e.stopPropagation();
+
+          // Remove the file preview.
+          _this.removeFile(file);
+          // If you want to the delete the file on the server as well,
+          // you can do the AJAX request here.
+        });
+
+        // Add the button to the file preview element.
+        file.previewElement.appendChild(removeButton);
+    });
 
   myDropzone.on("removedfile", function(file) {
       console.log(this);

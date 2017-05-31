@@ -45,7 +45,7 @@
                source-data="posts/getMyPosts"
                delete-api="posts/delete/"
                :tb-buttons="[
-                    { name: 'create-button', class: 'btn btn-primary', href: 'create', text: 'Criar'},
+                    { name: 'create-button', class: 'btn btn-primary', href: 'admin/posts/create', text: 'Criar'},
                 ]"
                :actions="[
                     { name: 'view-item', icon: 'glyphicon glyphicon-search', class: 'btn btn-info', href: 'admin/posts/preview/', param: 'true'},

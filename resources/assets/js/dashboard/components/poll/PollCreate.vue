@@ -22,7 +22,7 @@
                   <button type="button" class="btn btn-info" @click="addOption">Adicionar!</button>
                 </span>
             </div>
-			<div class="box-footer">
+			<div style="margin-top: 2%">
 				<button type="button" class="btn btn-primary" @click="sendForm" :disabled="isLoading"><i class="fa fa-refresh fa-spin" 
 				v-show="isLoading"></i> Concluir</button>
 

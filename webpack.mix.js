@@ -20,10 +20,12 @@ mix.js('resources/assets/js/dashboard/app.js', 'public/js/dashboard')
        'resources/assets/css/AdminLTE.css',
        'public/css/font-awesome.css',
        'node_modules/animate.css/animate.min.css',
-       'node_modules/toastr/build/toastr.min.css'
+       'node_modules/toastr/build/toastr.min.css',
+       'resources/assets/css/jConfirm/jConfirm.css'
     ], 'public/css/dashboard/all.css')
     .combine([
        'resources/assets/js/dashboard/adminLTEapp.js',
+       'resources/assets/js/vendor/jConfirm/jConfirm.js',
     ], 'public/js/dashboard/all.js')
     .copy('node_modules/font-awesome/fonts/*.*', 'public/fonts/')
     .copy('node_modules/ionicons/dist/fonts/*.*', 'public/fonts/');

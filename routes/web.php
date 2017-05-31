@@ -21,7 +21,7 @@ Auth::routes();
  * Rotas da área de admin do site
  * */
 Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
-    Route::get('/dashboard', 'DashboardController@index');
+    Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
 
     //Rotas para gerenciamento de usuário
     Route::group(['prefix' => 'users'], function() {

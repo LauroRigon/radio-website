@@ -113,7 +113,7 @@
                 }.bind(this))
                 .catch(function() {
                   this.isLoading = false;
-                  toastr.error("Ocorreu um erro ao tentar encontrar usuários!");
+                  toastr.error("Ocorreu um erro ao tentar buscar os dados!");
                 });
               },
 
@@ -128,23 +128,28 @@
               },
 
               deleteItem(item) {
-                if(confirm("Tem certeza que deseja deletar esse item?") != 1) {
+                /*if(confirm("Tem certeza que deseja deletar esse item?") != 1) {
                   return false;
-                }
+                }*/
+                jConfirm.confirm("Tem certeza de deletar este item?", function(confirmation){
+                  if(confirmation){
 
-                axios.delete(this.deleteApi + item.id)
-                .then(function(response) {
-                  this.loadData();
-                  toastr.success(response.data['status']);
-                }.bind(this))
+                    axios.delete(this.deleteApi + item.id)
+                    .then(function(response) {
+                      this.loadData();
+                      toastr.success(response.data['status']);
+                    }.bind(this))
 
-                .catch(function(error){
-                  if(error.response.status == 500){
-                    toastr.warning("Item tem dependências cadastradas!")
-                  }else{
-                    toastr.error(error.response.data['status'], "Ocorreu um erro ao deletar!")
+                    .catch(function(error){
+                      if(error.response.status == 500){
+                        toastr.warning("Item tem dependências cadastradas!")
+                      }else{
+                        toastr.error(error.response.data['status'], "Ocorreu um erro ao deletar!")
+                      }
+                    });
+
                   }
-                });
+                }.bind(this));
               },
 
               /*Verifica se é um item especial como Actions*/
