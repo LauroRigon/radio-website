@@ -114,8 +114,12 @@ class PostController extends Controller
      */
     public function preview(Post $post)
     {
-        $data = Carbon::create();
-        return view('dashboard.post.preview')->with('post', $post);
+        //$created_by = $post->user();
+        //dd($created_by->get());
+        return view('dashboard.post.preview')->with([
+            'post' => $post,
+  //          'gallery' => $gallery
+        ]);
     }
     /**
      * Show the form for editing the specified resource.
@@ -255,6 +259,19 @@ class PostController extends Controller
 
         return response()->json([
             $posts
+        ], 200);
+    }
+
+    /**
+     * Retorna todos os posts ainda não autorizados
+     * @param  Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getGallery(Post $post) {
+        $gallery = $post->galleries()->get();
+
+        return response()->json([
+            $gallery
         ], 200);
     }
 }

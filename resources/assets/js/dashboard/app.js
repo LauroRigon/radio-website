@@ -16,6 +16,9 @@ window.Event = new Vue();	//Instância que é usada pra comunicação entre os c
 
 window.toastr = require('toastr/build/toastr.min.js');
 
+window.Flickity = require('flickity/dist/flickity.pkgd.min.js')
+
+import Chart from 'chart.js';
 
 window.toastr.options = {
     positionClass: "toast-top-right",
@@ -44,6 +47,8 @@ Vue.component('category-create-modal', require('./components/category/CreateModa
 Vue.component('category-edit-modal', require('./components/category/EditModal.vue'));
 
 Vue.component('poll-create', require('./components/poll/PollCreate.vue'));
+
+Vue.component('vue-gallery', require('./components/partials/VueGallery.vue'));
 
 const app = new Vue({
     el: '#app'

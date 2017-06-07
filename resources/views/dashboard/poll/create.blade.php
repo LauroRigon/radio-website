@@ -5,12 +5,12 @@
 @endsection
 
 @section('content_title')
-    Criar votações
+    Criar enquetes
 @endsection
 
 @section('content_header')
     <li><a href="/admin/dashboard"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-    <li class="active">Criar votações</li>
+    <li class="active">Criar enquetes</li>
 @endsection
 
 @section('main-content')

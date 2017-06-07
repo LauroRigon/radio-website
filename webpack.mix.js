@@ -21,7 +21,7 @@ mix.js('resources/assets/js/dashboard/app.js', 'public/js/dashboard')
        'public/css/font-awesome.css',
        'node_modules/animate.css/animate.min.css',
        'node_modules/toastr/build/toastr.min.css',
-       'resources/assets/css/jConfirm/jConfirm.css'
+       'resources/assets/css/jConfirm/jConfirm.css',
     ], 'public/css/dashboard/all.css')
     .combine([
        'resources/assets/js/dashboard/adminLTEapp.js',

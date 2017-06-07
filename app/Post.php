@@ -9,13 +9,21 @@ class Post extends Model
 {
     protected $fillable = ['title', 'subtitle', 'slug', 'content', 'category_id', 'user_id', 'thumbnail', 'is_about'];
 
-    public function getCategoryIdAttribute($value)
-    {
+    public function galleries() {
+        return $this->hasMany('App\Gallery');
+    }
+
+    public function user(){
+        return $this->belongsTo('App\User');
+    }
+
+    //MUTATORS
+
+    public function getCategoryIdAttribute($value) {
         return Category::find($value)->name;
     }
 
-    public function getPublishedAtAttribute($value)
-    {
+    public function getPublishedAtAttribute($value) {
         if($value) {
             $date = date_create($value);
 
@@ -25,15 +33,13 @@ class Post extends Model
         }
     }
 
-    public function getCreatedAtAttribute($value)
-    {
+    public function getCreatedAtAttribute($value) {
         $date = date_create($value);
 
         return date_format($date, 'd-m-Y / H:i:s');
     }
 
-    public function getUpdatedAtAttribute($value)
-    {
+    public function getUpdatedAtAttribute($value) {
         $date = date_create($value);
 
         return date_format($date, 'd-m-Y / H:i:s');

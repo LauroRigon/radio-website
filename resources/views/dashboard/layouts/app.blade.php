@@ -54,6 +54,15 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 </ul>
             </div>
         @endif
+
+        @if (count(session('warning')) > 0)
+            <div class="alert alert-warning alert-dismissible">
+                <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                <ul>
+                    {{ session('warning') }}
+                </ul>
+            </div>
+        @endif
         </div>
 
         <!-- Main content -->

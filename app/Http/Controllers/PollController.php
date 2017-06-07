@@ -31,7 +31,7 @@ class PollController extends Controller
     }
 
     /**
-     * Armazena no banco uma votação
+     * Armazena no banco uma enquete
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
@@ -64,9 +64,10 @@ class PollController extends Controller
      * @param  int  $poll
      * @return \Illuminate\Http\Response
      */
-    public function show(Poll $poll)
+    public function show(Request $request, Poll $poll)
     {
         if($poll->user_id != Auth::user()->id && Auth::user()->is_master == 'Não'){
+            $request->session()->flash('warning', 'Você não tem permissão para isso');
             return redirect()->back();
         }
         return view('dashboard.poll.show')->with('poll', $poll);
@@ -131,7 +132,7 @@ class PollController extends Controller
     }
 
     /**
-     * Retorna todas as votações do usuário logado
+     * Retorna todas as enquetes do usuário logado
      * @param  Request  $request
      * @return \Illuminate\Http\Response
      */
@@ -141,5 +142,24 @@ class PollController extends Controller
         return response()->json([
             $polls
         ], 200);
+    }
+
+    /**
+     * Encerra uma enquete
+     * @param  Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function closePoll(Request $request, Poll $poll) {
+
+        if(Auth::user()->id != $poll->user_id && Auth::user()->is_master != 'Sim'){
+            $request->session()->flash('warning', 'Você não tem permissão parra isso!');
+            return redirect()->back();
+        }
+
+        $poll->status = 0;
+        $poll->save();
+
+        $request->session()->flash('success', 'Enquete encerrada com sucesso!');
+        return redirect()->back();
     }
 }

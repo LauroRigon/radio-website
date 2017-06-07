@@ -68,6 +68,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         Route::post('/setAbout/{id}', 'PostController@setAsAbout')->middleware('master');//coloca um post como conteúdo da sessão sobre
 
         Route::get('/getMyPosts', 'PostController@getMyPosts');//retorna todos posts do user logado
+        Route::get('/getGallery/{post}', 'PostController@getGallery');//retorna todas imagens de um post
 
         //Rotas para gerenciamento de galeria de imagens
         Route::group(['prefix' => 'gallery'], function () {
@@ -87,6 +88,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         Route::post('/addVote/{pollId}', 'PollController@addVote');
 
         Route::get('/getMyPolls', 'PollController@getMyPolls');
+
+        Route::post('/closePoll/{poll}', 'PollController@closePoll')->name('poll_close');
     });
 });
 

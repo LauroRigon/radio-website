@@ -14,7 +14,7 @@ class HelperFunctions
         foreach ($imgs as $img) {
             array_push($data, [
                 'post_id' => $postId,
-                'img_path' => $img
+                'img_path' => '/storage/' . $img
             ]);
         }
 

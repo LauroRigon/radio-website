@@ -5,18 +5,18 @@
 @endsection
 
 @section('content_title')
-    Minhas votações
+    Minhas enquetes
 @endsection
 
 @section('content_header')
     <li><a href="/admin/dashboard"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-    <li class="active">Minhas votações</li>
+    <li class="active">Minhas enquetes</li>
 @endsection
 
 @section('main-content')
     <div class="box box-primary">
         <div class="box-body">
-            <vue-table title="Tabela de votações"
+            <vue-table title="Tabela de enquetes"
                        :has-actions="true"
                        :fields="[
                           {

@@ -11,6 +11,14 @@ class Poll extends Model
         'title', 'user_id'
     ];
 
+    public function options() {
+        return $this->hasMany('App\PollOption');
+    }
+
+    public function user() {
+        return $this->belongsTo('App\User');
+    }
+
     /*MUTATORS*/
 
     public function getCreatedAtAttribute($value)

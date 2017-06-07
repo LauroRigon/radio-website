@@ -108,7 +108,7 @@
                 axios.get(this.sourceData)
                 .then(function(serverResponse) {
                   this.isLoading = false;
-
+                  console.log(serverResponse.data[0]);
                   this.items = serverResponse.data[0];                  
                 }.bind(this))
                 .catch(function() {

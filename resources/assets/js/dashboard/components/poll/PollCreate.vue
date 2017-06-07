@@ -5,19 +5,19 @@
 			<div class="row">
 				<div class="form-group col-md-8" :class="{'has-error': getError('title')}">
 					<label for='title'>Título</label>
-					<input type="text" class="form-control has-error" id='title' name="title" placeholder="Digite o título da votação aqui" 
+					<input type="text" class="form-control has-error" id='title' name="title" placeholder="Digite o título da enquete aqui" 
 					v-model="poll.title">
 					<span class="help-block" v-text="getError('title')" v-if="getError('title')"></span>
 				</div>
 
 			</div>
 
-		<label>Opções da votação</label>
+		<label>Opções da enquete</label>
 			<ol>
 				<li v-for="(option, index) in poll.options" class="li-item">{{option}} <button type="button" class="close" @click="deleteItem(index)">×</button></li>
 			</ol>
 			<div class="input-group" :class="{'has-error': getError('options')}">
-				<input  type="text" class="form-control" name="options" placeholder="Digite uma opção para a votação aqui" v-model="optionField" @keyup.enter="addOption">
+				<input  type="text" class="form-control" name="options" placeholder="Digite uma opção para a enquete aqui" v-model="optionField" @keyup.enter="addOption">
 				<span class="input-group-btn">
                   <button type="button" class="btn btn-info" @click="addOption">Adicionar!</button>
                 </span>

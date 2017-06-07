@@ -4947,6 +4947,11 @@ table.text-center th {
 .user-block.user-block-sm .username {
   font-size: 14px;
 }
+.description {
+  margin: 30px;
+  color: #999;
+  font-size: 14px;
+}
 .img-sm,
 .img-md,
 .img-lg,
