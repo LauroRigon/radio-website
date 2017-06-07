@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Notifications\PostRevised;
+use Illuminate\Foundation\Auth\User;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
@@ -11,6 +13,7 @@ use App\Post;
 use App\Category;
 use App\Http\HelperFunctions;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Notification;
 
 class PostController extends Controller
 {
@@ -214,6 +217,10 @@ class PostController extends Controller
         $post->allowed = $data['allowed'];
         $post->save();
 
+        $userToNotificate = \App\User::find($post->user_id);
+        $userToNotificate->notify(new PostRevised($post, "Uma postagem sua foi publicada!", "success"));
+
+        //Notification::send($userToNotificate, new PostRevised($post, "Uma postagem sua foi publicada!", "success"));
         $request->session()->flash('success', 'Postagem publicada com sucesso!');
         return redirect()->back();
     }
