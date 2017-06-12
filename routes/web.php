@@ -64,7 +64,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         Route::get('/pending', 'PostController@pending')->name('post_pending')->middleware('master');  //pagina de posts nao autorizados
         Route::get('/getPendingPosts', 'PostController@getPendingPosts');
 
-        Route::post('/allowPost/{post}', 'PostController@allowPost')->name('post_allow')->middleware('master');//permite um post ser publicado
+        Route::post('/approvePost/{post}', 'PostController@approvePost')->name('post_approve')->middleware('master');//permite um post ser publicado
+        Route::post('/disapprovePost/{post}', 'PostController@disapprovePost')->name('post_disapprove')->middleware('master');//reprova um post ser publicado
         Route::post('/setAbout/{id}', 'PostController@setAsAbout')->middleware('master');//coloca um post como conteúdo da sessão sobre
 
         Route::get('/getMyPosts', 'PostController@getMyPosts');//retorna todos posts do user logado

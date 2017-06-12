@@ -64,7 +64,6 @@ scratch. This page gets rid of all links and provides the needed markup only.
             </div>
         @endif
         </div>
-
         <!-- Main content -->
         <section class="content" id="content">
             <!-- Your Page Content Here -->

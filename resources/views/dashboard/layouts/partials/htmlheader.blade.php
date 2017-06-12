@@ -7,7 +7,10 @@
     
     <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('/css/dashboard/all.css') }}" rel="stylesheet" type="text/css" />
-    
+
+    <head>
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
+    </head>
 
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->

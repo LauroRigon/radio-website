@@ -18,6 +18,7 @@ window.toastr = require('toastr/build/toastr.min.js');
 
 window.Flickity = require('flickity/dist/flickity.pkgd.min.js')
 
+require('flickity-as-nav-for');
 import Chart from 'chart.js';
 
 window.toastr.options = {
@@ -49,6 +50,8 @@ Vue.component('category-edit-modal', require('./components/category/EditModal.vu
 Vue.component('poll-create', require('./components/poll/PollCreate.vue'));
 
 Vue.component('vue-gallery', require('./components/partials/VueGallery.vue'));
+
+Vue.component('post-authorizer', require('./components/post/PostAuthorizer.vue'));
 
 const app = new Vue({
     el: '#app'

@@ -2,7 +2,6 @@
 	<div>
 		<div class="main-carousel carousel">
 			<div class="carousel-cell" v-for="image in images"><img class="img-responsive" :src="image.img_path"></div>
-
 		</div>
 
 		<img-slider> </img-slider>
@@ -40,10 +39,10 @@
 				var el = document.querySelector('.carousel');
 				
 				var flkty = new Flickity(el, {
-					cellAlign: 'center',
-					contain: true,
-					imagesLoaded: true,
-  					percentPosition: false
+					cellAlign: 'left',
+					//freeScroll: true,
+					wrapAround: true,
+					lazyLoad: true
 				});
 			}, 500)
 		},

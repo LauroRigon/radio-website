@@ -203,26 +203,39 @@ class PostController extends Controller
      * @param  Request  $request (allowed(bool), published_at = Y-m-d H:i:s)
      * @return \Illuminate\Http\Response
      */
-    public function allowPost(Request $request, Post $post){
-        $data = $request->input();
-        $validator = Validator::make($data, [
-            'allowed' => 'required'
-        ]);
-
-        if($validator->fails()){
-            return redirect()->back()->withErrors($validator->errors());
-        }
-
+    public function approvePost(Post $post){
         $post->published_at = Carbon::create();
-        $post->allowed = $data['allowed'];
+        $post->allowed = 1;
         $post->save();
 
         $userToNotificate = \App\User::find($post->user_id);
         $userToNotificate->notify(new PostRevised($post, "Uma postagem sua foi publicada!", "success"));
 
         //Notification::send($userToNotificate, new PostRevised($post, "Uma postagem sua foi publicada!", "success"));
-        $request->session()->flash('success', 'Postagem publicada com sucesso!');
-        return redirect()->back();
+
+        return response()->json([
+            'status' => 'Postagem publicada com sucesso!'
+        ], 200);
+    }
+
+    /**
+     * Permite a publicação de um post
+     *
+     * @param  int  $id (post)
+     * @return \Illuminate\Http\Response
+     */
+    public function disapprovePost(Request $request, Post $post){
+        $validator = Validator::make($request->input(), [
+            'message' => 'required'
+        ]);
+        $userToNotificate = \App\User::find($post->user_id);
+        $userToNotificate->notify(new PostRevised($post, $request->input()['message'], 'danger'));
+
+        //Notification::send($userToNotificate, new PostRevised($post, "Uma postagem sua foi publicada!", "success"));
+
+        return response()->json([
+            'status' => 'Postagem reprovada! O criador será notificado e poderá modificá-la!'
+        ], 200);
     }
 
     /**
