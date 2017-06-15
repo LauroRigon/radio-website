@@ -38,6 +38,7 @@
                     <li class="{{ Route::currentRouteName() == 'poll_index'? 'active' : ''}}"><a href="{{route('poll_index')}}">Minhas enquetes</a></li>
                 </ul>
             </li>
+            <li class="{{ Route::currentRouteName() == 'programming'? 'active' : ''}}"><a href="{{route('programming')}}"><i class="fa fa-list"></i><span>Programação</span></a></li>
         </ul><!-- /.sidebar-menu -->
     </section>
     <!-- /.sidebar -->

@@ -16,12 +16,14 @@
 
 @section('content_header')
     <li><a href="/admin/dashboard"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-    <li class="active">Criar postagem</li>
+    <li class="active">Pré-visualização de postagem</li>
 @endsection
 
 @section('main-content')
     @if(Auth::user()->is_master == 'Sim' && !$post->allowed)
-        <post-authorizer approve-api="{{ route('post_approve', $post->id) }}" disapprove-api="{{ route('post_disapprove', $post->id) }}"></post-authorizer>
+        <post-authorizer approve-api="{{ route('post_approve', $post->id) }}"
+                         disapprove-api="{{ route('post_disapprove', $post->id) }}"
+                         delete-post-api="{{ route('post_delete', $post->id) }}"></post-authorizer>
     @endif
     <div class="box box-primary">
         <div class="box-body">
@@ -36,7 +38,6 @@
             <div class="row">
                 <div class="text-center">
                     {!! $post->content !!}
-
                     <vue-gallery source-api="/admin/posts/getGallery/{{ $post->id }}"></vue-gallery>
                 </div>
             </div>

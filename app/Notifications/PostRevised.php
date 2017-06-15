@@ -14,16 +14,20 @@ class PostRevised extends Notification
     public $post;
     public $message;
     public $type;
+    public $title;
+    public $link;
     /**
      * Create a new notification instance.
      *
      * @return void
      */
-    public function __construct($post, $message, $type)
+    public function __construct($post = null, $title = null, $message = null, $class = null, $link = null)
     {
         $this->post = $post;
         $this->message = $message;
-        $this->type = $type;
+        $this->class = $class;
+        $this->title = $title;
+        $this->link = $link;
     }
 
     /**
@@ -46,9 +50,11 @@ class PostRevised extends Notification
     public function toArray ($notifiable)
     {
         return [
+            'title' => $this->title,
             'post_id' => $this->post->id,
             'message' => $this->message,
-            'type' => $this->type
+            'class' => $this->class,
+            'link' => $this->link
         ];
     }
 

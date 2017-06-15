@@ -94,6 +94,11 @@ class PostController extends Controller
             DB::table('galleries')->insert(HelperFunctions::prepateImgsToDb($postCreated->id, $galleryImgsStoredPath));
         }
 
+        /*$usersToNotificate = User::where('is_master', 1)->get();
+        foreach($usersToNotificate as $user){
+            $user->notify($postCreated, 'Uma postagem foi enviada!', 'Um usuário enviou uma postagem e precisa de sua avaliação para publicar', 'fa-exclamation text-blue', route('post_preview', $postCreated->id));
+        }*/
+
         $request->session()->flash('alert', 'Postagem cadastrada com sucesso! Será publicada assim que um usuário master a revisar.');
         return redirect()->route('post_preview', ['post' => $postCreated->id]);
     }
@@ -209,7 +214,7 @@ class PostController extends Controller
         $post->save();
 
         $userToNotificate = \App\User::find($post->user_id);
-        $userToNotificate->notify(new PostRevised($post, "Uma postagem sua foi publicada!", "success"));
+        $userToNotificate->notify(new PostRevised($post, "Uma postagem sua foi publicada!", '', "fa-check-circle text-green", route('post_preview', $post->id)));
 
         //Notification::send($userToNotificate, new PostRevised($post, "Uma postagem sua foi publicada!", "success"));
 
@@ -228,8 +233,15 @@ class PostController extends Controller
         $validator = Validator::make($request->input(), [
             'message' => 'required'
         ]);
+
+        if($validator->fails()){
+            return response()->json([
+                $validator->errors()
+            ], 422);
+        }
+
         $userToNotificate = \App\User::find($post->user_id);
-        $userToNotificate->notify(new PostRevised($post, $request->input()['message'], 'danger'));
+        $userToNotificate->notify(new PostRevised($post, 'Uma postagem sua foi reprovada!', $request->input()['message'], 'fa-warning text-yellow', route('post_preview', $post->id)));
 
         //Notification::send($userToNotificate, new PostRevised($post, "Uma postagem sua foi publicada!", "success"));
 

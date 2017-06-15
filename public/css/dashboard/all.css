@@ -164,6 +164,11 @@ body {
   overflow-x: hidden;
   overflow-y: auto;
 }
+.centered{
+  margin-left: auto;
+  margin-right: auto;
+  float: none;
+}
 /* Layout */
 .wrapper {
   height: 100%;
@@ -1067,7 +1072,7 @@ a:focus {
  */
 /*Dropdowns in general*/
 .dropdown-menu {
-  box-shadow: none;
+  box-shadow: 2px 2px 2px 2px #888888;
   border-color: #eee;
 }
 .dropdown-menu > li > a {
@@ -1089,7 +1094,7 @@ a:focus {
 .navbar-nav > .messages-menu > .dropdown-menu,
 .navbar-nav > .tasks-menu > .dropdown-menu {
   width: 280px;
-  padding: 0 0 0 0;
+  padding: 0 10px 0 0;
   margin: 0;
   top: 100%;
 }
@@ -1124,6 +1129,7 @@ a:focus {
   border-bottom: 1px solid #eeeeee;
   color: #444 !important;
   text-align: center;
+  background-color: #eaeaea;
 }
 @media (max-width: 991px) {
   .navbar-nav > .notifications-menu > .dropdown-menu > li.footer > a,
@@ -1131,6 +1137,7 @@ a:focus {
   .navbar-nav > .tasks-menu > .dropdown-menu > li.footer > a {
     background: #fff !important;
     color: #444 !important;
+
   }
 }
 .navbar-nav > .notifications-menu > .dropdown-menu > li.footer > a:hover,
@@ -1138,6 +1145,7 @@ a:focus {
 .navbar-nav > .tasks-menu > .dropdown-menu > li.footer > a:hover {
   text-decoration: none;
   font-weight: normal;
+
 }
 .navbar-nav > .notifications-menu > .dropdown-menu > li .menu,
 .navbar-nav > .messages-menu > .dropdown-menu > li .menu,
@@ -1148,6 +1156,14 @@ a:focus {
   list-style: none;
   overflow-x: hidden;
 }
+.navbar-nav > .notifications-menu > .dropdown-menu > .notifications > .menu > li p{
+  font-size: 12px;
+  color: #888888;
+  margin-left: 45px;
+}
+.navbar-nav > .notifications-menu > .dropdown-menu > .notifications > .menu > .un-read{
+  background-color: #ddf3ff;
+}
 .navbar-nav > .notifications-menu > .dropdown-menu > li .menu > li > a,
 .navbar-nav > .messages-menu > .dropdown-menu > li .menu > li > a,
 .navbar-nav > .tasks-menu > .dropdown-menu > li .menu > li > a {
@@ -1156,11 +1172,14 @@ a:focus {
   /* Prevent text from breaking */
   border-bottom: 1px solid #f4f4f4;
 }
-.navbar-nav > .notifications-menu > .dropdown-menu > li .menu > li > a:hover,
+.navbar-nav > .notifications-menu > .dropdown-menu > li .menu > li:hover,
 .navbar-nav > .messages-menu > .dropdown-menu > li .menu > li > a:hover,
 .navbar-nav > .tasks-menu > .dropdown-menu > li .menu > li > a:hover {
-  background: #f4f4f4;
+  background-color: #eaeaea;
   text-decoration: none;
+  margin-left: 5px;
+  box-shadow: 1px 1px 1px 1px #888888;
+
 }
 .navbar-nav > .notifications-menu > .dropdown-menu > li .menu > li > a {
   color: #444444;

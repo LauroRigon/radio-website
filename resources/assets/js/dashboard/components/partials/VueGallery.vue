@@ -1,5 +1,5 @@
 <template>
-	<div>
+	<div v-if="images">
 		<div class="main-carousel carousel">
 			<div class="carousel-cell" v-for="image in images"><img class="img-responsive" :src="image.img_path"></div>
 		</div>
@@ -25,7 +25,7 @@
 
 		data() {
 			return {
-				images: {}
+				images: false
 			}
 		},
 
@@ -51,7 +51,7 @@
 			loadImgs() {
 				axios.get(this.SourceApi)
 				.then(function(response) {
-					this.images = response.data[0];
+					this.images = (response.data[0].length != 0)? response.data[0]: false;
 				}.bind(this));
 			}
 		}

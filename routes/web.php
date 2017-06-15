@@ -39,7 +39,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         Route::get('/getCurrentUser', 'UserController@getCurrentUserData')->name('getCurrentUser'); //retorna informações sobre o user logado
     });
 
-    //Rotas para gerenciamento de categoritas
+    //Rotas para gerenciamento de categorias
     Route::group(['prefix' => 'categories'], function() {
         Route::get('/', 'CategoryController@index')->name('categories');  //pagina de categorias
         Route::post('/create', 'CategoryController@store');  //criar categoria
@@ -59,7 +59,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
 
         Route::get('/edit/{post}', 'PostController@edit');//form pra atualizar
         Route::post('/update/{post}', 'PostController@update')->name('post_update'); //atualiza post
-        Route::delete('/delete/{id}', 'PostController@destroy'); //deleta post
+        Route::delete('/delete/{id}', 'PostController@destroy')->name('post_delete'); //deleta post
 
         Route::get('/pending', 'PostController@pending')->name('post_pending')->middleware('master');  //pagina de posts nao autorizados
         Route::get('/getPendingPosts', 'PostController@getPendingPosts');
@@ -91,6 +91,18 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         Route::get('/getMyPolls', 'PollController@getMyPolls');
 
         Route::post('/closePoll/{poll}', 'PollController@closePoll')->name('poll_close');
+    });
+
+    Route::group(['prefix' => 'notifications'], function() {
+        Route::get('/', 'NotificationController@index')->name('notification_index');
+
+        Route::get('/getNotifications', 'NotificationController@getNotifications')->name('notification_get');
+
+        Route::post('/markAsRead', 'NotificationController@markAsRead')->name('notification_masrkAsRead');
+    });
+
+    Route::group(['prefix' => 'programming'], function() {
+        Route::get('/', 'ProgrammingController@index')->name('programming_index');
     });
 });
 

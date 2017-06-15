@@ -53,6 +53,9 @@ Vue.component('vue-gallery', require('./components/partials/VueGallery.vue'));
 
 Vue.component('post-authorizer', require('./components/post/PostAuthorizer.vue'));
 
+Vue.component('notifications-tab', require('./components/partials/NotificationsTab.vue'));
+Vue.component('notifications', require('./components/partials/Notifications.vue'));
+
 const app = new Vue({
     el: '#app'
 });
