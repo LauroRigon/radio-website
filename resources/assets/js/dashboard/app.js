@@ -37,6 +37,7 @@ window.toastr.options = {
 };
 
 Vue.component('vue-table', require('./components/partials/VueTable.vue'));
+//Vue.component('pagination', require('./components/partials/Pagination.vue'));
 
 Vue.component('user-view-modal', require('./components/user/ViewModal.vue'));
 Vue.component('user-create-modal', require('./components/user/CreateModal.vue'));
@@ -55,9 +56,9 @@ Vue.component('vue-gallery', require('./components/partials/VueGallery.vue'));
 Vue.component('post-authorizer', require('./components/post/PostAuthorizer.vue'));
 
 Vue.component('notifications-tab', require('./components/partials/NotificationsTab.vue'));
-Vue.component('notifications', require('./components/partials/Notifications.vue'));
+Vue.component('notifications', require('./components/notification/Notifications.vue'));
 
-Vue.component('programming-create', require('./components/programming/ProgrammingCreate.vue'));
+//Vue.component('music-orders', require('./components/music_order/MusicOrders.vue'));
 
 const app = new Vue({
     el: '#app'

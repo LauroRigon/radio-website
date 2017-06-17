@@ -47,6 +47,7 @@
                 </ul>
             </li>
 
+            <li class="{{ Route::currentRouteName() == 'musicorder_index'? 'active' : ''}}"><a href="{{route('musicorder_index')}}"><i class="fa fa-music"></i><span>Pedidos de músicas</span></a></li>
         </ul><!-- /.sidebar-menu -->
     </section>
     <!-- /.sidebar -->

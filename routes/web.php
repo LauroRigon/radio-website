@@ -23,7 +23,7 @@ Auth::routes();
 Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::get('/dashboard', 'DashboardController@index')->name('dashboard');
 
-    //Rotas para gerenciamento de usuário
+    //Rotas de usuário
     Route::group(['prefix' => 'users'], function() {
         Route::get('/', 'UserController@index')->name('user_index')->middleware('master');  //pagina de usuários
         Route::post('/create', 'UserController@store')->middleware('master');  //criar usuário
@@ -39,7 +39,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         Route::get('/getCurrentUser', 'UserController@getCurrentUserData')->name('getCurrentUser'); //retorna informações sobre o user logado
     });
 
-    //Rotas para gerenciamento de categorias
+    //Rotas de categorias
     Route::group(['prefix' => 'categories'], function() {
         Route::get('/', 'CategoryController@index')->name('categories');  //pagina de categorias
         Route::post('/create', 'CategoryController@store');  //criar categoria
@@ -49,7 +49,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         Route::get('/getCategories', 'CategoryController@getCategories');
     });
 
-    //Rotas de gerenciamento de posts
+    //Rotas de posts
     Route::group(['prefix' => 'posts'], function() {
         Route::get('/', 'PostController@index')->name('post_index');  //pagina de posts
         Route::get('/preview/{post}', 'PostController@preview')->name('post_preview');
@@ -71,13 +71,14 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         Route::get('/getMyPosts', 'PostController@getMyPosts');//retorna todos posts do user logado
         Route::get('/getGallery/{post}', 'PostController@getGallery');//retorna todas imagens de um post
 
-        //Rotas para gerenciamento de galeria de imagens
+        //Rotas para galeria de imagens
         Route::group(['prefix' => 'gallery'], function () {
             Route::post('/sendGalleryImg', 'GalleryController@storeTempGallery')->name('send_gallery');//guarda galeria em pasta temp
             Route::post('/deleteGalleryImg', 'GalleryController@destroy');//deleta uma imagem da galeria
         });
     });
 
+    //Rotas paraas enquetes
     Route::group(['prefix' => 'polls'], function() {
         Route::get('/', 'PollController@index')->name('poll_index');
         Route::get('/create', 'PollController@create')->name('poll_create');
@@ -93,6 +94,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         Route::post('/closePoll/{poll}', 'PollController@closePoll')->name('poll_close');
     });
 
+    //Rotas para as notificações
     Route::group(['prefix' => 'notifications'], function() {
         Route::get('/', 'NotificationController@index')->name('notification_index');
 
@@ -101,6 +103,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         Route::post('/markAsRead', 'NotificationController@markAsRead')->name('notification_masrkAsRead');
     });
 
+    //Rotas para programação
     Route::group(['prefix' => 'programming'], function() {
         Route::get('/', 'ProgrammingController@index')->name('programming_index');
         Route::get('/create', 'ProgrammingController@create')->name('programming_create');
@@ -108,6 +111,14 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         Route::post('/store', 'ProgrammingController@store')->name('programming_store');
 
         Route::get('/delete/{program}', 'ProgrammingController@destroy')->name('programming_delete');
+    });
+
+    //Rotas para pedidos de musicas
+    Route::group(['prefix' => 'musicorders'], function() {
+        Route::get('/', 'MusicOrderController@index')->name('musicorder_index');
+        Route::get('/getMusicOrders', 'MusicOrderController@getMusicOrders')->name('musicorder_get');
+
+        Route::get('/delete/{program}', 'MusicOrderController@destroy')->name('musicorder_delete');
     });
 });
 

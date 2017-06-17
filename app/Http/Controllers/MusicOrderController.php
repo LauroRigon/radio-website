@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\MusicOrder;
 
 class MusicOrderController extends Controller
 {
@@ -13,7 +14,7 @@ class MusicOrderController extends Controller
      */
     public function index()
     {
-
+        return view('dashboard.music_order.index');
     }
 
     /**
@@ -61,5 +62,16 @@ class MusicOrderController extends Controller
     public function destroy(User $id)
     {
 
+    }
+
+    /**
+     * Retorna todos os pedidos de musicas
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function getMusicOrders()
+    {
+        return MusicOrder::paginate(15);
     }
 }
