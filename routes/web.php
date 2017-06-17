@@ -103,6 +103,11 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
 
     Route::group(['prefix' => 'programming'], function() {
         Route::get('/', 'ProgrammingController@index')->name('programming_index');
+        Route::get('/create', 'ProgrammingController@create')->name('programming_create');
+
+        Route::post('/store', 'ProgrammingController@store')->name('programming_store');
+
+        Route::get('/delete/{program}', 'ProgrammingController@destroy')->name('programming_delete');
     });
 });
 

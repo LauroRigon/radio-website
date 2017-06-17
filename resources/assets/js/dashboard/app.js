@@ -7,6 +7,7 @@
  */
 
 require('./bootstrap.js');
+require('bootstrap-timepicker/js/bootstrap-timepicker.min.js');
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
@@ -55,6 +56,8 @@ Vue.component('post-authorizer', require('./components/post/PostAuthorizer.vue')
 
 Vue.component('notifications-tab', require('./components/partials/NotificationsTab.vue'));
 Vue.component('notifications', require('./components/partials/Notifications.vue'));
+
+Vue.component('programming-create', require('./components/programming/ProgrammingCreate.vue'));
 
 const app = new Vue({
     el: '#app'

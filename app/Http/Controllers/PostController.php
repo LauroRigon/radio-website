@@ -94,10 +94,9 @@ class PostController extends Controller
             DB::table('galleries')->insert(HelperFunctions::prepateImgsToDb($postCreated->id, $galleryImgsStoredPath));
         }
 
-        /*$usersToNotificate = User::where('is_master', 1)->get();
-        foreach($usersToNotificate as $user){
-            $user->notify($postCreated, 'Uma postagem foi enviada!', 'Um usuário enviou uma postagem e precisa de sua avaliação para publicar', 'fa-exclamation text-blue', route('post_preview', $postCreated->id));
-        }*/
+        $userToNotificate = \App\User::where('is_master', 1)->get();
+        Notification::send($userToNotificate, new PostRevised($postCreated, 'Uma postagem foi enviada!', 'Uma postagem está a espera por aprovação!', 'fa-info-circle text-blue', route('post_preview', $postCreated->id)));
+        //$userToNotificate->notify(new PostRevised($postCreated, 'Uma postagem sua foi reprovada!', '', 'fa-warning text-yellow', route('post_preview', $postCreated->id)));
 
         $request->session()->flash('alert', 'Postagem cadastrada com sucesso! Será publicada assim que um usuário master a revisar.');
         return redirect()->route('post_preview', ['post' => $postCreated->id]);

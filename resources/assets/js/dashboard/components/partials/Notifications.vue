@@ -4,7 +4,7 @@
 			<ul class="timeline">
 				<li v-for="(notification, index) in notifications" v-if="index < maxNotifications">
 					<i class="fa" :class="notification.data.class"></i>
-					<div class="timeline-item">
+					<div class="timeline-item clickable" @click="redirectTo(notification.data.link)">
 						<span class="time"><i class="fa fa-clock-o"></i> {{ formatDate(notification.created_at) }}</span>
 						<h3 class="timeline-header" v-text="notification.data.title"></h3>
 						<div class="timeline-body" v-text="notification.data.message"></div>
@@ -58,7 +58,17 @@
 
 			countNotifications() {
 				return this.notifications.length;
+			},
+
+			redirectTo(link) {
+				window.location.href = link;
 			}
 		}
 	}
 </script>
+
+<style>
+	.clickable:hover {
+		cursor: pointer;
+	}
+</style>

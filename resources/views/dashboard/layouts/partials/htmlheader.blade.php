@@ -7,8 +7,9 @@
     
     <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet" type="text/css" />
     <link href="{{ asset('/css/dashboard/all.css') }}" rel="stylesheet" type="text/css" />
-
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.5/bluebird.min.js"></script>
     <head>
+        <!--To work on IE-->
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/3.5.2/animate.min.css">
     </head>
 

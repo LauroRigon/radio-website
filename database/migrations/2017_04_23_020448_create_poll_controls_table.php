@@ -15,7 +15,7 @@ class CreatePollControlsTable extends Migration
     {
         Schema::create('poll_controls', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('ip');
+            $table->ipAddress('ip');
             $table->integer('poll_id')->unsigned();
             $table->timestamps();
 

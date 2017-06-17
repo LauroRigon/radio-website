@@ -77,17 +77,17 @@
                 <!-- textarea -->
                 <div class="form-group">
                     <label>Conteúdo</label>
-            <textarea name="content" id="editor1" rows="1" cols="80" class="form-control">
-                {{ $post->content }}
-            </textarea>
+                    <textarea name="content" id="editor1" rows="1" cols="80" class="form-control">
+                        {{ $post->content }}
+                    </textarea>
                 </div>
 
-
+                <div class="box-footer">
+                    <button type="submit" class="btn btn-primary" form="post-form" id="sendForm">Enviar</button>
+                </div>
             </form>
 
-            <div class="box-footer">
-                <button type="submit" class="btn btn-primary" form="post-form" id="sendForm">Enviar</button>
-            </div>
+            
         </div>
 
 

@@ -1039,6 +1039,7 @@ a:focus {
   text-decoration: none;
   margin-left: 5px;
   box-shadow: 1px 1px 1px 1px #888888;
+  transition: 0.2s;
 
 }
 .navbar-nav > .notifications-menu > .dropdown-menu > li .menu > li > a {

@@ -38,7 +38,15 @@
                     <li class="{{ Route::currentRouteName() == 'poll_index'? 'active' : ''}}"><a href="{{route('poll_index')}}">Minhas enquetes</a></li>
                 </ul>
             </li>
-            <li class="{{ Route::currentRouteName() == 'programming'? 'active' : ''}}"><a href="{{route('programming')}}"><i class="fa fa-list"></i><span>Programação</span></a></li>
+
+            <li class="treeview {{ Route::current()->getAction()['prefix'] == 'admin/programming'? 'active' : ''}}">
+                <a href="#"><i class='fa fa-calendar'></i> <span>Programação</span> <i class="fa fa-angle-left pull-right"></i></a>
+                <ul class="treeview-menu">
+                    <li class="{{ Route::currentRouteName() == 'programming_index'? 'active' : ''}}"><a href="{{route('programming_index')}}">Programação atual</a></li>
+                    <li class="{{ Route::currentRouteName() == 'programming_create'? 'active' : ''}}"><a href="{{route('programming_create')}}">Adicionar programação</a></li>
+                </ul>
+            </li>
+
         </ul><!-- /.sidebar-menu -->
     </section>
     <!-- /.sidebar -->

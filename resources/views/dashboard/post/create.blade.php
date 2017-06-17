@@ -33,44 +33,43 @@
 <div class="box box-primary">
 	<div class="box-body">
       <form role="form" action="{{route('post_store')}}" id="post-form" method="POST" enctype="multipart/form-data">
-      {{ csrf_field() }}
-      <input name="galleryKey" type="hidden" value="{{ $galleryKey }}">
-      <input name="PostGalleryImgs" type="hidden" value="">
-        <!-- text input -->
-        <div class="form-group">
-          <label>Título</label>
-          <input type="text" class="form-control" id="title" name="title" placeholder="Digite aqui o título da postagem" value="{{ old('title') }}">
-        </div>
+        {{ csrf_field() }}
+        <input name="galleryKey" type="hidden" value="{{ $galleryKey }}">
+        <input name="PostGalleryImgs" type="hidden" value="">
+          <!-- text input -->
+          <div class="form-group">
+            <label>Título</label>
+            <input type="text" class="form-control" id="title" name="title" placeholder="Digite aqui o título da postagem" value="{{ old('title') }}">
+          </div>
 
-        <div class="form-group">
-          <label>Subtítulo</label>
-          <input type="text" class="form-control" id="subtitle" name="subtitle" placeholder="Digite aqui o subtítulo da postagem" value="{{ old('subtitle') }}">
-        </div>
-		
-		<div class="form-group">
-          <label>Categoria</label>
-          <select class="form-control" name="category_id">
-          <option>Selecione uma categoria</option>
-            @foreach($categories as $category)              
-              <option value="{{$category->id}}" {{ (old('category_id')? 'selected': '') }}>{{ $category->name }}</option>
-              @endforeach
-          </select>
-        </div>
+          <div class="form-group">
+            <label>Subtítulo</label>
+            <input type="text" class="form-control" id="subtitle" name="subtitle" placeholder="Digite aqui o subtítulo da postagem" value="{{ old('subtitle') }}">
+          </div>
+  		
+  		<div class="form-group">
+            <label>Categoria</label>
+            <select class="form-control" name="category_id">
+            <option>Selecione uma categoria</option>
+              @foreach($categories as $category)              
+                <option value="{{$category->id}}" {{ (old('category_id')? 'selected': '') }}>{{ $category->name }}</option>
+                @endforeach
+            </select>
+          </div>
+          <input type="submit" value="Submit" style="display: none" />
+          <div class="form-group">
+            <label>Foto de capa</label>
+            <input type="file" id="exampleInputFile" name="thumbnail">
+            <p class="help-block">Essa será a capa da postagem.</p>
+          </div>
 
-        <div class="form-group">
-          <label>Foto de capa</label>
-          <input type="file" id="exampleInputFile" name="thumbnail">
-
-          <p class="help-block">Essa será a capa da postagem.</p>
-        </div>
-
-        <!-- textarea -->
-        <div class="form-group">
-          <label>Conteúdo</label>
-          <textarea name="content" id="editor1" rows="1" cols="80" class="form-control">
-            
-        </textarea>
-        </div>
+          <!-- textarea -->
+          <div class="form-group">
+            <label>Conteúdo</label>
+            <textarea name="content" id="editor1" rows="1" cols="80" class="form-control">
+              
+          </textarea>
+          </div>
 
         
       </form>
@@ -90,7 +89,7 @@
         </form>
 
         <div class="box-footer">
-          <button type="submit" class="btn btn-primary" form="post-form" id="sendForm">Concluir</button>
+          <button type="submit" class="btn btn-primary" form="post-form" id="sendFormBtn">Concluir</button>
         </div>
       </div>
     </div>
@@ -155,7 +154,7 @@ var myDropzone = new Dropzone("form#dropzone-id", {
       }
     });
 
-$("#sendForm").on('click', function(e){
+$("#sendFormBtn").on('click', function(e){
   e.preventDefault();
   var acceptedFiles = myDropzone.getAcceptedFiles();
   
@@ -166,7 +165,7 @@ $("#sendForm").on('click', function(e){
 
   $("[name='PostGalleryImgs']").val(filesName);
 
-  e.target.form.submit();
+  $('#post-form').trigger('submit');
 })
 </script>
 
