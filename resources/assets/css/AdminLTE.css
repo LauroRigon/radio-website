@@ -2316,6 +2316,41 @@ a:focus {
 .btn-warning.hover {
   background-color: #e08e0b;
 }
+.btn-circle {
+    width: 30px;
+    height: 30px;
+    text-align: center;
+    padding: 6px 0;
+    font-size: 12px;
+    line-height: 18px;
+    border-radius: 50%;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+}
+.btn-circle.btn-md {
+    width: 50px;
+    height: 50px;
+    padding: 10px 15px;
+    font-size: 18px;
+    line-height: 30px;
+    border-radius: 50%;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+}
+.btn-circle.btn-lg {
+    width: 70px;
+    height: 70px;
+    padding: 10px 15px;
+    font-size: 24px;
+    line-height: 50px;
+    border-radius: 50%;
+    -moz-border-radius: 50%;
+    -webkit-border-radius: 50%;
+}
+.btn:active {
+  box-shadow: 2px 2px 2px #666;
+  transform: translateY(2px);
+}
 .btn-outline {
   border: 1px solid #fff;
   background: transparent;
@@ -2542,7 +2577,7 @@ a:focus {
   border-color: transparent;
 }
 .nav-tabs-custom > .nav-tabs > li.active {
-  border-top-color: #3c8dbc;
+  border-top-color: #565656;
 }
 .nav-tabs-custom > .nav-tabs > li.active > a,
 .nav-tabs-custom > .nav-tabs > li.active:hover > a {
@@ -4386,6 +4421,7 @@ table.text-center th {
 .bg-red-active,
 .bg-yellow-active,
 .bg-aqua-active,
+.bg-brown-active,
 .bg-blue-active,
 .bg-light-blue-active,
 .bg-green-active,
@@ -4455,6 +4491,13 @@ table.text-center th {
   background-color: #f39c12 !important;
 }
 .bg-aqua,
+.callout.callout-info,
+.alert-info,
+.label-info,
+.modal-info .modal-body {
+  background-color: #00c0ef !important;
+}
+.bg-brown,
 .callout.callout-info,
 .alert-info,
 .label-info,

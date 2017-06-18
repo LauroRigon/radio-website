@@ -104,7 +104,7 @@ class CategoryController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function getCategories() {
-        $categories = Category::all();
+        $categories = Category::paginate(10);
 
         return response()->json([
             $categories

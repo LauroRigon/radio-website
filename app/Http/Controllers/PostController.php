@@ -37,6 +37,15 @@ class PostController extends Controller
     }
 
     /**
+     * Mostra a página de todos os posts
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function all() {
+        return view('dashboard.post.all');
+    }
+
+    /**
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\Http\Response
@@ -136,7 +145,7 @@ class PostController extends Controller
      */
     public function edit(Post $post)
     {
-        if(Auth::id() != $post->user_id){
+        if(Auth::id() != $post->user_id && Auth::user()->is_master !== 'Sim'){
             return redirect('admin/dashboard');
         }
         $categories = Category::all();
@@ -273,7 +282,7 @@ class PostController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function getMyPosts(Request $request) {
-        $posts = Post::where('user_id', $request->user()->id)->get();
+        $posts = Post::where('user_id', $request->user()->id)->paginate(15);
 
         return response()->json([
             $posts
@@ -286,7 +295,7 @@ class PostController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function getPendingPosts() {
-        $posts = Post::where('allowed', 0)->get();
+        $posts = Post::where('allowed', 0)->paginate(15);
 
         return response()->json([
             $posts
@@ -303,6 +312,23 @@ class PostController extends Controller
 
         return response()->json([
             $gallery
+        ], 200);
+    }
+
+    /**
+     * Retorna todos os posts
+     * @param  Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function getAllPosts() {
+        $posts = Post::paginate(15);
+
+        foreach($posts as $post) {
+            $post->user_name = $post->user()->get()[0]->name;
+        }
+
+        return response()->json([
+            $posts
         ], 200);
     }
 }

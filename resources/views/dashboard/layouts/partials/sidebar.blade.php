@@ -25,6 +25,7 @@
                     <li class="{{ Route::currentRouteName() == 'post_index'? 'active' : ''}}"><a href="{{route('post_index')}}">Minhas postagens</a></li>
                     <li class="{{ Route::currentRouteName() == 'post_create'? 'active' : ''}}"><a href="{{route('post_create')}}">Criar postagem</a></li>
                     @if(Auth::user()->is_master == 'Sim')
+                        <li class="{{ Route::currentRouteName() == 'post_all'? 'active' : ''}}"><a href="{{route('post_all')}}">Todas postagens</a></li>
                         <li class="{{ Route::currentRouteName() == 'post_pending'? 'active' : ''}}"><a href="{{route('post_pending')}}">Postagens pendentes</a></li>
                     @endif
 

@@ -1,12 +1,12 @@
 @extends('dashboard.layouts.app')
 
 @section('content_title')
-    Minhas postagens
+    Todas postagens
 @endsection
 
 @section('content_header')
     <li><a href="/admin/dashboard"><i class="fa fa-dashboard"></i> Dashboard</a></li>
-    <li class="active">Minhas postagens</li>
+    <li class="active">Todas postagens</li>
 @endsection
 
 @section('main-content')
@@ -21,12 +21,12 @@
                     dbName: 'title'
                   },
                   {
-                    name: 'Categoria',
-                    dbName: 'category_id'
+                    name: 'Criador',
+                    dbName: 'user_name'
                   },
                   {
-                    name: 'Visualizações',
-                    dbName: 'view_count'
+                    name: 'Categoria',
+                    dbName: 'category_id'
                   },
                   {
                     name: 'Publicado em',
@@ -36,8 +36,8 @@
                     name: '__actions'
                   }
                ]"
-               source-data="posts/getMyPosts"
-               delete-api="posts/delete/"
+               source-data="getAllPosts"
+               delete-api="delete/"
                :tb-buttons="[
                     { name: 'create-button', class: 'btn btn-primary', href: 'admin/posts/create', text: 'Criar'},
                 ]"
@@ -46,12 +46,12 @@
                     { name: 'edit-item', icon: 'glyphicon glyphicon-pencil', class: 'btn btn-warning', href: 'admin/posts/edit/', param: 'true'},
                     { name: 'delete-item', icon: 'glyphicon glyphicon-trash', class: 'btn btn-danger'}
                 ]"
-               ></vue-table>
+    ></vue-table>
 @endsection
 @section('page-scripts')
-<script type="text/javascript" src="{{ asset('js/dashboard/plugins/ckeditor/ckeditor.js') }}"></script>
-<script type="text/javascript" src="{{ asset('js/dashboard/plugins/dropzone/dist/dropzone.js') }}"></script>
-<script>
-    
-</script>
+    <script type="text/javascript" src="{{ asset('js/dashboard/plugins/ckeditor/ckeditor.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('js/dashboard/plugins/dropzone/dist/dropzone.js') }}"></script>
+    <script>
+
+    </script>
 @endsection

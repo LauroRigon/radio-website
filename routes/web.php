@@ -61,6 +61,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         Route::post('/update/{post}', 'PostController@update')->name('post_update'); //atualiza post
         Route::delete('/delete/{id}', 'PostController@destroy')->name('post_delete'); //deleta post
 
+        Route::get('/all', 'PostController@all')->name('post_all')->middleware('master');   //retorna view de todos os posts
+        Route::get('/getAllPosts', 'PostController@getAllPosts')->middleware('master');   //retorna todos os posts
         Route::get('/pending', 'PostController@pending')->name('post_pending')->middleware('master');  //pagina de posts nao autorizados
         Route::get('/getPendingPosts', 'PostController@getPendingPosts');
 
