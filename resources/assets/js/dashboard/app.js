@@ -58,7 +58,7 @@ Vue.component('post-authorizer', require('./components/post/PostAuthorizer.vue')
 Vue.component('notifications-tab', require('./components/partials/NotificationsTab.vue'));
 Vue.component('notifications', require('./components/notification/Notifications.vue'));
 
-//Vue.component('music-orders', require('./components/music_order/MusicOrders.vue'));
+Vue.component('music-orders', require('./components/music_order/MusicOrders.vue'));
 
 const app = new Vue({
     el: '#app'

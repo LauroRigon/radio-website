@@ -1,15 +1,14 @@
 <template>
 	<div>
 		<ul class="pagination pagination-md no-margin pull-right">
-		    <li :class="isOnFirstPage? 'disabled': ''"><a>«</a></li>
-		    <li><a href="#">»</a></li>
-			<template v-if="notEnoughPages">
+		    <li :class="isOnFirstPage? 'disabled': ''"><a href="#" @click="loadPage('prev')">«</a></li>
 	            <template v-for="n in totalPage">
 	                <li :class="isCurrentPage(n) ? 'active' : ''">
-	                    <a @click="loadPage(n)"> {{ n }} </a>
+	                    <a href="#" @click="loadPage(n)"> {{ n }} </a>
 	                </li>
 	            </template>
-	        </template>
+		    <li :class="isOnLastPage? 'disabled': ''"><a href="#" @click="loadPage('next')">»</a></li>
+			
         </ul>
 	</div>
 </template>
@@ -23,14 +22,16 @@
                 default() {
                     return null
                 }
+            },
+
+            onEachSide: {
+            	type: Number,
+            	default() {
+            		return 3;
+            	}
             }
 		},
 
-		data() {
-            return {
-                onEachSide: 3
-            }
-        },
 
 		computed: {
 			totalPage() {
@@ -44,6 +45,10 @@
             notEnoughPages() {
                 return this.totalPage < (this.onEachSide * 2) + 1;
             },
+
+            isOnLastPage() {
+            	return this.pagination == null? false: this.pagination.current_page == this.pagination.total_pages;
+            }
 		},
 
 		methods: {

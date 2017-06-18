@@ -72,6 +72,6 @@ class MusicOrderController extends Controller
      */
     public function getMusicOrders()
     {
-        return MusicOrder::paginate(15);
+        return MusicOrder::orderBy('created_at', 'desc')->paginate(15);
     }
 }

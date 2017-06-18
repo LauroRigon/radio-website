@@ -1,5 +1,8 @@
 <template>
 	<div class="row">
+		<div class="row" style="margin-right: 38px">
+			<pagination @loadPage="loadPage" :pagination="pagination"></pagination>
+		</div>
 		<div class="col-md-12">
 			<ul class="timeline">
 				<li v-for="musicOrder in musicOrders">
@@ -11,7 +14,7 @@
 					</div>
 				</li>
 			</ul>
-			<!--<pagination :pagination="pagination"></pagination>-->
+			<pagination @loadPage="loadPage" :pagination="pagination" style="margin-right: 21px"></pagination>
 		</div>
 	</div>
 </template>
@@ -47,11 +50,32 @@
 		methods: {
 			loadPage(page) {
                 if (page == 'prev') {
-                    this.goPreviousPage()
+                    this.goPreviousPage();
                 } else if (page == 'next') {
-                    this.goNextPage()
+                    this.goNextPage();
                 } else {
-                    this.goPage(page)
+                    this.goToPage(page);
+                }
+            },
+
+            goPreviousPage() {
+            	if(this.currentPage > 1){
+            		this.currentPage--;
+            		this.loadData();
+            	}
+            },
+
+            goNextPage() {
+            	if(this.totalPage > this.currentPage){
+            		this.currentPage++;
+            		this.loadData();
+            	}
+            },
+
+            goToPage(page) {
+            	if (page != this.currentPage && (page > 0 && page <= this.totalPage)) {
+                    this.currentPage = page;
+                    this.loadData();
                 }
             },
 
@@ -74,10 +98,12 @@
 					this.musicOrders = response.data.data;
 					this.pagination = {
 						current_page: response.data.current_page,
-						totalPage: response.data.last_page,
+						total_pages: response.data.last_page,
 						per_page: response.data.per_page,
 						total: response.data.total
 					};
+					this.totalPage = response.data.last_page;
+					this.currentPage = response.data.current_page;
 				}.bind(this))
             },
 			formatDate(date) {
