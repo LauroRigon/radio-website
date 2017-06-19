@@ -189,6 +189,34 @@ class UserController extends Controller
     }
 
     /**
+     * Da ou retira master
+     * @param $value(true, false), $user
+     *  @return \Illuminate\Http\Response
+     */
+    public function setMaster(Request $request, User $user) {
+        $validator = Validator::make($request->all(), [
+            'value' => 'required|boolean'
+        ]);
+
+        /*Retorna os erros se ouver*/
+        if ($validator->fails()){
+            return back()->withErrors($validator->errors());
+        }
+
+        if($user->id == Auth::id()) {
+            return response()->json([
+                'status' => 'Não é possível retirar seu próprio master!'
+            ], 422);
+        }
+
+        $user->is_master = $request->input('value');
+        $user->save();
+        return response()->json([
+            "status" => 'Operação concluida com sucesso!'
+        ], 200);
+    }
+
+    /**
      * Retorna informações da conta de todos os uruários
      *
      *  @return \Illuminate\Http\Response

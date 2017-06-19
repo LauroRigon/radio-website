@@ -33,6 +33,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         Route::get('/profile', 'UserController@show')->name('user_profile');
         Route::post('/changePassword', 'UserController@changePassword'); //troca senha
         Route::post('/uploadAvatar', 'UserController@uploadAvatar'); //upload do avatar
+        Route::put('/setMaster/{user}', 'UserController@setMaster'); //troca senha
 
         Route::get('/getUsers', 'UserController@getUsers')->middleware('master'); //get all users
         Route::get('/getUserComplete/{user}', 'UserController@getUserComplete'); //retorna informações mais completas sobre usuário

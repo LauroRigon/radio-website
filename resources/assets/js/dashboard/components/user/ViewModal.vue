@@ -15,6 +15,9 @@
         <div class="box box-widget widget-user">
             <!-- Add the bg color to the header using any of the bg-* classes -->
             <div class="widget-user-header bg-aqua-active">
+            <a class="btn btn-success btn-xs pull-right" v-if="data.is_master != 'Sim'" @click="setMaster(true)">Tornar master</a>
+            <a class="btn btn-danger btn-xs pull-right" v-else @click="setMaster(false)">Retirar master</a>
+
               <h3 class="widget-user-username" v-text="data.name"></h3>
               <span class="label label-danger" v-show="data.is_master == 'Sim'">Master</span>
             </div>
@@ -80,7 +83,7 @@ export default {
   created() {
     Event.$on("open-view-modal", function(data){
       this.isVisible = true;
-      this.isLoading = true;
+ //     this.isLoading = true;
       this.getData(data.id);
     }.bind(this));
   },
@@ -95,19 +98,33 @@ export default {
   },
 
   methods: {
-    closeModal: function() {
+    closeModal() {
       this.isVisible = false;
     },
 
     getData(user) {
+      this.isLoading = true;
       axios.get("users/getUserComplete/" + user)
-      .then(function(serverResponse) {
-        this.data = serverResponse.data[0];
+      .then(function(response) {
+        this.data = response.data[0];
 
         this.isLoading = false;
       }.bind(this))
       .catch(function() {
         toastr.error("Ocorreu um erro ao tentar encontrar usuário!");
+      });
+    },
+
+    setMaster(val) {
+      axios.put("users/setMaster/" + this.data.id, {value: val})
+      .then(function(response) {
+        this.getData(this.data.id);
+        toastr.success(response.data.status);
+        window.Event.$emit('reload-table');
+
+      }.bind(this))
+      .catch(function(error) {
+        toastr.warning(error.response.data.status);
       });
     }
   }

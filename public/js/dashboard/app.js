@@ -31744,6 +31744,9 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
 //
 //
 //
+//
+//
+//
 
 /* harmony default export */ __webpack_exports__["default"] = ({
   props: ['title'],
@@ -31757,7 +31760,7 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
   created: function created() {
     Event.$on("open-view-modal", function (data) {
       this.isVisible = true;
-      this.isLoading = true;
+      //     this.isLoading = true;
       this.getData(data.id);
     }.bind(this));
   },
@@ -31776,14 +31779,23 @@ Object.defineProperty(__webpack_exports__, "__esModule", { value: true });
     closeModal: function closeModal() {
       this.isVisible = false;
     },
-
     getData: function getData(user) {
-      axios.get("users/getUserComplete/" + user).then(function (serverResponse) {
-        this.data = serverResponse.data[0];
+      this.isLoading = true;
+      axios.get("users/getUserComplete/" + user).then(function (response) {
+        this.data = response.data[0];
 
         this.isLoading = false;
       }.bind(this)).catch(function () {
         toastr.error("Ocorreu um erro ao tentar encontrar usuário!");
+      });
+    },
+    setMaster: function setMaster(val) {
+      axios.put("users/setMaster/" + this.data.id, { value: val }).then(function (response) {
+        this.getData(this.data.id);
+        toastr.success(response.data.status);
+        window.Event.$emit('reload-table');
+      }.bind(this)).catch(function (error) {
+        toastr.warning(error.response.data.status);
       });
     }
   }
@@ -67944,7 +67956,21 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
     staticClass: "box box-widget widget-user"
   }, [_c('div', {
     staticClass: "widget-user-header bg-aqua-active"
-  }, [_c('h3', {
+  }, [(_vm.data.is_master != 'Sim') ? _c('a', {
+    staticClass: "btn btn-success btn-xs pull-right",
+    on: {
+      "click": function($event) {
+        _vm.setMaster(true)
+      }
+    }
+  }, [_vm._v("Tornar master")]) : _c('a', {
+    staticClass: "btn btn-danger btn-xs pull-right",
+    on: {
+      "click": function($event) {
+        _vm.setMaster(false)
+      }
+    }
+  }, [_vm._v("Retirar master")]), _vm._v(" "), _c('h3', {
     staticClass: "widget-user-username",
     domProps: {
       "textContent": _vm._s(_vm.data.name)
