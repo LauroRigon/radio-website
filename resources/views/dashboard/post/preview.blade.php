@@ -25,7 +25,17 @@
                          disapprove-api="{{ route('post_disapprove', $post->id) }}"
                          delete-post-api="{{ route('post_delete', $post->id) }}"></post-authorizer>
     @endif
+    @if(!$post->is_about)
+        <div class="row">
+            <div class="col-4 pull-right" style="position:absolute;bottom:5px;right:5px;margin:0;padding:5px 3px;">
+                <div class="box box-solid" style="padding:5px">
+                    <a class="btn btn-primary" >Substituir sessão "Sobre"</a>
+                </div>
+            </div>
+        </div>
+    @endif
     <div class="box box-primary">
+
         <div class="box-body">
             <div class="col-md-12 text-center">
                 <img src="{{ $post->thumbnail }}" class="img-responsive">

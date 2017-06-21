@@ -137,7 +137,7 @@ class PollController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function getMyPolls(Request $request) {
-        $polls = Poll::where('user_id', $request->user()->id)->paginate(10);
+        $polls = Poll::where('user_id', $request->user()->id)->orderBy('created_at', 'desc')->paginate(10);
 
         return response()->json([
             $polls

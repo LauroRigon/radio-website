@@ -17,7 +17,7 @@
             <li class="header">Menu</li>
             <li class="{{ Route::currentRouteName() == 'dashboard'? 'active' : ''}}"><a href="{{route('dashboard')}}"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
 			@if(Auth::user()->is_master == 'Sim')
-				<li class="{{ Route::currentRouteName() == 'user_index'? 'active' : ''}}"><a href="{{route('user_index')}}"><i class="fa fa-users"></i> <span>Usuários</span></a></li>
+				<li class="{{ Route::currentRouteName() == 'user_index'? 'active' : ''}}"><a href="{{route('user_index')}}"><i class="fa fa-user-circle-o"></i> <span>Usuários</span></a></li>
 			@endif
             <li class="treeview {{ Route::current()->getAction()['prefix'] == 'admin/posts'? 'active' : ''}}">
                 <a href="#"><i class='fa fa-newspaper-o'></i> <span>Postagens</span> <i class="fa fa-angle-left pull-right"></i></a>
@@ -47,8 +47,10 @@
                     <li class="{{ Route::currentRouteName() == 'programming_create'? 'active' : ''}}"><a href="{{route('programming_create')}}">Adicionar programação</a></li>
                 </ul>
             </li>
-
             <li class="{{ Route::currentRouteName() == 'musicorder_index'? 'active' : ''}}"><a href="{{route('musicorder_index')}}"><i class="fa fa-music"></i><span>Pedidos de músicas</span></a></li>
+            @if(Auth::user()->is_master == 'Sim')
+                <li class="{{ Route::currentRouteName() == 'supporter_index'? 'active' : ''}}"><a href="{{route('supporter_index')}}"><i class="fa fa-users"></i> <span>Apoiadores</span></a></li>
+            @endif
         </ul><!-- /.sidebar-menu -->
     </section>
     <!-- /.sidebar -->

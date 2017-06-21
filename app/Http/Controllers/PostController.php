@@ -272,7 +272,7 @@ class PostController extends Controller
         $id->save();
 
         return response()->json([
-            'status' => 'Sessão Sobre atualizada com sucesso!'
+            'status' => 'Sessão "Sobre" atualizada com sucesso!'
         ], 200);
     }
 
@@ -296,6 +296,10 @@ class PostController extends Controller
      */
     public function getPendingPosts() {
         $posts = Post::where('allowed', 0)->paginate(15);
+
+        foreach($posts as $post) {
+            $post->user_name = $post->user()->get()[0]->name;
+        }
 
         return response()->json([
             $posts

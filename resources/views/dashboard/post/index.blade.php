@@ -13,10 +13,6 @@
     <vue-table title="Tabela de posts"
                :fields="[
                   {
-                    name: 'Id',
-                    dbName: 'id'
-                  },
-                  {
                     name: 'Título',
                     dbName: 'title'
                   },
@@ -42,9 +38,9 @@
                     { name: 'create-button', class: 'btn btn-primary', href: 'admin/posts/create', text: 'Criar'},
                 ]"
                :actions="[
-                    { name: 'view-item', icon: 'glyphicon glyphicon-search', class: 'btn btn-info', href: 'admin/posts/preview/', param: 'true'},
-                    { name: 'edit-item', icon: 'glyphicon glyphicon-pencil', class: 'btn btn-warning', href: 'admin/posts/edit/', param: 'true'},
-                    { name: 'delete-item', icon: 'glyphicon glyphicon-trash', class: 'btn btn-danger'}
+                    { name: 'view-item', icon: 'glyphicon glyphicon-search', class: 'btn btn-info btn-sm', href: 'admin/posts/preview/', param: 'true'},
+                    { name: 'edit-item', icon: 'glyphicon glyphicon-pencil', class: 'btn btn-warning btn-sm', href: 'admin/posts/edit/', param: 'true'},
+                    { name: 'delete-item', icon: 'glyphicon glyphicon-trash', class: 'btn btn-danger btn-sm'}
                 ]"
                ></vue-table>
 @endsection

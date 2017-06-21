@@ -81,7 +81,7 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         });
     });
 
-    //Rotas paraas enquetes
+    //Rotas para as enquetes
     Route::group(['prefix' => 'polls'], function() {
         Route::get('/', 'PollController@index')->name('poll_index');
         Route::get('/create', 'PollController@create')->name('poll_create');
@@ -122,6 +122,21 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         Route::get('/getMusicOrders', 'MusicOrderController@getMusicOrders')->name('musicorder_get');
 
         Route::get('/delete/{program}', 'MusicOrderController@destroy')->name('musicorder_delete');
+    });
+
+    Route::group(['prefix' => 'supporters'], function() {
+        Route::get('/', 'SupportersController@index')->name('supporter_index');
+        Route::get('/getSupporters', 'SupportersController@getSupporters');
+
+        Route::get('/create', 'SupportersController@create');
+        Route::post('/store', 'SupportersController@store')->name('supporter_store');
+
+        Route::get('/edit/{supporter}', 'SupportersController@edit');
+        Route::post('/update/{supporter}', 'SupportersController@update')->name('supporter_update');
+
+
+        Route::delete('/delete/{supporter}', 'SupportersController@destroy');
+
     });
 });
 

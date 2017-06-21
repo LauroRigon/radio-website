@@ -19,16 +19,16 @@
     <vue-table title="Tabela de posts"
                :fields="[
                   {
-                    name: 'Id',
-                    dbName: 'id'
-                  },
-                  {
                     name: 'Título',
                     dbName: 'title'
                   },
                   {
                     name: 'Categoria',
                     dbName: 'category_id'
+                  },
+                  {
+                    name: 'Criador',
+                    dbName: 'user_name'
                   },
                   {
                     name: 'Criado em',

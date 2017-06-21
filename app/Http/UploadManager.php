@@ -44,6 +44,20 @@ class UploadManager
         return $path;
     }
 
+    public static function storeSupporterImg($supporter, $img) {
+        $oldImg = $supporter->image;
+        if($oldImg != null){
+            Storage::delete($oldImg);
+        }
+
+        $fileName = $supporter->id . "." . $img->getClientOriginalExtension();
+        $img = Image::make($img);
+        $img->save(storage_path('app/public/supporters/' . $fileName));
+
+        $path = '/storage/supporters/' . $fileName;
+        return $path;
+    }
+
     public static function deleteFile($filePath) {
         return Storage::delete($filePath);
     }
