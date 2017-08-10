@@ -39,6 +39,22 @@
                         </div>
 
                         <div class="form-group">
+                            <label>Posição na página:</label>
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="side" value="left" {{ ($supporter['side'] == 'left')? 'checked': ''}}>
+                                    Esquerdo
+                                </label>
+                            </div>
+                            <div class="radio">
+                                <label>
+                                    <input type="radio" name="side" value="right" {{ ($supporter['side'] == 'right')? 'checked': ''}}>
+                                    Direito
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
                             <label for="link">Link:</label>
                             <input type="text" class="form-control" id="link" name="link" value="{{ $supporter['link'] }}">
                         </div>

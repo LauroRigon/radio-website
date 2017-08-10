@@ -5,8 +5,11 @@
 <script>
 	
 export default {
-	props: {name: {required: true},
-          selected: {default: false}
+	props: {
+		name: {
+			required: true
+		},
+        selected: false
 	},
 
 

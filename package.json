@@ -31,6 +31,8 @@
     "chart.js": "^2.6.0",
     "flickity": "^2.0.8",
     "flickity-as-nav-for": "^2.0.1",
+    "icheck": "^1.0.2",
+    "js-cookie": "^2.1.4",
     "moment": "^2.18.1",
     "vue-events": "^3.0.1"
   }

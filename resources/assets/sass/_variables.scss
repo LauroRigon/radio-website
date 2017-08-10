@@ -1,6 +1,11 @@
 
+//cores base
+$primary: #322C53;
+$second: #506797;
+$third: #e5c93d;
+
 // Body
-$body-bg: #f5f8fa;
+$body-bg: #E9EBEE;
 
 // Borders
 $laravel-border-color: darken($body-bg, 10%);
@@ -24,8 +29,12 @@ $line-height-base: 1.6;
 $text-color: #636b6f;
 
 // Navbar
-$navbar-default-bg: #fff;
-
+$navbar-default-bg: rgba(52, 44, 87, 0.1);
+$navbar-second-bg: #506797;
+$navbar-hover: #D8BC2F;
+$navbar-font-color: #FFFFFE;
+$navbar-font-color-hover: #D8BC2F;
+$dropdown-menu-color: #eae4e1;
 // Buttons
 $btn-default-color: $text-color;
 

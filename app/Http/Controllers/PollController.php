@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Poll;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 
@@ -38,10 +39,14 @@ class PollController extends Controller
      */
     public function store(Request $request) {
         $data = $request->input();
+
+        $messages = [
+            'required' => 'Este campo é obrigatório!'
+        ];
         $validator = Validator::make($data, [
             'title' => 'required',
             'options' => 'required'
-        ]);
+        ], $messages);
 
         if ($validator->fails()){
             return response()->json([
@@ -73,28 +78,6 @@ class PollController extends Controller
         return view('dashboard.poll.show')->with('poll', $poll);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
 
     /**
      * Remove the specified resource from storage.
@@ -118,13 +101,28 @@ class PollController extends Controller
      * @return \Illuminate\Http\Response
      */
     public function addVote(Request $request, $pollId) {
-        if(!Poll::canVote($request, $pollId)){
+        $data = $request->input();
+        $validator = Validator::make($data, [
+            'optionChosen' => 'required'
+        ]);
+
+        if ($validator->fails()){
             return response()->json([
-                'status' => 'Já votado!'
+                $validator->errors()
             ], 422);
         }
 
-        Poll::storeVote($request->input('option'));
+        if(!Poll::canVote($request, $pollId)){
+            return response()->json([
+                'status' => 'Você já votou nessa enquete!'
+            ], 422);
+        }
+
+        Poll::storeVote($request->input('optionChosen'));
+        DB::table('poll_controls')->insert([
+            'ip' => $request->ip(),
+            'poll_id' => $pollId
+        ]);
 
         return response()->json([
             'status' => 'Voto efetuado com sucesso!'
@@ -161,5 +159,18 @@ class PollController extends Controller
 
         $request->session()->flash('success', 'Enquete encerrada com sucesso!');
         return redirect()->back();
+    }
+
+    /**
+     * Retorna uma enquete completa (para o front)
+     * @param  Poll  $poll (id)
+     * @return \Illuminate\Http\Response
+     */
+    public function getPoll(Request $request, Poll $poll) {
+        $poll->options = $poll->options();
+        $poll->canVote = $poll->canVote($request, $poll->id);
+        $poll->votesSum = $poll->options->sum('vote_count');
+
+        return $poll;
     }
 }

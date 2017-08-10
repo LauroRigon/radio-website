@@ -5,22 +5,15 @@
  * includes Vue and other libraries. It is a great starting point when
  * building robust, powerful web applications using Vue and Laravel.
  */
-
 require('./bootstrap.js');
-require('bootstrap-timepicker/js/bootstrap-timepicker.min.js');
+
 /**
  * Next, we will create a fresh Vue application instance and attach it to
  * the page. Then, you may begin adding components to this application
  * or customize the JavaScript scaffolding to fit your unique needs.
  */
-window.Event = new Vue();	//Instância que é usada pra comunicação entre os componentes
 
-window.toastr = require('toastr/build/toastr.min.js');
-
-window.Flickity = require('flickity/dist/flickity.pkgd.min.js')
-
-require('flickity-as-nav-for');
-import Chart from 'chart.js';
+moment.locale('pt-br');
 
 window.toastr.options = {
     positionClass: "toast-top-right",

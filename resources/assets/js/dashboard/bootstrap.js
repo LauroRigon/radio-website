@@ -11,6 +11,18 @@ window.$ = window.jQuery = require('jquery');
 
 require('bootstrap-sass');
 
+require('bootstrap-timepicker/js/bootstrap-timepicker.min.js');
+
+
+
+window.toastr = require('toastr/build/toastr.min.js');
+
+window.Flickity = require('flickity/dist/flickity.pkgd.min.js');
+require('flickity-as-nav-for');
+
+window.moment = require('moment');
+
+import Chart from 'chart.js';
 /**
  * Vue is a modern JavaScript library for building interactive web interfaces
  * using reactive data binding and reusable components. Vue's API is clean
@@ -18,6 +30,8 @@ require('bootstrap-sass');
  */
 
 window.Vue = require('vue');
+
+window.Event = new Vue();	//Instância que é usada pra comunicação entre os componentes
 
 /**
  * We'll load the axios HTTP library which allows us to easily issue requests

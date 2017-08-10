@@ -39,6 +39,22 @@
                     </div>
 
                     <div class="form-group">
+                        <label>Posição na página:</label>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="side" value="left">
+                                Esquerdo
+                            </label>
+                        </div>
+                        <div class="radio">
+                            <label>
+                                <input type="radio" name="side" value="right">
+                                Direito
+                            </label>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
                         <label for="link">Link:</label>
                         <input type="text" class="form-control" id="link" name="link">
                     </div>

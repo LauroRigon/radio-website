@@ -1,20 +1,5 @@
 <?php
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register web routes for your application. These
-| routes are loaded by the RouteServiceProvider within a group which
-| contains the "web" middleware group. Now create something great!
-|
-*/
-
-Route::get('/', function () {
-    return view('welcome');
-});
-
 Auth::routes();
 
 /*
@@ -27,10 +12,10 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::group(['prefix' => 'users'], function() {
         Route::get('/', 'UserController@index')->name('user_index')->middleware('master');  //pagina de usuários
         Route::post('/create', 'UserController@store')->middleware('master');  //criar usuário
-        Route::put('/{id}', 'UserController@update'); //atualiza usuário
+        //Route::put('/{id}', 'UserController@update'); //atualiza usuário
         Route::delete('/delete/{id}', 'UserController@destroy')->middleware('master'); //deleta usuário
 
-        Route::get('/profile', 'UserController@show')->name('user_profile');
+        Route::get('/profile', 'UserController@profile')->name('user_profile');
         Route::post('/changePassword', 'UserController@changePassword'); //troca senha
         Route::post('/uploadAvatar', 'UserController@uploadAvatar'); //upload do avatar
         Route::put('/setMaster/{user}', 'UserController@setMaster'); //troca senha
@@ -72,12 +57,12 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         Route::post('/setAbout/{id}', 'PostController@setAsAbout')->middleware('master');//coloca um post como conteúdo da sessão sobre
 
         Route::get('/getMyPosts', 'PostController@getMyPosts');//retorna todos posts do user logado
-        Route::get('/getGallery/{post}', 'PostController@getGallery');//retorna todas imagens de um post
 
         //Rotas para galeria de imagens
         Route::group(['prefix' => 'gallery'], function () {
             Route::post('/sendGalleryImg', 'GalleryController@storeTempGallery')->name('send_gallery');//guarda galeria em pasta temp
             Route::post('/deleteGalleryImg', 'GalleryController@destroy');//deleta uma imagem da galeria
+            Route::get('/getGallery/{post}', 'GalleryController@getGallery')->name('get_gallery');//retorna todas imagens de um post
         });
     });
 
@@ -89,8 +74,6 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
         Route::delete('delete/{id}', 'PollController@destroy');
 
         Route::get('/view/{poll}', 'PollController@show')->name('poll_view');
-
-        Route::post('/addVote/{pollId}', 'PollController@addVote');
 
         Route::get('/getMyPolls', 'PollController@getMyPolls');
 
@@ -140,4 +123,27 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     });
 });
 
-Route::get('/home', 'HomeController@index');
+/*
+ * Rotas públicas
+ * */
+Route::get('/', 'HomeController@index');
+Route::get('/programacao', 'ProgrammingController@indexPublic')->name('programming_indexpublic');
+Route::get('/locutores', 'UserController@indexPublic')->name('users_indexpublic');
+Route::get('/sobre', 'HomeController@aboutShow')->name('about');
+
+//enquetes apis
+Route::get('/getPoll/{poll}', 'PollController@getPoll')->name('poll_get');
+Route::post('/addVote/{pollId}', 'PollController@addVote')->name('add_vote');
+
+//noticias
+Route::group(['prefix' => 'noticias'], function () {
+    Route::get('/{post}', 'PostController@show')->name('post_show');
+    Route::get('/categoria/{categoria}', 'PostController@getByCategory')->name('post_getByCategory');
+    Route::get('/getGallery/{post}', 'GalleryController@getGallery')->name('get_public_gallery');//retorna todas imagens de um post
+});
+
+//pedidos de musicas
+Route::group(['prefix' => 'musicOrder'], function () {
+    Route::post('/store', 'MusicOrderController@store')->name('order_store');
+});
+

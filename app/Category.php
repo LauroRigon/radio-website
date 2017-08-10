@@ -10,6 +10,10 @@ class Category extends Model
         'name', 'description'
     ];
 
+    public function posts() {
+        return $this->hasMany('App\Post')->orderBy('published_at', 'desc');
+    }
+
     public function getCreatedAtAttribute($value)
     {
         if($value) {

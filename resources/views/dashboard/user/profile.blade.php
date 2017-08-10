@@ -12,7 +12,7 @@
 @section('main-content')
 <div class="col-md-12 col-md-offset-2">
 	<tabs>
-		<tab name="Perfil" :selected="true">
+		<tab name="Perfil" :selected="true" style="display: none">
 			<div id="profile">
 	          <div class="box box-widget widget-user">
 	            <!-- Add the bg color to the header using any of the bg-* classes -->
@@ -57,14 +57,14 @@
 	          </div>
 	      	</div>
 		</tab>
-		<tab name="Alterar avatar">
+		<tab name="Alterar avatar" style="display: none">
 			<avatar-upload token="{{csrf_token()}}">
 				<template slot="token">
 					{{ csrf_field() }}
 				</template>
 			</avatar-upload>
 		</tab>
-		<tab name="Senha">
+		<tab name="Senha" style="display: none">
 			<form class="form-horizontal" method="POST" action="changePassword">
 				{{ csrf_field() }}
 				<div class="box-body">

@@ -1,10 +1,10 @@
 <template>
 <div>    
-    <div class="col-lg-8">
+    <div :class="sizeClass" v-show="isReady">
     	<div class="nav-tabs-custom">
 	    	<ul class="nav nav-tabs">
 		      <li v-for="tab in tabs" :class="{'active' : tab.isActive}">
-		      	<a href="#" @click="activeTab(tab)">{{tab.name}}</a>
+		      	<a href="" @click.prevent="activeTab(tab)">{{tab.name}}</a>
 		      </li>
 		    </ul>
 	    	<div class="box box-body">
@@ -17,15 +17,29 @@
 
 <script>
 export default {
+	props: {
+		sizeClass: {
+			type: String,
+			default() {
+				return 'col-md-8';
+			}
+		}
+	},
+
 	data() {
 	    return {
 	      tabs: [],
+				isReady: false
 	    }
 	},
 
 
-	created: function (){
+	created(){
 		this.tabs = this.$children;
+	},
+
+	mounted() {
+		this.isReady = true;
 	},
 
 

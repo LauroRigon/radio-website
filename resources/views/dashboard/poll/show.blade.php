@@ -21,10 +21,10 @@
 
                 <h3 class="profile-username text-center">{{ $poll->title }}</h3>
 
-                <p class="text-muted text-center">Criador: {{ $poll->user()->get()[0]->name }}</p>
+                <p class="text-muted text-center">Criador: {{ $poll->user()->name }}</p>
 
                 <ul class="list-group list-group-unbordered">
-                    @foreach ($poll->options()->get() as $option)
+                    @foreach ($poll->options() as $option)
                         <li class="list-group-item">
                             <b>{{ $option->name }}</b> <a class="pull-right">{{ $option->vote_count }}</a>
                         </li>
@@ -46,7 +46,7 @@
         <div class="box box-success">
             <div class="box-body">
               <div class="chart">
-                <canvas id="pollChart" width="400" height="200%" poll-id="{{ $poll->id }}" data="{{$poll->options()->get()}}"></canvas>
+                <canvas id="pollChart" width="400" height="200%" poll-id="{{ $poll->id }}" data="{{$poll->options()}}"></canvas>
               </div>
             </div>
             <!-- /.box-body -->

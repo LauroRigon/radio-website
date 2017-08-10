@@ -28,10 +28,14 @@ class CategoryController extends Controller
     {
         $data = $request->input();
 
+        $messages = [
+            'required' => 'Este campo é obrigatório!',
+            'name.unique' => 'Esta categoria já existe!'
+        ];
         $validator = Validator::make($data, [
             'name' => 'required|unique:categories',
             'description' => 'required'
-        ]);
+        ],$messages);
 
         /*Retorna os erros se ouver*/
         if ($validator->fails()){
@@ -45,9 +49,7 @@ class CategoryController extends Controller
             'description' => ucfirst($data['description'])
         ]);
 
-
         return $createdCategory;
-
     }
 
 
@@ -62,15 +64,19 @@ class CategoryController extends Controller
     {
         $data = $request->input();
 
+        $messages = [
+            'required' => 'Este campo é obrigatório!',
+            'name.unique' => 'Esta categoria já existe!'
+        ];
         $validator = Validator::make($data, [
-            'name' => 'required',
+            'name' => 'required|unique:categories,name,'.$id->id,
             'description' => 'required'
-        ]);
+        ], $messages);
 
         if ($validator->fails()){
             return response()->json([
                 $validator->errors()
-            ]);
+            ], 422);
         }
 
         $updatedCategory = $id->update([

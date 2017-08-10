@@ -101,7 +101,7 @@ export default {
 
       .catch(function(error) {
         console.log(error.response)
-        this.errors = error.response.data;
+        this.errors = error.response.data[0];
         this.isLoading = false
       }.bind(this));
     },

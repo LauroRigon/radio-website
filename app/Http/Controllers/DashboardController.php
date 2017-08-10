@@ -25,7 +25,7 @@ class DashboardController extends Controller
         $lastPoll = \App\Poll::where('user_id', Auth::id())->where('status', 1)->orderBy('created_at', 'desc')->first();
 
         if($lastPoll) {
-            $lastPollOptions = $lastPoll->options()->orderBy('vote_count', 'desc')->get();
+            $lastPollOptions = $lastPoll->options();
             $lastPoll->votesSum = $lastPollOptions->sum('vote_count');
         }
 

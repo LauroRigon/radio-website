@@ -17,7 +17,7 @@
     <div class="row">
         <div class="col-md-12">
             <tabs>
-                <tab name="Segunda" :selected="true">
+                <tab name="Segunda" :selected="true" style="display: none">
                     <div id="segunda">
                         <table class="table table-bordered">
                             <thead>
@@ -48,7 +48,7 @@
                     </div>
                 </tab>
 
-                <tab name="Terça">
+                <tab name="Terça" style="display: none">
                     <div id="segunda">
                         <table class="table table-bordered">
                             <thead>
@@ -79,7 +79,7 @@
                     </div>
                 </tab>
 
-                <tab name="Quarta">
+                <tab name="Quarta" style="display: none">
                     <div id="segunda">
                         <table class="table table-bordered">
                             <thead>
@@ -110,7 +110,7 @@
                     </div>
                 </tab>
 
-                <tab name="Quinta">
+                <tab name="Quinta" style="display: none">
                     <div id="segunda">
                         <table class="table table-bordered">
                             <thead>
@@ -141,7 +141,7 @@
                     </div>
                 </tab>
 
-                <tab name="Sexta">
+                <tab name="Sexta" style="display: none">
                     <div id="segunda">
                         <table class="table table-bordered">
                             <thead>
@@ -172,7 +172,7 @@
                     </div>
                 </tab>
 
-                <tab name="Sábado">
+                <tab name="Sábado" style="display: none">
                     <div id="segunda">
                         <table class="table table-bordered">
                             <thead>
@@ -203,7 +203,7 @@
                     </div>
                 </tab>
 
-                <tab name="Domingo">
+                <tab name="Domingo" style="display: none">
                     <div id="segunda">
                         <table class="table table-bordered">
                             <thead>
@@ -240,15 +240,5 @@
 
 @endsection
 @section('page-scripts')
-    <script>
-        $(function () {
-            //Timepicker
-            $(".timepicker").timepicker({
-                showInputs: false,
-                minuteStep: 10,
-                showMeridian: false,
-                explicitMode: true
-            });
-        });
-    </script>
+
 @endsection

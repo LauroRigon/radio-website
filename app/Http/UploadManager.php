@@ -35,7 +35,7 @@ class UploadManager
             Storage::delete($oldThumb);
         }
 
-        $img = Image::make($thumbnail->getLinkTarget())->resize(1200, 600);
+        $img = Image::make($thumbnail->getLinkTarget());
         $fileName = $post->id . "." . $thumbnail->getClientOriginalExtension();
 
         $img->save(storage_path('app/public/thumbnails/' . $fileName));

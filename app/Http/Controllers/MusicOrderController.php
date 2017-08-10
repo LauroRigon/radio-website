@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\MusicOrder;
+use Illuminate\Support\Facades\Validator;
+use Carbon\Carbon;
 
 class MusicOrderController extends Controller
 {
@@ -17,52 +19,6 @@ class MusicOrderController extends Controller
         return view('dashboard.music_order.index');
     }
 
-    /**
-     * Cadastra no banco de dados um pedido.
-     *
-     * @param  \Illuminate\Http\Request  $request(name, content)
-     * @return \Illuminate\Http\Response
-     */
-    public function store(Request $request)
-    {
-
-    }
-
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  $request (name, email)
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, User $id)
-    {
-
-    }
-
-
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy(User $id)
-    {
-
-    }
 
     /**
      * Retorna todos os pedidos de musicas
@@ -73,5 +29,37 @@ class MusicOrderController extends Controller
     public function getMusicOrders()
     {
         return MusicOrder::orderBy('created_at', 'desc')->paginate(15);
+    }
+
+    /**
+     * Armazena um pedido
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request) {
+        $validator = Validator::make($request->input(), [
+            'content' => 'required'
+        ]);
+
+        if($validator->fails()){
+            return response()->json([
+                $validator->errors()
+            ], 422);
+        }
+
+        $order = new MusicOrder();
+        if(!$order->canSendOrder($request)){
+            return response()->json([
+                'Você deve esperar para poder enviar outro pedido!'
+            ], 422);
+        }
+
+        $order->name = ($request->input('name'))? $request->input('name'): 'Anônimo';
+        $order->content = $request->input('content');
+        $order->user_order_ip = $request->ip();
+        $order->expires_date = Carbon::create()->addMinutes(15);
+        $order->save();
+        return $order;
     }
 }

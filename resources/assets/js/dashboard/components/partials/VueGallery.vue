@@ -1,19 +1,14 @@
 <template>
 	<div v-if="images">
-		<div class="main-carousel carousel">
+		<div class="carousel-main carousel">
 			<div class="carousel-cell" v-for="image in images"><img class="img-responsive" :src="image.img_path"></div>
 		</div>
-
-		<img-slider> </img-slider>
 	</div>
 </template>
 
 <script>
-	import ImgSlider from './Slider.vue'
 
 	export default {
-		components: { ImgSlider },
-
 		props: {
 			SourceApi: {
                     type: String,
@@ -34,17 +29,16 @@
 		},
 
 		mounted() {
-			var self = this;
-			setTimeout(function() {
-				var el = document.querySelector('.carousel');
-				
-				var flkty = new Flickity(el, {
-					cellAlign: 'left',
-					//freeScroll: true,
-					wrapAround: true,
-					lazyLoad: true
-				});
-			}, 500)
+			$( document ).ready(function() {
+				setTimeout(function() {					
+					var flkty = new Flickity('.carousel-main', {
+						cellAlign: 'left',
+						//freeScroll: true,
+						wrapAround: true,
+						lazyLoad: true
+					});
+				}, 2000)
+			});
 		},
 
 		methods: {

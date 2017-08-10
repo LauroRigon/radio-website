@@ -19,6 +19,7 @@ class CreateSupportersTable extends Migration
             $table->string('image')->nullable();
             $table->boolean('status');
             $table->string('link')->nullable();
+            $table->string('side')->default('right');
             $table->timestamps();
         });
     }

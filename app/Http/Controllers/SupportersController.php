@@ -39,7 +39,8 @@ class SupportersController extends Controller
         $data = $request->all();
         $validator = Validator::make($data, [
             'name' => 'required',
-            'image' => 'mimes:jpeg,bmp,png,jpg'
+            'image' => 'mimes:jpeg,bmp,png,jpg',
+            'side' => 'required'
         ]);
 
         /*Retorna os erros se ouver*/
@@ -50,7 +51,8 @@ class SupportersController extends Controller
         $createdSupp = Supporter::create([
            'name' => $data['name'],
             'link' => $data['link'],
-            'status' => (isset($data['status']))? 1: 0
+            'status' => (isset($data['status']))? 1: 0,
+            'side' => $data['side']
         ]);
 
         if(isset($data['image'])) {
@@ -65,18 +67,7 @@ class SupportersController extends Controller
     }
 
     /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
+     * Mostra a página de edição.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
@@ -116,6 +107,7 @@ class SupportersController extends Controller
 
         $supporter->name = $data['name'];
         $supporter->link = $data['link'];
+        $supporter->side = $data['side'];
         $supporter->status = (isset($data['status']))? 1: 0;
         $supporter->update();
 

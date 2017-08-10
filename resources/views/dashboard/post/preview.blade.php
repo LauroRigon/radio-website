@@ -25,15 +25,6 @@
                          disapprove-api="{{ route('post_disapprove', $post->id) }}"
                          delete-post-api="{{ route('post_delete', $post->id) }}"></post-authorizer>
     @endif
-    @if(!$post->is_about)
-        <div class="row">
-            <div class="col-4 pull-right" style="position:absolute;bottom:5px;right:5px;margin:0;padding:5px 3px;">
-                <div class="box box-solid" style="padding:5px">
-                    <a class="btn btn-primary" >Substituir sessão "Sobre"</a>
-                </div>
-            </div>
-        </div>
-    @endif
     <div class="box box-primary">
 
         <div class="box-body">
@@ -48,7 +39,7 @@
             <div class="row">
                 <div class="text-center">
                     {!! $post->content !!}
-                    <vue-gallery source-api="/admin/posts/getGallery/{{ $post->id }}"></vue-gallery>
+                    <vue-gallery source-api="{{ route('get_gallery', $post->id) }}"></vue-gallery>
                 </div>
             </div>
         </div>

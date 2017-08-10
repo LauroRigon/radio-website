@@ -1,13 +1,13 @@
 <template>
 	<div>
 		<ul class="pagination pagination-md no-margin pull-right">
-		    <li :class="isOnFirstPage? 'disabled': ''"><a href="#" @click="loadPage('prev')">«</a></li>
+		    <li :class="isOnFirstPage? 'disabled': ''"><a href="#" @click.prevent="loadPage('prev')">«</a></li>
 	            <template v-for="n in totalPage">
 	                <li :class="isCurrentPage(n) ? 'active' : ''">
-	                    <a href="#" @click="loadPage(n)"> {{ n }} </a>
+	                    <a href="#" @click.prevent="loadPage(n)"> {{ n }} </a>
 	                </li>
 	            </template>
-		    <li :class="isOnLastPage? 'disabled': ''"><a href="#" @click="loadPage('next')">»</a></li>
+		    <li :class="isOnLastPage? 'disabled': ''"><a href="#" @click.prevent="loadPage('next')">»</a></li>
 			
         </ul>
 	</div>

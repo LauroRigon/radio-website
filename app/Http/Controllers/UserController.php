@@ -13,6 +13,22 @@ use Illuminate\Support\Facades\Hash;
 class UserController extends Controller
 {
     /**
+     * Página publica de locutores (users)
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function indexPublic()
+    {
+        $users = User::all();
+        $supporters = \App\Supporter::where('status', 1)->get();
+
+        return view('users')->with([
+            "users" => $users,
+            'supporters' => $supporters
+        ]);
+    }
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
@@ -31,12 +47,18 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
+        $messages = [
+            'required' => 'Este campo é obrigatório!',
+            'email' => 'O email deve ser válido!',
+            'email.unique' => 'Este email já está sendo utilizado!',
+            'password.min' => 'A senha deve ter no mínimo :min caracteres'
+        ];
         $validator = Validator::make($request->all(), [
             'name' => 'required',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6',
             'is_master' => 'required'
-        ]);
+        ], $messages);
 
         /*Retorna os erros se ouver*/
         if ($validator->fails()){
@@ -57,20 +79,20 @@ class UserController extends Controller
     }
 
     /**
-     * Mostra o perfil do user
+     * Mostra o perfil do user logado
      *
      * @return \Illuminate\Http\Response
      */
-    public function show()
+    public function profile()
     {
         $user = User::find(Auth::user()->id);
 
-        return view('dashboard.user.show')->with('user', $user);
+        return view('dashboard.user.profile')->with('user', $user);
     }
 
 
     /**
-     * Update the specified resource in storage.
+     * Atualiza um usuário (senha e email).
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  $request (name, email)
@@ -79,7 +101,7 @@ class UserController extends Controller
     public function update(Request $request, User $id)
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'email|required',
+            'email' => 'email|required|unique:users,'.$id->id,
             'name' => 'required'
         ]);
 
@@ -109,12 +131,16 @@ class UserController extends Controller
      */
     public function changePassword(Request $request)
     {
+        $messages = [
+            'required' => 'O campo :attribute é obrigatório!',
+            'novasenha.min' => 'A nova senha deve ter no mínimo :min caracteres'
+        ];
 
         $validator = Validator::make($request->all(), [
-            'senhaatual' => 'required|min:6',
+            'senhaatual' => 'required',
             'novasenha' => 'required|min:6',
-            'confirmarsenha' => 'required|min:6'
-        ]);
+            'confirmarsenha' => 'required'
+        ], $messages);
 
         /*Retorna os erros se ouver*/
         if ($validator->fails()){
@@ -140,13 +166,11 @@ class UserController extends Controller
     /**
      * Envia avatar do usuario
      *
-     * @param  int  $id
+     * @param  int  $data
      * @return \Illuminate\Http\Response
      */
     public function uploadAvatar(Request $request)
     {
-        //dd($request->all());
-        //dd($request->user()->id);     usar isso se possivel quando tiver login
         $user = User::find($request->user()->id);
 
         $validator = Validator::make($request->all(), [
@@ -221,7 +245,7 @@ class UserController extends Controller
      *  @return \Illuminate\Http\Response
      */
     public function getUsers() {
-        $users = User::paginate(4);
+        $users = User::paginate(10);
 
         return response()->json([
         $users

@@ -20,5 +20,30 @@ class HelperFunctions
 
         return $data;
     }
+
+    public static function dayOfWeekByNum($day) {
+        switch ($day) {
+            case 0:
+                return 'domingo';
+            case 1:
+                return 'segunda-feira';
+                break;
+            case 2:
+                return 'terca-feira';
+                break;
+            case 3:
+                return 'quarta-feira';
+                break;
+            case 4:
+                return 'quinta-feira';
+                break;
+            case 5:
+                return 'sexta-feira';
+                break;
+            case 6:
+                return 'sabado';
+                break;
+        }
+    }
         
 }

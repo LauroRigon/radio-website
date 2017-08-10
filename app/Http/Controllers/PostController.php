@@ -18,7 +18,7 @@ use Illuminate\Support\Facades\Notification;
 class PostController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Mostra todos os posts do user logado.
      *
      * @return \Illuminate\Http\Response
      */
@@ -54,7 +54,7 @@ class PostController extends Controller
     {
         $categories = Category::all();
 
-        $galleryKey = time() . $request->user()->id;
+        $galleryKey = time() . $request->user()->id;    //gera uma key pra armazenar as imagens temporáriamente
 
         return view('dashboard.post.create')->with([
             'categories' => $categories,
@@ -112,14 +112,18 @@ class PostController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Mostra uma noticia (public)
      *
-     * @param  int  $id
+     * @param  String  $slug
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function show($slug)
     {
-        //
+        $post = Post::where('slug', $slug)->first();
+
+        return view('post.show')->with([
+            'post' => $post
+        ]);
     }
 
     /**
@@ -138,7 +142,7 @@ class PostController extends Controller
         ]);
     }
     /**
-     * Show the form for editing the specified resource.
+     * Mostra página de edit.
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
@@ -232,7 +236,7 @@ class PostController extends Controller
     }
 
     /**
-     * Permite a publicação de um post
+     * Recusa a publicação de um post
      *
      * @param  int  $id (post)
      * @return \Illuminate\Http\Response
@@ -259,7 +263,7 @@ class PostController extends Controller
     }
 
     /**
-     * Modifica o conteudo da sessão about
+     * Modifica um post para conteudo da sessão about
      *
      * @param  int  $id (post)
      * @param  Request  $request
@@ -298,24 +302,11 @@ class PostController extends Controller
         $posts = Post::where('allowed', 0)->paginate(15);
 
         foreach($posts as $post) {
-            $post->user_name = $post->user()->get()[0]->name;
+            $post->user_name = $post->user()->name;
         }
 
         return response()->json([
             $posts
-        ], 200);
-    }
-
-    /**
-     * Retorna todos os posts ainda não autorizados
-     * @param  Request  $request
-     * @return \Illuminate\Http\Response
-     */
-    public function getGallery(Post $post) {
-        $gallery = $post->galleries()->get();
-
-        return response()->json([
-            $gallery
         ], 200);
     }
 
@@ -328,11 +319,36 @@ class PostController extends Controller
         $posts = Post::paginate(15);
 
         foreach($posts as $post) {
-            $post->user_name = $post->user()->get()[0]->name;
+            $post->user_name = $post->user()->name;
         }
 
         return response()->json([
             $posts
         ], 200);
+    }
+
+    /**
+     * Retorna todos os posts de uma determinada categoria
+     * @param  Request  $categoria (nome)
+     * @return \Illuminate\Http\Response
+     */
+    public function getByCategory($category) {
+        $category = \App\Category::where('name', $category)->first();
+
+        $posts = $category->posts()->paginate(10);
+
+        $supporters = \App\Supporter::where('status', 1)->get();
+        $polls = \App\Poll::where('status', 1)->get();
+
+        $day = Carbon::create()->dayOfWeek;
+        $day = \App\Http\HelperFunctions::dayOfWeekByNum($day);
+        $programmingOfDay = \App\Programming::where('day_of_week', $day)->get();
+
+        return view('home')->with([
+            'posts' => $posts,
+            'supporters' => $supporters,
+            'programmingOfDay' => $programmingOfDay,
+            'polls' => $polls
+        ]);
     }
 }

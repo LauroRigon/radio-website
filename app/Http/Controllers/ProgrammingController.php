@@ -9,6 +9,22 @@ use App\Programming;
 class ProgrammingController extends Controller
 {
     /**
+     * Pagina publica de programação
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function indexPublic()
+    {
+        $programs = Programming::all();
+        $supporters = \App\Supporter::where('status', 1)->get();
+
+        return view('programming')->with([
+            'programs' => $programs,
+            'supporters' => $supporters
+        ]);
+    }
+
+    /**
      * Display a listing of the resource.
      *
      * @return \Illuminate\Http\Response
@@ -65,39 +81,6 @@ class ProgrammingController extends Controller
         return redirect()->back();
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function show($id)
-    {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
-    }
 
     /**
      * Remove the specified resource from storage.

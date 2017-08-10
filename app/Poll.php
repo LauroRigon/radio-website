@@ -12,11 +12,11 @@ class Poll extends Model
     ];
 
     public function options() {
-        return $this->hasMany('App\PollOption');
+        return $this->hasMany('App\PollOption')->get();
     }
 
     public function user() {
-        return $this->belongsTo('App\User');
+        return $this->belongsTo('App\User')->get()[0];
     }
 
     /*MUTATORS*/
@@ -64,10 +64,7 @@ class Poll extends Model
         if(isset($exist[0])){
             return false;
         }else{
-            return DB::table('poll_controls')->insert([
-                'ip' => $request->ip(),
-                'poll_id' => $pollId
-            ]);
+            return true;
         }
     }
 
