@@ -71,16 +71,25 @@ class PostController extends Controller
     public function store(Request $request) {
         $data = $request->all();
 
+        $messages = [
+            'title.required' => "Você precisa dar um título ao seu post!",
+            'subtitle.required' => "Você precisa dar um subtítulo ao seu post!",
+            'content.required' => "Conteúdo do post vazio!",
+            'category_id.required' => "Você precisa escolher uma categoria para o post!",
+            'category_id.exists' => "Você precisa escolher uma categoria existente para o post!",
+            'thumbnail.mimes' => "Imagem de thumbnail não suportada! Envie em algum dos seguintes formatos: jpeg, bmp, png, jpg",
+        ];
+
         $validator = Validator::make($data, [
             'title' => 'required',
             'subtitle' => 'required',
             'content' => 'required',
             'category_id' => 'required|exists:categories,id',
             'thumbnail' => 'mimes:jpeg,bmp,png,jpg'
-        ]);
+        ], $messages);
 
         if($validator->fails()){
-            return back()->withErrors($validator->errors());
+            return back()->withErrors($validator->errors())->withInput();
         }
 
         $postCreated = Post::create([
@@ -169,13 +178,21 @@ class PostController extends Controller
      */
     public function update(Request $request, Post $post) {
         $data = $request->all();
+
+        $messages = [
+            'title.required' => "Você precisa dar um título ao seu post!",
+            'subtitle.required' => "Você precisa dar um subtítulo ao seu post!",
+            'content.required' => "Conteúdo do post vazio!",
+            'category_id.required' => "Você precisa escolher uma categoria para o post!",
+            'thumbnail.mimes' => "Imagem de thumbnail não suportada! Envie em algum dos seguintes formatos: jpeg, bmp, png, jpg",
+        ];
         $validator = Validator::make($data, [
             'title' => 'required',
             'subtitle' => 'required',
             'content' => 'required',
             'category_id' => 'required',
             'thumbnail' => 'mimes:jpeg,bmp,png,jpg'
-        ]);
+        ], $messages);
 
         if($validator->fails()){
             return response()->json([

@@ -173,9 +173,13 @@ class UserController extends Controller
     {
         $user = User::find($request->user()->id);
 
+        $messages = [
+            'required' => 'Selecione uma foto a ser enviada!',
+            'mimes' => 'Imagem não suportada! Envie uma imagem em uma das seguintes extensões: jpeg, bmp, png, jpg.'
+        ];
         $validator = Validator::make($request->all(), [
             'avatar' => 'required|mimes:jpeg,bmp,png,jpg'
-        ]);
+        ], $messages);
 
         /*Retorna os erros se ouver*/
         if ($validator->fails()){

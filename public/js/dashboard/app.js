@@ -61973,9 +61973,8 @@ module.exports = Component.exports
 /***/ }),
 /* 189 */,
 /* 190 */
-/***/ (function(module, __webpack_exports__, __webpack_require__) {
+/***/ (function(module, exports, __webpack_require__) {
 
-"use strict";
 
 //import UserTable from './components/user/UsersTable.vue';
 /**

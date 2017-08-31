@@ -37,15 +37,20 @@ class SupportersController extends Controller
     public function store(Request $request)
     {
         $data = $request->all();
+        $messages = [
+            'name.required' => 'Preencha o campo nome!',
+            'image.mimes' => 'Imagem não suportada! Enviem em algum dos seguintes formatos: jpeg, bmp, png, jpg.',
+            'side.required' => 'Escolha em qual lado da página o apoiador irá parecer!'
+        ];
         $validator = Validator::make($data, [
             'name' => 'required',
             'image' => 'mimes:jpeg,bmp,png,jpg',
             'side' => 'required'
-        ]);
+        ], $messages);
 
         /*Retorna os erros se ouver*/
         if ($validator->fails()){
-            return back()->withErrors($validator->errors());
+            return back()->withErrors($validator->errors())->withInput();
         }
 
         $createdSupp = Supporter::create([
@@ -89,11 +94,16 @@ class SupportersController extends Controller
     public function update(Request $request, Supporter $supporter)
     {
         $data = $request->all();
-        //dd($data);
+
+        $messages = [
+            'name.required' => 'Preencha o campo nome!',
+            'side.required' => 'Escolha em qual lado da página o apoiador irá parecer!',
+            'image.mimes' => 'Imagem não suportada! Enviem em algum dos seguintes formatos: jpeg, bmp, png, jpg.'
+        ];
         $validator = Validator::make($data, [
             'name' => 'required',
             'image' => 'mimes:jpeg,bmp,png,jpg'
-        ]);
+        ], $messages);
 
         /*Retorna os erros se ouver*/
         if ($validator->fails()){

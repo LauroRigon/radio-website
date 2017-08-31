@@ -24,7 +24,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
         @include('dashboard.layouts.partials.contentheader')
 
         <!-- MOSTRA OS FLASHS DE SESSÃO -->
-        <div>
+        <div class="row">
+        <div class="col-md-6">
         @if (count($errors) > 0)
             <div class="alert alert-danger alert-dismissible">
                 <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
@@ -63,6 +64,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
                 </ul>
             </div>
         @endif
+        </div>
         </div>
         <!-- Main content -->
         <section class="content" id="content">

@@ -67,7 +67,7 @@
           <div class="form-group">
             <label>Conteúdo</label>
             <textarea name="content" id="editor1" rows="1" cols="80" class="form-control">
-              
+                {{ old('content') }}
           </textarea>
           </div>
 

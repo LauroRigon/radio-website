@@ -9,6 +9,16 @@ use Illuminate\Support\Facades\Auth;
 class NotificationController extends Controller
 {
     /**
+     * Display a listing of the resource.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function index()
+    {
+        return view('dashboard.notification.index');
+    }
+
+    /**
      * Retorna todas notificações
      *
      * @param  int  $id

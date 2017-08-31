@@ -55,12 +55,16 @@ class ProgrammingController extends Controller
     {
         $data = $request->all();
 
+        $messages = [
+            'name.required' => 'Preencha o nome do programa!',
+            'type.required' => 'Preencha o gênero do programa!',
+        ];
         $validator = Validator::make($data, [
             'name' => 'required',
             'day_of_week' => 'required',
             'time' => 'required|date_format:G:i',
             'type' => 'required|'
-        ]);
+        ], $messages);
 
         if($validator->fails()){
             return back()->withErrors($validator->errors());

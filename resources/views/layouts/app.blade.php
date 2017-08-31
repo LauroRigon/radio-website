@@ -27,7 +27,9 @@
 
             </section><!-- /.content -->
         </div><!-- /.content-wrapper -->
-        <music-order send-order-api="{{ route('order_store') }}"></music-order>
+
+        <music-order send-order-api="{{ secure_url(route('order_store', [], false)) }}"></music-order>
+
         @include('layouts.partials.footer')
 
     </div><!-- ./wrapper -->
