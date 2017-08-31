@@ -188,6 +188,7 @@
               /*if(confirm("Tem certeza que deseja deletar esse item?") != 1) {
                 return false;
               }*/
+
               jConfirm.confirm("Tem certeza de deletar este item?", function(confirmation){
                 if(confirmation){
 

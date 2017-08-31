@@ -1,5 +1,5 @@
-var jConfirm = {
-	confirm: function (message, callback) {
+const jConfirm = {
+	confirm (message, callback) {
 		var ConfirmBox = "<div class='divMessageBox animated fadeIn fast' id='MsgBoxBack'></div>";
 		$('body').append(ConfirmBox);
 
@@ -24,9 +24,11 @@ var jConfirm = {
 		}.bind(this))
 	},
 
-	closeConfirm: function() {
+	closeConfirm() {
 		$("#MsgBoxBack").removeClass("fadeIn").addClass("fadeOut").delay(300).queue(function () {
             $(this).remove();
         });
 	}
 }
+
+export default jConfirm
