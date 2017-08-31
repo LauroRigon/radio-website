@@ -17,7 +17,12 @@ class CreatePollsTable extends Migration
             $table->engine = 'InnoDB';
             $table->increments('id');
             $table->string('title');
+            $table->integer('user_id')->unsigned();
+            $table->boolean('status')->default(1);
             $table->timestamps();
+
+            //referencias
+            $table->foreign('user_id')->references('id')->on('users');
         });
     }
 

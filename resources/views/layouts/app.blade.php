@@ -1,87 +1,70 @@
 <!DOCTYPE html>
-<html lang="{{ config('app.locale') }}">
-<head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+<?php
+    $categories = \App\Category::all();
+    $supporters = \App\Supporter::where('status', 1)->get();
+?>
+<html>
 
-    <!-- CSRF Token -->
-    <meta name="csrf-token" content="{{ csrf_token() }}">
+@section('htmlheader')
+    @include('layouts.partials.htmlheader')
+    @yield('page-links')
+@show
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
-
-    <!-- Styles -->
-    <link href="{{ asset('css/app.css') }}" rel="stylesheet">
-
-    <!-- Scripts -->
-    <script>
-        window.Laravel = {!! json_encode([
-            'csrfToken' => csrf_token(),
-        ]) !!};
-    </script>
-</head>
 <body>
-    <div id="app">
-        <nav class="navbar navbar-default navbar-static-top">
-            <div class="container">
-                <div class="navbar-header">
+<div id="app" v-cloak>
+    <div>
+        @include('layouts.partials.mainheader')
+                <!-- Content Wrapper. Contains page content -->
+        <div class="content-wrapper container">
+            @include('layouts.partials.contentheader')
 
-                    <!-- Collapsed Hamburger -->
-                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#app-navbar-collapse">
-                        <span class="sr-only">Toggle Navigation</span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                        <span class="icon-bar"></span>
-                    </button>
+            <!-- Main content -->
+            <section class="content" id="content">
 
-                    <!-- Branding Image -->
-                    <a class="navbar-brand" href="{{ url('/') }}">
-                        {{ config('app.name', 'Laravel') }}
-                    </a>
-                </div>
+                <!-- Your Page Content Here -->
+                @yield('main-content')
+                @include('layouts.partials.rightside')
 
-                <div class="collapse navbar-collapse" id="app-navbar-collapse">
-                    <!-- Left Side Of Navbar -->
-                    <ul class="nav navbar-nav">
-                        &nbsp;
-                    </ul>
+            </section><!-- /.content -->
+        </div><!-- /.content-wrapper -->
 
-                    <!-- Right Side Of Navbar -->
-                    <ul class="nav navbar-nav navbar-right">
-                        <!-- Authentication Links -->
-                        @if (Auth::guest())
-                            <li><a href="{{ route('login') }}">Login</a></li>
-                            <li><a href="{{ route('register') }}">Register</a></li>
-                        @else
-                            <li class="dropdown">
-                                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-expanded="false">
-                                    {{ Auth::user()->name }} <span class="caret"></span>
-                                </a>
+        <music-order send-order-api="{{ secure_url(route('order_store', [], false)) }}"></music-order>
 
-                                <ul class="dropdown-menu" role="menu">
-                                    <li>
-                                        <a href="{{ route('logout') }}"
-                                            onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                                            Logout
-                                        </a>
+        @include('layouts.partials.footer')
 
-                                        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                            {{ csrf_field() }}
-                                        </form>
-                                    </li>
-                                </ul>
-                            </li>
-                        @endif
-                    </ul>
-                </div>
-            </div>
-        </nav>
+    </div><!-- ./wrapper -->
+</div>
+@section('scripts')
+    @include('layouts.partials.scripts')
+@show
 
-        @yield('content')
-    </div>
-
-    <!-- Scripts -->
-    <script src="{{ asset('js/app.js') }}"></script>
 </body>
+<script>
+    $(document).ready(function(){
+        $('.dropdown-submenu a.drop-level').on("click", function(e){
+            $(this).next('ul').toggle();
+            e.stopPropagation();
+            e.preventDefault();
+        });
+    });
+</script>
+<script>
+    (function($) {
+        "use strict"; // Start of use strict
+        $('body').scrollspy({
+            target: '.navbar-fixed-top',
+            offset: 100
+        });
+
+        // Offset for Main Navigation
+        $('#mainNav').affix({
+            offset: {
+                top: 50
+            }
+        })
+
+    })(jQuery); // End of use strict
+
+</script>
+@yield('page-scripts')
 </html>

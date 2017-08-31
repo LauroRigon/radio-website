@@ -5,12 +5,29 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\User;
 use App\Http\UploadManager;
+use App\Post;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-
-
+use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
 {
+    /**
+     * Página publica de locutores (users)
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function indexPublic()
+    {
+        $users = User::all();
+        $supporters = \App\Supporter::where('status', 1)->get();
+
+        return view('users')->with([
+            "users" => $users,
+            'supporters' => $supporters
+        ]);
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -18,7 +35,8 @@ class UserController extends Controller
      */
     public function index()
     {
-        return view('dashboard.user.index');
+        $users = User::all();
+        return view('dashboard.user.index')->with("users", $users);
     }
 
     /**
@@ -29,17 +47,31 @@ class UserController extends Controller
      */
     public function store(Request $request)
     {
-
-        $this->validate($request, [
+        $messages = [
+            'required' => 'Este campo é obrigatório!',
+            'email' => 'O email deve ser válido!',
+            'email.unique' => 'Este email já está sendo utilizado!',
+            'password.min' => 'A senha deve ter no mínimo :min caracteres'
+        ];
+        $validator = Validator::make($request->all(), [
             'name' => 'required',
             'email' => 'required|email|unique:users',
             'password' => 'required|min:6',
-        ]);
+            'is_master' => 'required'
+        ], $messages);
+
+        /*Retorna os erros se ouver*/
+        if ($validator->fails()){
+            return response()->json(
+                $validator->errors()
+            , 422);
+        }
 
         $createdUser = User::create([
-            'name' => $request->input()['name'],
+            'name' => ucfirst($request->input()['name']),
             'email' => $request->input()['email'],
-            'password' => bcrypt($request->input()['password'])
+            'password' => bcrypt($request->input()['password']),
+            'is_master' => $request->input()['is_master']
         ]);
 
         return $createdUser;
@@ -47,19 +79,20 @@ class UserController extends Controller
     }
 
     /**
-     * Display the specified resource.
+     * Mostra o perfil do user logado
      *
-     * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function show($id)
+    public function profile()
     {
-        //
+        $user = User::find(Auth::user()->id);
+
+        return view('dashboard.user.profile')->with('user', $user);
     }
 
 
     /**
-     * Update the specified resource in storage.
+     * Atualiza um usuário (senha e email).
      *
      * @param  \Illuminate\Http\Request  $request
      * @param  $request (name, email)
@@ -68,7 +101,7 @@ class UserController extends Controller
     public function update(Request $request, User $id)
     {
         $validator = Validator::make($request->all(), [
-            'email' => 'email|required',
+            'email' => 'email|required|unique:users,'.$id->id,
             'name' => 'required'
         ]);
 
@@ -80,7 +113,7 @@ class UserController extends Controller
         }
 
         $updatedUser = $id->update([
-            'name' => $request->input()['name'],
+            'name' => ucfirst($request->input()['name']),
             'email' => $request->input()['email'],
         ]);
 
@@ -96,60 +129,145 @@ class UserController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function changePassword(Request $request, User $id)
+    public function changePassword(Request $request)
     {
+        $messages = [
+            'required' => 'O campo :attribute é obrigatório!',
+            'novasenha.min' => 'A nova senha deve ter no mínimo :min caracteres'
+        ];
+
         $validator = Validator::make($request->all(), [
-            'new_password' => 'required|min:6'
-        ]);
+            'senhaatual' => 'required',
+            'novasenha' => 'required|min:6',
+            'confirmarsenha' => 'required'
+        ], $messages);
 
         /*Retorna os erros se ouver*/
         if ($validator->fails()){
-            return response()->json([
-                $validator->errors()
-            ]);
+            return back()->withErrors($validator->errors());
         }
 
-        $id->password = bcrypt($request['new_password']);
-        $id->update();
+        if(!Hash::check($request['senhaatual'], $request->user()->password)){
+            return back()->withErrors('Senha atual errada');
+        }
 
-        return response()->json([
-            'status' => 'Senha alterada com sucesso!'
-        ], 200);
+        if($request['novasenha'] != $request['confirmarsenha']){
+            return back()->withErrors('Nova senha e confirmação não conferem');
+        }
+
+        $user = User::find($request->user()->id);
+        $user->password = bcrypt($request['novasenha']);
+        $user->update();
+
+        $request->session()->flash('success', 'Senha atualizada com sucesso!');
+        return back();
     }
 
     /**
      * Envia avatar do usuario
      *
-     * @param  int  $id
+     * @param  int  $data
      * @return \Illuminate\Http\Response
      */
-    public function uploadAvatar(Request $request, User $id)
+    public function uploadAvatar(Request $request)
     {
-        //dd($request->all());
-        //dd($request->user()->id);     usar isso se possivel quando tiver login
-        $fileName = $id->id . "." . $request->file('avatar')->getClientOriginalExtension();
-        $path = $request->file('avatar')->storeAs('avatars', $fileName); //aqui
+        $user = User::find($request->user()->id);
 
-        $id->avatar = $path;
-        $id->update();
+        $messages = [
+            'required' => 'Selecione uma foto a ser enviada!',
+            'mimes' => 'Imagem não suportada! Envie uma imagem em uma das seguintes extensões: jpeg, bmp, png, jpg.'
+        ];
+        $validator = Validator::make($request->all(), [
+            'avatar' => 'required|mimes:jpeg,bmp,png,jpg'
+        ], $messages);
 
-        return response()->json([
-            'status' => 'Avatar atualizado com sucesso!'
-        ], 200);
+        /*Retorna os erros se ouver*/
+        if ($validator->fails()){
+            return back()->withErrors($validator->errors());
+        }
+
+        $path = UploadManager:: storeAvatar($user, $request->file('avatar'));
+
+        $user->avatar = $path;
+        $user->update();
+
+        $request->session()->flash('success', 'Avatar atualizado com sucesso');
+        return back();
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Remove um usuário
      *
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
     public function destroy(User $id)
     {
+        if($id->id == Auth::id()) {
+            return response()->json([
+                'status' => 'Não é possível deletar você mesmo!'
+            ], 422);
+        }
         $id->delete();
 
         return response()->json([
-            'status' => 'Deletado com sucesso!'
+            'status' => 'Usuário deletado com sucesso!'
+        ], 200);
+    }
+
+    /**
+     * Da ou retira master
+     * @param $value(true, false), $user
+     *  @return \Illuminate\Http\Response
+     */
+    public function setMaster(Request $request, User $user) {
+        $validator = Validator::make($request->all(), [
+            'value' => 'required|boolean'
+        ]);
+
+        /*Retorna os erros se ouver*/
+        if ($validator->fails()){
+            return back()->withErrors($validator->errors());
+        }
+
+        if($user->id == Auth::id()) {
+            return response()->json([
+                'status' => 'Não é possível retirar seu próprio master!'
+            ], 422);
+        }
+
+        $user->is_master = $request->input('value');
+        $user->save();
+        return response()->json([
+            "status" => 'Operação concluida com sucesso!'
+        ], 200);
+    }
+
+    /**
+     * Retorna informações da conta de todos os uruários
+     *
+     *  @return \Illuminate\Http\Response
+     */
+    public function getUsers() {
+        $users = User::paginate(10);
+
+        return response()->json([
+        $users
+        ], 200);
+    }
+
+    /**
+     * Retorna informações completas sobre um único usuário como numero de posts e infos básicas...
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function getUserComplete(User $user) {
+        $user->post_count = Post::where('user_id', $user->id)->where('allowed', 1)->count();
+
+        //$user->is_master = ($user->is_master)? "Sim" : "Não";
+        return response()->json([
+            $user
         ], 200);
     }
 }

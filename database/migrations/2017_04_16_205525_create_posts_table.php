@@ -16,18 +16,20 @@ class CreatePostsTable extends Migration
         Schema::create('posts', function (Blueprint $table) {
             $table->engine = 'InnoDB';
             $table->increments('id');
+            $table->string('slug')->unique();
             $table->string('title');
-            $table->string('subtitle');
-            $table->string('content');
+            $table->string('subtitle')->nullable();
+            $table->text('content');
             $table->integer('category_id')->unsigned();
             $table->integer('user_id')->unsigned();
-            $table->string('avatar')->nullable();
+            $table->string('thumbnail')->nullable()->default("/storage/thumbnail/default.jpg");
             $table->boolean('allowed')->default(0);
             $table->integer('view_count')->default(0);
+            $table->boolean('is_about')->default(0);
             $table->timestamp('published_at')->nullable();
 
             //referencias
-            $table->foreign('category_id')->references('id')->on('categories')->onDelete('cascade');
+            $table->foreign('category_id')->references('id')->on('categories');
             $table->foreign('user_id')->references('id')->on('users');
 
             $table->timestamps();
@@ -38,7 +40,7 @@ class CreatePostsTable extends Migration
      * Reverse the migrations.
      *
      * @return void
-     */
+ */
     public function down()
     {
         Schema::dropIfExists('posts');

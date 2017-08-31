@@ -21,7 +21,7 @@ class CreatePollOptionsTable extends Migration
             $table->integer('poll_id')->unsigned();
             $table->timestamps();
 
-            $table->foreign('poll_id')->references('id')->on('polls');
+            $table->foreign('poll_id')->references('id')->on('polls')->onDelete('cascade');
         });
     }
 

@@ -11,11 +11,29 @@
   },
   "devDependencies": {
     "axios": "^0.15.3",
+    "babel-plugin-transform-runtime": "^6.23.0",
+    "babel-preset-stage-2": "^6.24.1",
+    "bootstrap-less": "3.3.7",
     "bootstrap-sass": "^3.3.7",
     "cross-env": "^3.2.3",
+    "font-awesome": "^4.7.0",
+    "icheck": "^1.0.2",
     "jquery": "^3.1.1",
     "laravel-mix": "0.*",
     "lodash": "^4.17.4",
-    "vue": "^2.1.10"
+    "vue": "^2.1.10",
+    "animate.css": "^3.5.2",
+    "toastr": "^2.1.2"
+  },
+  "dependencies": {
+    "accounting": "^0.4.1",
+    "bootstrap-timepicker": "^0.5.2",
+    "chart.js": "^2.6.0",
+    "flickity": "^2.0.8",
+    "flickity-as-nav-for": "^2.0.1",
+    "icheck": "^1.0.2",
+    "js-cookie": "^2.1.4",
+    "moment": "^2.18.1",
+    "vue-events": "^3.0.1"
   }
 }
