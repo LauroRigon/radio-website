@@ -11,21 +11,13 @@ const { mix } = require('laravel-mix');
  |
  */
 //dashboard
-mix.js('resources/assets/js/dashboard/app.js', 'public/js/dashboard')
-    .sass("resources/assets/sass/dashboard/app.scss", "public/css/dashboard")
+mix.js('resources/assets/js/dashboard/app.js', 'public/dashboard/js')
+    .sass("resources/assets/sass/dashboard/app.scss", "public/dashboard/css")
     .copy('node_modules/font-awesome/fonts/*.*', 'public/fonts/')
-    .copy('node_modules/ionicons/dist/fonts/*.*', 'public/fonts/');
+    .copy('node_modules/ionicons/dist/fonts/*.*', 'public/fonts/')
+    .copy('resources/assets/js/dashboard/plugins/ckeditor', 'public/dashboard/plugins/ckeditor');
     
-/*
-//'front'
-mix.js('resources/assets/js/app.js', 'public/js')
-    .sass('resources/assets/sass/app.scss', 'public/css')
-    .combine([
-      'public/css/font-awesome.css',
-      'node_modules/animate.css/animate.min.css',
-      'node_modules/flickity/dist/flickity.min.css',
-//      'node_modules/icheck/skins/square/square.css',
-//      'node_modules/icheck/skins/square/blue.css',
-//      'resources/assets/css/bootstrap.min.css',
-      
-      ], 'public/css/all.css');*/
+
+//home
+mix.js('resources/assets/js/home/app.js', 'public/home/js')
+    .sass('resources/assets/sass/home/app.scss', 'public/home/css');

@@ -1,5 +1,4 @@
-<link rel="stylesheet" href="{{mix('css/bootstrap.css')}}">
-<link rel="stylesheet" href="{{mix('css/dashboard/all.css')}}">
+<link rel="stylesheet" href="{{mix('dashboard/css/app.css')}}">
 
 </head>
 <body class="hold-transition login-page">
@@ -40,7 +39,7 @@
 
 
 <!-- iCheck -->
-<script src="{{ mix('js/dashboard/all.js') }}"></script>
+
 
 <script>
     $(function () {
