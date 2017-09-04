@@ -9,17 +9,19 @@ window._ = require('lodash');
 
 window.$ = window.jQuery = require('jquery');
 
-require('bootstrap-sass');
-
+/*
+plugins
+*/
 require('bootstrap-timepicker/js/bootstrap-timepicker.min.js');
-
 window.toastr = require('toastr/build/toastr.min.js');
-
 window.Flickity = require('flickity/dist/flickity.pkgd.min.js');
 require('flickity-as-nav-for');
+window.jConfirm = require ("../dashboard/vendor/jConfirm/jConfirm.js").default;
+require('../dashboard/plugins/dropzone/dist/dropzone');
 
-require('../vendor/adminLTEapp.js');
-window.jConfirm = require ("../vendor/jConfirm/jConfirm.js").default;
+require('bootstrap');
+
+require('../dashboard/vendor/adminLTEapp.js');
 
 window.moment = require('moment');
 
