@@ -6,15 +6,15 @@
         <a href="#" data-activates="slide-out" class="button-collapse"><i class="material-icons">menu</i></a>
         <a href="#" class="brand-logo">Logo</a>
         <ul id="nav-mobile" class="right hide-on-med-and-down">
-          <li><a href="">Inicial</a></li>
+          <router-link :to="{name: 'home'}" tag="li"><a>Inicial</a></router-link>
           <li><a class="dropdown-button" href="#" data-activates="news-dropdown">Notícias <i class="material-icons right">arrow_drop_down</i></a></li>
             <ul id="news-dropdown" class="dropdown-content">
               <li><a href="#">Últimas notícias</a></li>
               <li><a href="#">Categorias</a></li>
             </ul>
-          <li><a href="">Programação</a></li>
-          <li><a href="">Locutores</a></li>
-          <li><a href="">Sobre</a></li>
+          <router-link :to="{name: 'programming'}" tag="li"><a>Programação</a></router-link>
+          <router-link :to="{name: 'speakers'}" tag="li"><a>Locutores</a></router-link>
+          <router-link :to="{name: 'about'}" tag="li"><a>Sobre</a></router-link>
         </ul>
       </div>
     </div>
@@ -46,8 +46,6 @@ export default {
 </script>
 
 <style>
-.purple-radio {
-  background-color: #322C53;
-}
+
 </style>
 

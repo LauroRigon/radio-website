@@ -1,8 +1,4 @@
 <!DOCTYPE html>
-<?php
-    $categories = \App\Category::all();
-    $supporters = \App\Supporter::where('status', 1)->get();
-?>
 <html>
 
 @section('htmlheader')

@@ -1,7 +1,7 @@
 <template>
 <div>
     <ul id="slide-out" class="side-nav">
-        <li><a href="" class="bold">Inicial</a></li>        
+        <router-link :to="{name: 'home'}" tag="li"><a>Inicial</a></router-link>        
         <li class="no-padding">
             <ul class="collapsible collapsible-accordion">
             <li>
@@ -15,9 +15,9 @@
             </li>
             </ul>
         </li>
-        <li><a href="">Programação</a></li>
-        <li><a href="">Locutores</a></li>
-        <li><a href="">Sobre</a></li>
+        <router-link :to="{name: 'programming'}" tag="li"><a>Programação</a></router-link>
+        <router-link :to="{name: 'speakers'}" tag="li"><a>Locutores</a></router-link>
+        <router-link :to="{name: 'about'}" tag="li"><a>Sobre</a></router-link>
     </ul>
 </div>
 </template>
@@ -32,7 +32,11 @@ export default {
 
   methods: {
     setUpConfigs() {
-      $(".button-collapse").sideNav();
+      $(".button-collapse").sideNav({
+      menuWidth: 300,
+      closeOnClick: true,
+      draggable: true
+    });
     }
   }
 }

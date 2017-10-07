@@ -45,7 +45,7 @@
 					<template v-else>
 						<div class="row">
 						<template v-for="option in poll.options">
-								<div class="col m10">
+								<div class="col m10" :key="option.id">
 									<label class="truncate">{{ option.name }}</label>
 									<div class="progress" :key="option">								
 										<div class="determinate" :style="{width: calcPercent(option.vote_count, sumVotes(poll.options)) + '%'}">
@@ -53,7 +53,7 @@
 									</div>
 									
 								</div>
-								<div class="col m2 result-num right">
+								<div class="col m2 result-num right" :key="option.id">
 									<span class="badge">
 									{{ option.vote_count }}
 									</span>

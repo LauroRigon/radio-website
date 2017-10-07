@@ -13,3 +13,9 @@ import MenuLeft from './Left.vue'
     components: { MenuUp, MenuLeft }
   }
 </script>
+
+<style>
+.navbar-fixed {
+  z-index: 999;
+}
+</style>

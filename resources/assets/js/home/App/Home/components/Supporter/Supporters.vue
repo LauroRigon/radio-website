@@ -1,7 +1,7 @@
 <template>
     <div>
-        <template v-for="poll in polls">
-            <poll :key="poll.id" :poll-data="poll"></poll>
+        <template v-for="supporter in supporters">
+            <supporter :key="supporter.id" :supporter-data="supporter"></supporter>
         </template>
         
     </div>
@@ -9,34 +9,26 @@
 
 <script>
 import { http } from '../../../../services'
-import Poll from './Supporter'
+import Supporter from './Supporter'
 
 export default {
-    components: { Poll },
+    components: { Supporter },
 
     data(){
         return {
-            polls: [],
-            side: ''
+            supporters: []
         }
     },
 
     props: {
         side: {
             type: String,
-            required: true,
-            validator: (value) => {
-                if(value == "right"){
-                    return this.side = "right"
-                }else{
-                    return this.side = "left"
-                }
-            }
+            required: true
         }
     },
 
     created() {
-        http.get('supporters/getSupportersRight')
+        http.get('supporters/getSupporters/' + this.side)
         .then( ({ data }) => this.supporters = data)
     }
 }

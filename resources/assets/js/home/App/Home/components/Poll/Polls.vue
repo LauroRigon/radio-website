@@ -22,7 +22,9 @@ export default {
 
     created() {
         http.get('polls/getPolls')
-        .then( ({ data }) => this.polls = data)
+        .then( ({ data }) => {
+            this.polls = data
+        })
     }
 }
 </script>

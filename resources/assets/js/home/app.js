@@ -17,6 +17,8 @@ import store from './vuex'
 
 import { http } from './services'
 
+import loader from './plugins/Loader'
+Vue.use(loader, { store, router })
 //Vue.component('vue-table', require('./components/VueTable.vue'))
 
 const app = new Vue({

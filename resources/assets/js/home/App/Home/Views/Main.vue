@@ -16,12 +16,11 @@
                 <div class="col m3">
                     <polls></polls>
                     <social-medias></social-medias>
-                    <supporters></supporters>
+                    <supporters side="right"></supporters>
                 </div>
             </div>
         </div>
     </main>
-    
 </div>
 </template>
 
