@@ -6,18 +6,26 @@
         <a href="#" data-activates="slide-out" class="button-collapse"><i class="material-icons">menu</i></a>
         <a href="#" class="brand-logo">Logo</a>
         <ul id="nav-mobile" class="right hide-on-med-and-down">
-          <router-link :to="{name: 'home'}" tag="li"><a>Inicial</a></router-link>
-          <li><a class="dropdown-button" href="#" data-activates="news-dropdown">Notícias <i class="material-icons right">arrow_drop_down</i></a></li>
-            <ul id="news-dropdown" class="dropdown-content">
-              <li><a href="#">Últimas notícias</a></li>
-              <li><a href="#">Categorias</a></li>
-            </ul>
-          <router-link :to="{name: 'programming'}" tag="li"><a>Programação</a></router-link>
-          <router-link :to="{name: 'speakers'}" tag="li"><a>Locutores</a></router-link>
-          <router-link :to="{name: 'about'}" tag="li"><a>Sobre</a></router-link>
+          <router-link exact :to="{name: 'home'}" tag="li"><a>Inicial</a></router-link>
+          <router-link exact to="" tag="li" class="dropdown-button" data-activates="news-dropdown"><a>Programação <i class="material-icons right">arrow_drop_down</i></a></router-link>
+  
+          <router-link exact :to="{name: 'programming'}" tag="li"><a>Programação</a></router-link>
+          <router-link exact :to="{name: 'speakers'}" tag="li"><a>Locutores</a></router-link>
+          <router-link exact :to="{name: 'about'}" tag="li"><a>Sobre</a></router-link>
         </ul>
       </div>
     </div>
+
+    <!-- DROPDOWN NEWS -->
+    <ul id="news-dropdown" class="dropdown-content nested">
+      <router-link exact :to="{name: 'posts'}" tag="li"><a>Últimas notícias</a></router-link>
+      <li><a class="dropdown-button" href="#" data-activates="categories-dropdown">Categorias <i class="material-icons right">arrow_drop_down</i></a></li>
+    </ul>
+
+    <!-- DROPDOWN CATEGORIES -->
+    <ul id="categories-dropdown" class="dropdown-content second-level">
+      <router-link exact :to="{name: 'posts', query:{categoria: category.name}}" tag="li" v-for="category in categories" :key="category.id"><a>{{ category.name }}</a></router-link>
+    </ul>
   </nav>
 </div>
 </template>
@@ -26,6 +34,8 @@
 
 
 export default {
+  props: ['categories'],
+
   mounted() {
     this.setUpConfigs()
   },
@@ -46,6 +56,13 @@ export default {
 </script>
 
 <style>
+.dropdown-content.nested {
+   overflow-y: visible;
+}
 
+.dropdown-content .dropdown-content {
+   margin-left: 100%;
+   top: 50px !important;
+}
 </style>
 

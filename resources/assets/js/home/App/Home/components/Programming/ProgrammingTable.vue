@@ -4,7 +4,7 @@
         <div class="card">
             <div class="col s6 m12">
                 <ul class="tabs z-depth-1">
-                    <li class="tab col s2"><a class="active" href="#" @click.prevent="activeWeek = 'segunda-feira'">SEG</a></li>
+                    <li class="tab col s2"><a href="#" @click.prevent="activeWeek = 'segunda-feira'">SEG</a></li>
                     <li class="tab col s2"><a href="#" @click.prevent="activeWeek = 'terca-feira'">TER</a></li>
                     <li class="tab col s2"><a href="#" @click.prevent="activeWeek = 'quarta-feira'">QUA</a></li>
                     <li class="tab col s2"><a href="#" @click.prevent="activeWeek = 'quinta-feira'">QUI</a></li>
@@ -44,7 +44,7 @@ export default {
     data() {
         return {
             programming: [],
-            activeWeek: 'domingo'
+            activeWeek: 'segunda-feira'
         }
     },
 

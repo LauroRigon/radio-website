@@ -1,26 +1,26 @@
 <template>
     <div class="row">
-        <div class="col m12">
-            <div class="card hoverable">
-                <div class="card-image">
+        <div class="col s12 m12">
+            <div class="card horizontal">
+                <div class="card-image col m4 valign-wrapper">
                     <router-link :to="{name:'post', params: {post_slug: post.slug}}">
                         <img :src="post.thumbnail">
-                        <span class="card-title"><h4 class="post-title">{{ post.title }}</h4></span>
                     </router-link>
                 </div>
-                <div class="card-content">
+                <div class="card-stacked">
+                    <router-link :to="{name:'post', params: {post_slug: post.slug}}">
+                        <span class="card-title"><h4 class="post-title" style="color:black">{{ post.title }}</h4></span>
+                    </router-link>
                     <div class="row">
-                        <div class="col m12">
+                        <div class="col m12 center-align">
                             <p class="text-faded"><i class="tiny material-icons">dehaze</i>Categoria: {{ post.category_id }} | <i class="tiny material-icons">access_time</i>Publicado em: {{ post.published_at }}</p>
                         </div>
                     </div>
-                    <p>
-                        {{ post.subtitle }}
-                    </p>
-                    <div class="row">
-                        <div class="col m2 right">
-                            <router-link :to="{name:'post', params: {post_slug: post.slug}}">Ler mais...</router-link>
-                        </div>
+                    <div class="card-content">
+                        <p> {{ post.subtitle }} </p>
+                    </div>
+                    <div class="card-action">
+                        <router-link class="right" :to="{name:'post', params: {post_slug: post.slug}}">Ler mais</router-link>
                     </div>
                 </div>
             </div>
@@ -29,7 +29,7 @@
 </template>
 
 <script>
-import { http } from '../../../../services'
+import { http } from '../../../../../services'
 
 	export default {
 		data() {
@@ -49,12 +49,5 @@ import { http } from '../../../../services'
 </script>
 
 <style>
-.post-title {
-    text-shadow:0 1px 1px black;
-}
 
-.text-faded {
-    color: #868e96 !important;
-    font-size: 13px;
-}
 </style>

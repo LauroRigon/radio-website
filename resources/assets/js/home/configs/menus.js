@@ -12,14 +12,21 @@ export default [
 			{	
 				label: 'Ultímas noticias',
 				uri: {
-					name: 'bills'
+					name: 'posts'
+				}
+			},
+			{	
+				label: 'Categorias',
+				uri: {
+					name: 'categories'
 				}
 			}
 		]
 	},
 	{
-		label: 'Configurações',
-		icon: 'tal',
-		uri: "/configs"
+		label: 'Programação',
+		uri: {
+			name: 'programming'
+		}
 	}
 ]

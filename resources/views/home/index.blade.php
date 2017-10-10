@@ -18,7 +18,7 @@
     </script>
 </head>
 
-<body>
+<body style="background-color:#E9EBEE">
 
 <div id="app"></div>
 

@@ -38,6 +38,11 @@ export default [
                         name: 'post',
                         props: true,
                         component: require('./Home/components/Post/Post')
+                    },
+                    {
+                        path: '/',
+                        name: 'posts',
+                        component: require('./Home/Views/Posts/Main.vue')
                     }
                 ]
             }

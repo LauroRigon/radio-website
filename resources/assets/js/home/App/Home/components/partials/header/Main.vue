@@ -1,7 +1,7 @@
 <template>
   <header>
-    <menu-up></menu-up>
-    <menu-left></menu-left>
+    <menu-up :categories="categories"></menu-up>
+    <menu-left :categories="categories"></menu-left>
   </header>
 </template>
 
@@ -9,8 +9,29 @@
 import MenuUp from './Up.vue'
 import MenuLeft from './Left.vue'
 
+import { http } from '../../../../../services'
+
   export default {
-    components: { MenuUp, MenuLeft }
+    components: { MenuUp, MenuLeft },
+
+    data() {
+      return {
+        categories: []
+      }
+    },
+
+    created() {
+      this.getCategories()
+    },
+
+    methods: {
+      getCategories() {
+        http.get('categories')
+        .then(( {data} ) => {
+          this.categories = data
+        })
+      }
+    }
   }
 </script>
 

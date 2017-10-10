@@ -10,8 +10,11 @@ import beforeEach from './beforeEach.js'
 
 Vue.use(VueRouter)
 
+import scrollBehavior from './scrollBehavior.js'
+
 const router = new VueRouter({
   routes,
+  scrollBehavior,
   linkActiveClass: 'active'
 })
 

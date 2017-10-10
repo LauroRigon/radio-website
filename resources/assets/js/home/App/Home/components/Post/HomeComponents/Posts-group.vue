@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { http } from '../../../../services'
+import { http } from '../../../../../services'
 import Post from './Post-item'
 import { mapActions } from 'vuex'
 
