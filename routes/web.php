@@ -130,13 +130,15 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
  * Rotas públicas
  * */
 Route::get('/', 'HomeController@index');
+
+
 Route::get('/programacao', 'ProgrammingController@indexPublic')->name('programming_indexpublic');
 Route::get('/locutores', 'UserController@indexPublic')->name('users_indexpublic');
 Route::get('/sobre', 'HomeController@aboutShow')->name('about');
 
 //enquetes apis
-Route::get('/getPoll/{poll}', 'PollController@getPoll')->name('poll_get');
-Route::post('/addVote/{pollId}', 'PollController@addVote')->name('add_vote');
+//Route::get('/getPoll/{poll}', 'PollController@getPoll')->name('poll_get');
+//Route::post('/addVote/{pollId}', 'PollController@addVote')->name('add_vote');
 
 //noticias
 Route::group(['prefix' => 'noticias'], function () {

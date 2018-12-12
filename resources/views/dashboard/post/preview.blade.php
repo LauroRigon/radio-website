@@ -1,7 +1,6 @@
 @extends('dashboard.layouts.app')
 
 @section('page-links')
-<link rel="stylesheet" href="https://unpkg.com/flickity@2/dist/flickity.min.css">
 <style>
     .box{
         padding-left: 15%;

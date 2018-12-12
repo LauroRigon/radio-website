@@ -14,7 +14,7 @@ class Post extends Model
     }
 
     public function user(){
-        return $this->belongsTo('App\User')->get()[0];
+        return $this->belongsTo('App\User')->select(['id', 'name']);
     }
 
     //MUTATORS

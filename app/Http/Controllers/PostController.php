@@ -319,7 +319,7 @@ class PostController extends Controller
         $posts = Post::where('allowed', 0)->paginate(15);
 
         foreach($posts as $post) {
-            $post->user_name = $post->user()->name;
+            $post->user_name = $post->user()->get()[0]->name;
         }
 
         return response()->json([
@@ -336,7 +336,7 @@ class PostController extends Controller
         $posts = Post::paginate(15);
 
         foreach($posts as $post) {
-            $post->user_name = $post->user()->name;
+            $post->user_name = $post->user()->get()[0]->name;
         }
 
         return response()->json([

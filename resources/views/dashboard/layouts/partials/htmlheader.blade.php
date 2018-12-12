@@ -4,9 +4,8 @@
     <meta content='width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no' name='viewport'>
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    
-    <link href="{{ asset('css/bootstrap.css') }}" rel="stylesheet" type="text/css" />
-    <link href="{{ asset('/css/dashboard/all.css') }}" rel="stylesheet" type="text/css" />
+
+    <link href="{{ mix('/dashboard/css/app.css') }}" rel="stylesheet" type="text/css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.5/bluebird.min.js"></script>
     <head>
         <!--To work on IE-->

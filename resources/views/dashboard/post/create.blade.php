@@ -99,8 +99,7 @@
 
 @endsection
 @section('page-scripts')
-<script type="text/javascript" src="{{ asset('js/dashboard/plugins/ckeditor/ckeditor.js') }}"></script>
-<script type="text/javascript" src="{{ asset('js/dashboard/plugins/dropzone/dist/dropzone.js') }}"></script>
+<script type="text/javascript" src="{{ asset('dashboard/plugins/ckeditor/ckeditor.js') }}"></script>
 <script>
                 // Replace the <textarea id="editor1"> with a CKEditor
                 // instance, using default configuration.
