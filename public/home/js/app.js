@@ -41777,13 +41777,26 @@ Object.defineProperty(exports, "__esModule", {
 exports.default = {
   props: ['categories'],
 
+  data: function data() {
+    return {
+      pageOffset: 0
+    };
+  },
   mounted: function mounted() {
     this.setUpConfigs();
   },
 
 
+  computed: {
+    getScrollOffSet: function getScrollOffSet() {
+      return this.pageOffset;
+    }
+  },
+
   methods: {
     setUpConfigs: function setUpConfigs() {
+      var _this = this;
+
       $('.dropdown-button').dropdown({
         constrainWidth: false, // Does not change width of dropdown to that of the activator
         hover: true, // Activate on hover
@@ -41791,6 +41804,10 @@ exports.default = {
         belowOrigin: true, // Displays dropdown below the button
         alignment: 'left', // Displays dropdown with edge aligned to the left of button
         stopPropagation: false // Stops event propagation
+      });
+
+      $(window).scroll(function () {
+        _this.pageOffset = window.pageYOffset;
       });
     }
   }
@@ -42653,7 +42670,7 @@ exports.push([module.i, "\n.card-header{\r\n\tcolor: white;\r\n\tbackground-colo
 /***/ (function(module, exports, __webpack_require__) {
 
 exports = module.exports = __webpack_require__(2)();
-exports.push([module.i, "\n.dropdown-content.nested {\r\n   overflow-y: visible;\n}\n.dropdown-content .dropdown-content {\r\n   margin-left: 100%;\r\n   top: 50px !important;\n}\r\n", ""]);
+exports.push([module.i, "\n.dropdown-content.nested {\r\n   overflow-y: visible;\n}\n.dropdown-content .dropdown-content {\r\n   margin-left: 100%;\r\n   top: 50px !important;\n}\n.dropdown-content li > a, .dropdown-content li > span {\r\n  color: #322C53;\n}\n.menu-scrolled {\r\n  background-color: rgb(80, 103, 151) !important;\r\n  padding-bottom: 10px;\r\n  transition: 1s;\n}\r\n", ""]);
 
 /***/ }),
 /* 279 */
@@ -57639,16 +57656,14 @@ if (false) {
 module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('div', {
     staticClass: "navbar-fixed"
-  }, [_c('nav', [_c('div', {
-    staticClass: "nav-wrapper purple-radio"
+  }, [_c('nav', {
+    staticClass: "purple-radio",
+    class: (_vm.getScrollOffSet >= 100) ? 'menu-scrolled' : ''
+  }, [_c('div', {
+    staticClass: "nav-wrapper"
   }, [_c('div', {
     staticClass: "container"
-  }, [_vm._m(0), _vm._v(" "), _c('a', {
-    staticClass: "brand-logo",
-    attrs: {
-      "href": "#"
-    }
-  }, [_vm._v("Logo")]), _vm._v(" "), _c('ul', {
+  }, [_vm._m(0), _vm._v(" "), _vm._m(1), _vm._v(" "), _c('ul', {
     staticClass: "right hide-on-med-and-down",
     attrs: {
       "id": "nav-mobile"
@@ -57661,17 +57676,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       },
       "tag": "li"
     }
-  }, [_c('a', [_vm._v("Inicial")])]), _vm._v(" "), _c('router-link', {
-    staticClass: "dropdown-button",
-    attrs: {
-      "exact": "",
-      "to": "",
-      "tag": "li",
-      "data-activates": "news-dropdown"
-    }
-  }, [_c('a', [_vm._v("Programação "), _c('i', {
-    staticClass: "material-icons right"
-  }, [_vm._v("arrow_drop_down")])])]), _vm._v(" "), _c('router-link', {
+  }, [_c('a', [_vm._v("Inicial")])]), _vm._v(" "), _vm._m(2), _vm._v(" "), _c('router-link', {
     attrs: {
       "exact": "",
       "to": {
@@ -57708,7 +57713,7 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
       },
       "tag": "li"
     }
-  }, [_c('a', [_vm._v("Últimas notícias")])]), _vm._v(" "), _vm._m(1)], 1), _vm._v(" "), _c('ul', {
+  }, [_c('a', [_vm._v("Últimas notícias")])]), _vm._v(" "), _vm._m(3)], 1), _vm._v(" "), _c('ul', {
     staticClass: "dropdown-content second-level",
     attrs: {
       "id": "categories-dropdown"
@@ -57738,6 +57743,30 @@ module.exports={render:function (){var _vm=this;var _h=_vm.$createElement;var _c
   }, [_c('i', {
     staticClass: "material-icons"
   }, [_vm._v("menu")])])
+},function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('a', {
+    staticClass: "brand-logo",
+    attrs: {
+      "href": "#"
+    }
+  }, [_c('img', {
+    staticClass: "responsive-img",
+    attrs: {
+      "src": "/storage/site/main-logo.png",
+      "alt": "Banner da rádio",
+      "width": "70px"
+    }
+  })])
+},function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
+  return _c('li', [_c('a', {
+    staticClass: "dropdown-button",
+    attrs: {
+      "href": "#",
+      "data-activates": "news-dropdown"
+    }
+  }, [_vm._v("Notícias "), _c('i', {
+    staticClass: "material-icons right"
+  }, [_vm._v("arrow_drop_down")])])])
 },function (){var _vm=this;var _h=_vm.$createElement;var _c=_vm._self._c||_h;
   return _c('li', [_c('a', {
     staticClass: "dropdown-button",

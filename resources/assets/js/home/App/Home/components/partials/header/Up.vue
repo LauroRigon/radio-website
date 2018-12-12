@@ -1,14 +1,14 @@
 <template>
 <div class="navbar-fixed">
-  <nav>
-    <div class="nav-wrapper purple-radio">
+  <nav class="purple-radio" :class="(getScrollOffSet >= 100)? 'menu-scrolled': ''">
+    <div class="nav-wrapper" >
       <div class="container">
         <a href="#" data-activates="slide-out" class="button-collapse"><i class="material-icons">menu</i></a>
-        <a href="#" class="brand-logo">Logo</a>
+        <a href="#" class="brand-logo"> <img src="/storage/site/main-logo.png" alt="Banner da rádio" class="responsive-img" width="70px"> </a>
         <ul id="nav-mobile" class="right hide-on-med-and-down">
           <router-link exact :to="{name: 'home'}" tag="li"><a>Inicial</a></router-link>
-          <router-link exact to="" tag="li" class="dropdown-button" data-activates="news-dropdown"><a>Programação <i class="material-icons right">arrow_drop_down</i></a></router-link>
-  
+          
+          <li><a class="dropdown-button" href="#" data-activates="news-dropdown">Notícias <i class="material-icons right">arrow_drop_down</i></a></li>
           <router-link exact :to="{name: 'programming'}" tag="li"><a>Programação</a></router-link>
           <router-link exact :to="{name: 'speakers'}" tag="li"><a>Locutores</a></router-link>
           <router-link exact :to="{name: 'about'}" tag="li"><a>Sobre</a></router-link>
@@ -36,8 +36,20 @@
 export default {
   props: ['categories'],
 
+  data() {
+    return {
+      pageOffset: 0
+    }
+  },
+
   mounted() {
     this.setUpConfigs()
+  },
+
+  computed: {
+    getScrollOffSet() {
+     return this.pageOffset
+    }
   },
 
   methods: {
@@ -50,7 +62,14 @@ export default {
           alignment: 'left', // Displays dropdown with edge aligned to the left of button
           stopPropagation: false // Stops event propagation
       });
-    }
+
+      $( window ).scroll(() => {
+        this.pageOffset = window.pageYOffset
+      });
+      
+      }
+      
+      
   }
 }
 </script>
@@ -63,6 +82,16 @@ export default {
 .dropdown-content .dropdown-content {
    margin-left: 100%;
    top: 50px !important;
+}
+
+.dropdown-content li > a, .dropdown-content li > span {
+  color: #322C53;
+}
+
+.menu-scrolled {
+  background-color: rgb(80, 103, 151) !important;
+  padding-bottom: 10px;
+  transition: 1s;
 }
 </style>
 
